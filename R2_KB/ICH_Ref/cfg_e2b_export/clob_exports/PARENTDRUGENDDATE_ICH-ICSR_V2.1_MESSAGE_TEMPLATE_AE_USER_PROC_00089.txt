@@ -1,0 +1,24 @@
+DECLARE
+   v_xml    varchar2(32767);
+   v_xml1   varchar2(32767);
+   l_return number := 0;
+   l_date1  date;
+   l_vc1    varchar2(32767);
+   l_number number;
+BEGIN
+   v_xml   := ESM_IMP.F_READ(:REPORT_ID,'PARENTDRUGENDDATE');
+   v_xml1  := ESM_IMP.F_READ(:REPORT_ID,'PARENTDRUGENDDATEFORMAT');
+   l_return := ESM_IMP_UTL.F_CHECK_UNIT_VALUE('PARENTDRUGENDDATE',v_xml,'PARENTDRUGENDDATEFORMAT',v_xml1, :report_id);
+   if l_return = 0 then
+      l_return := ESM_IMP_UTL.F_CHECK_VALIDATION(:PROFILE,'PARENTDRUGENDDATEFORMAT',v_xml1,:REPORT_ID);
+      IF l_return = 0 THEN
+         l_date1  := to_date(ESM_AE.TRANSLATE_DATEFORMAT(v_xml,v_xml1,'N','PARENTDRUGENDDATE','PARENTDRUGENDDATEFORMAT',:report_id),'YYYYMMDDHH24MISS');
+         l_vc1    := ESM_AE.TRANSLATE_DATEFORMAT(v_xml,v_xml1,'Y','PARENTDRUGENDDATE','PARENTDRUGENDDATEFORMAT',:report_id);
+         l_number := esm_imp_utl.F_GET_DATE_RES(v_xml1);
+         v_xml := to_char(l_date1,'DD-MON-YYYY HH24:MI:SS');
+         l_return := ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_PAT_HIST','STOP_DATE',v_xml);
+         l_return := ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_PAT_HIST','STOP_DATE_PARTIAL',l_vc1);
+         l_return := ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_PAT_HIST','STOP_DATE_RES',l_number);
+      END IF;   
+   end if;
+END;

@@ -1,0 +1,355 @@
+DECLARE
+   v_xml1                 VARCHAR2 (32767);
+   v_xml2                 VARCHAR2 (32767);
+   v_xml3                 VARCHAR2 (32767);
+   v_prod_name            VARCHAR2 (32767);
+   l_return               NUMBER;
+   l_item_coded           NUMBER           := 0;
+   l_item_coded_j         NUMBER           := 0;
+   vmeddrauser            VARCHAR2 (500)   := NULL;
+   v_pref_term            VARCHAR2 (250)   := NULL;
+   v_pref_term_j          VARCHAR2 (400)   := NULL;
+   v_llt                  VARCHAR2 (250)   := NULL;
+   v_llt_j                VARCHAR2 (400)   := NULL;
+   v_soc                  VARCHAR2 (250)   := NULL;
+   v_soc_j                VARCHAR2 (400)   := NULL;
+   v_hlt                  VARCHAR2 (250)   := NULL;
+   v_hlt_j                VARCHAR2 (400)   := NULL;
+   v_hlgt                 VARCHAR2 (250)   := NULL;
+   v_hlgt_j               VARCHAR2 (400)   := NULL;
+   v_pref_term_code       VARCHAR2 (50)    := NULL;
+   v_llt_code             VARCHAR2 (50)    := NULL;
+   v_hlgt_code            VARCHAR2 (50)    := NULL;
+   v_soc_code             VARCHAR2 (50)    := NULL;
+   v_hlt_code             VARCHAR2 (50)    := NULL;
+   l_dict_id              NUMBER;
+   v_dtd_elements         esm_imp.vtab;
+   lb_return              BOOLEAN;
+   lb_exists              BOOLEAN;
+   v_non_current_term     VARCHAR2 (250);
+   v_non_current_term_j   VARCHAR2 (400);
+   ln_rank          	  NUMBER  := -1;
+BEGIN
+   v_xml1 := esm_imp.f_read (:report_id, :dtd_element);
+   v_xml2 := esm_imp.f_read (:report_id, 'DRUGINDICATIONMEDDRAVERSION');
+   IF v_xml1 IS NOT NULL
+   THEN
+      v_xml3 := esm_imp.f_read (:report_id, 'OCCURCOUNTRY');
+      IF v_xml3 IS NULL
+      THEN
+         v_xml3 := esm_imp.f_read (:report_id, 'PRIMARYSOURCECOUNTRY');
+      END IF;
+      v_dtd_elements (1) := 'DRUGCHARACTERIZATION';
+      v_dtd_elements (2) := 'MEDICINALPRODUCT';
+      v_dtd_elements (3) := 'DRUGDOSAGEFORM';
+      v_prod_name := esm_imp.f_read (:report_id, 'MEDICINALPRODUCT');
+      IF v_prod_name IS NULL
+      THEN
+         v_dtd_elements (2) := 'ACTIVESUBSTANCENAME';
+      END IF;
+      lb_return :=
+         esm_imp.f_check_and_build_key (:report_id,
+                                        :parent_element,
+                                        v_dtd_elements
+                                       );
+      vmeddrauser := esm_utl.f_get_meddrausername;
+      IF vmeddrauser IS NOT NULL
+      THEN
+         vmeddrauser := vmeddrauser || '.';
+      END IF;
+      esm_utl.get_meddra_info (vmeddrauser,
+                               v_xml1,
+                               v_xml3,
+                               v_llt,
+                               v_llt_j,
+                               v_hlt,
+                               v_hlt_j,
+                               v_hlgt,
+                               v_hlgt_j,
+                               v_soc,
+                               v_soc_j,
+                               v_llt_code,
+                               v_hlt_code,
+                               v_hlgt_code,
+                               v_soc_code,
+                               v_pref_term,
+                               v_pref_term_j,
+                               v_pref_term_code,
+                               v_non_current_term,
+                               v_non_current_term_j,
+                               l_item_coded,
+                               l_item_coded_j,
+							   ln_rank
+                              );
+      l_return :=
+         esm_ae.f_check_unit_value (:dtd_element,
+                                    v_xml1,
+                                    'DRUGINDICATIONMEDDRAVERSION',
+                                    v_xml2,
+                                    :report_id
+                                   );
+      IF l_return = 1
+      THEN
+         l_return :=
+            esm_ae.f_check_meddra (v_pref_term,
+                                   :dtd_element,
+                                   v_xml1,
+                                   :report_id
+                                  );
+      END IF;
+      l_dict_id :=
+         esm_imp_utl.f_get_dict_id (:report_id,
+                                    :dtd_element,
+                                    'AUTOE_P_E_TERM_DIC'
+                                   );
+      lb_exists := FALSE;
+      IF l_item_coded > 0
+      THEN
+         lb_exists :=
+            esm_imp.f_data_exists (:report_id,
+                                   :parent_element,
+                                   :dtd_element,
+                                   'CASE_PROD_INDICATIONS',
+                                   'IND_CODE',
+                                   v_pref_term_code
+                                  );
+      END IF;
+      IF (lb_exists = FALSE)
+      THEN
+         IF l_item_coded = 0
+         THEN
+            l_return :=
+               esm_imp.f_write (:report_id,
+                                :parent_element,
+                                :dtd_element,
+                                :PROFILE,
+                                'CASE_PROD_INDICATIONS',
+                                'IND_REPTD',
+                                NVL (v_non_current_term, v_xml1)
+                               );
+         ELSE
+            l_return :=
+               esm_imp.f_write (:report_id,
+                                :parent_element,
+                                :dtd_element,
+                                :PROFILE,
+                                'CASE_PROD_INDICATIONS',
+                                'IND_REPTD',
+                                NVL (v_pref_term, v_xml1)
+                               );
+         END IF;
+         l_return :=
+            esm_imp.f_write (:report_id,
+                             :parent_element,
+                             :dtd_element,
+                             :PROFILE,
+                             'CASE_PROD_INDICATIONS',
+                             'IND_LLT',
+                             v_llt
+                            );
+         l_return :=
+            esm_imp.f_write (:report_id,
+                             :parent_element,
+                             :dtd_element,
+                             :PROFILE,
+                             'CASE_PROD_INDICATIONS',
+                             'IND_HLT',
+                             v_hlt
+                            );
+         l_return :=
+            esm_imp.f_write (:report_id,
+                             :parent_element,
+                             :dtd_element,
+                             :PROFILE,
+                             'CASE_PROD_INDICATIONS',
+                             'IND_HLGT',
+                             v_hlgt
+                            );
+         l_return :=
+            esm_imp.f_write (:report_id,
+                             :parent_element,
+                             :dtd_element,
+                             :PROFILE,
+                             'CASE_PROD_INDICATIONS',
+                             'IND_SOC',
+                             v_soc
+                            );
+         l_return :=
+            esm_imp.f_write (:report_id,
+                             :parent_element,
+                             :dtd_element,
+                             :PROFILE,
+                             'CASE_PROD_INDICATIONS',
+                             'IND_LLT_CODE',
+                             v_llt_code
+                            );
+         l_return :=
+            esm_imp.f_write (:report_id,
+                             :parent_element,
+                             :dtd_element,
+                             :PROFILE,
+                             'CASE_PROD_INDICATIONS',
+                             'IND_HLT_CODE',
+                             v_hlt_code
+                            );
+         l_return :=
+            esm_imp.f_write (:report_id,
+                             :parent_element,
+                             :dtd_element,
+                             :PROFILE,
+                             'CASE_PROD_INDICATIONS',
+                             'IND_HLGT_CODE',
+                             v_hlgt_code
+                            );
+         l_return :=
+            esm_imp.f_write (:report_id,
+                             :parent_element,
+                             :dtd_element,
+                             :PROFILE,
+                             'CASE_PROD_INDICATIONS',
+                             'IND_SOC_CODE',
+                             v_soc_code
+                            );
+         l_return :=
+            esm_imp.f_write (:report_id,
+                             :parent_element,
+                             :dtd_element,
+                             :PROFILE,
+                             'CASE_PROD_INDICATIONS',
+                             'IND_CODE_STATUS',
+                             l_item_coded
+                            );
+         l_return :=
+            esm_imp.f_write (:report_id,
+                             :parent_element,
+                             :dtd_element,
+                             :PROFILE,
+                             'CASE_PROD_INDICATIONS',
+                             'IND_CODED',
+                             v_pref_term
+                            );
+         l_return :=
+            esm_imp.f_write (:report_id,
+                             :parent_element,
+                             :dtd_element,
+                             :PROFILE,
+                             'CASE_PROD_INDICATIONS',
+                             'IND_CODE',
+                             v_pref_term_code
+                            );
+         l_return :=
+            esm_imp.f_write (:report_id,
+                             :parent_element,
+                             :dtd_element,
+                             :PROFILE,
+                             'CASE_PROD_INDICATIONS',
+                             'IND_PREF_TERM',
+                             v_pref_term
+                            );
+         l_return :=
+            esm_imp.f_write (:report_id,
+                             :parent_element,
+                             :dtd_element,
+                             :PROFILE,
+                             'CASE_PROD_INDICATIONS',
+                             'IND_CODE_DICT',
+                             l_dict_id
+                            );
+		
+		 l_return :=
+            esm_imp.f_write (:report_id,
+                             :parent_element,
+                             :dtd_element,
+                             :PROFILE,
+                             'CASE_PROD_INDICATIONS',
+                             'MULTI_EVENT_EXISTS',
+                             ln_rank
+                            );
+							
+         IF :argus_j = 1 AND l_item_coded_j > 0
+         THEN
+            l_return :=
+               esm_imp.f_write (:report_id,
+                                :parent_element,
+                                :dtd_element,
+                                :PROFILE,
+                                'CASE_PROD_INDICATIONS',
+                                'IND_REPTD_J',
+                                NVL (v_pref_term_j, v_xml1)
+                               );
+            l_return :=
+               esm_imp.f_write (:report_id,
+                                :parent_element,
+                                :dtd_element,
+                                :PROFILE,
+                                'CASE_PROD_INDICATIONS',
+                                'IND_CODED_J',
+                                v_pref_term_j
+                               );
+            l_return :=
+               esm_imp.f_write (:report_id,
+                                :parent_element,
+                                :dtd_element,
+                                :PROFILE,
+                                'CASE_PROD_INDICATIONS',
+                                'IND_LLT_CODE_J',
+                                v_llt_code
+                               );
+            l_return :=
+               esm_imp.f_write (:report_id,
+                                :parent_element,
+                                :dtd_element,
+                                :PROFILE,
+                                'CASE_PROD_INDICATIONS',
+                                'IND_LLT_J',
+                                v_llt_j
+                               );
+            l_return :=
+               esm_imp.f_write (:report_id,
+                                :parent_element,
+                                :dtd_element,
+                                :PROFILE,
+                                'CASE_PROD_INDICATIONS',
+                                'IND_HLGT_J',
+                                v_hlgt_j
+                               );
+            l_return :=
+               esm_imp.f_write (:report_id,
+                                :parent_element,
+                                :dtd_element,
+                                :PROFILE,
+                                'CASE_PROD_INDICATIONS',
+                                'IND_HLT_J',
+                                v_hlt_j
+                               );
+            l_return :=
+               esm_imp.f_write (:report_id,
+                                :parent_element,
+                                :dtd_element,
+                                :PROFILE,
+                                'CASE_PROD_INDICATIONS',
+                                'IND_PREF_TERM_J',
+                                v_pref_term_j
+                               );
+            l_return :=
+               esm_imp.f_write (:report_id,
+                                :parent_element,
+                                :dtd_element,
+                                :PROFILE,
+                                'CASE_PROD_INDICATIONS',
+                                'IND_SOC_J',
+                                v_soc_j
+                               );
+            l_return :=
+               esm_imp.f_write (:report_id,
+                                :parent_element,
+                                :dtd_element,
+                                :PROFILE,
+                                'CASE_PROD_INDICATIONS',
+                                'IND_CODE_STATUS_J',
+                                l_item_coded_j
+                               );
+         END IF;
+      END IF;
+   END IF;
+END;

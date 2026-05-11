@@ -1,0 +1,34 @@
+DECLARE
+  v_xml         varchar2(32767);
+  v_xml2        varchar2(32767);
+  v_prod_name   varchar2(32767); 
+  l_return      number := 0;
+  lb_return     boolean := FALSE;
+  v_dtd_elements esm_imp.vtab;
+  l_unit        number;
+BEGIN
+	  v_xml    := ESM_IMP.F_READ(:REPORT_ID,:DTD_ELEMENT);
+	  v_xml2   := ESM_IMP.F_READ(:REPORT_ID,'DRUGCUMULATIVEDOSAGEUNIT');
+	  l_return := ESM_IMP_UTL.F_CHECK_VALIDATION(:PROFILE,'DRUGCUMULATIVEDOSAGEUNIT',trim(to_char(to_number(v_xml2),'009')),:REPORT_ID);
+	  if l_return = 0 then
+		  l_return := ESM_IMP_UTL.F_CHECK_UNIT_VALUE(:DTD_ELEMENT,v_xml,'DRUGCUMULATIVEDOSAGEUNIT',v_xml2, :REPORT_ID);
+		  if l_return = 0 then
+				  v_dtd_elements(1) := 'DRUGCHARACTERIZATION';
+  	  		v_dtd_elements(2) := 'MEDICINALPRODUCT';
+      		v_dtd_elements(3) := 'DRUGDOSAGEFORM';
+      		v_prod_name  := ESM_IMP.F_READ(:REPORT_ID,'MEDICINALPRODUCT');
+	    		if v_prod_name is null then
+	       		v_dtd_elements(2) := 'ACTIVESUBSTANCENAME';
+	    		end if;
+				  lb_return := ESM_IMP.F_CHECK_AND_BUILD_KEY(:REPORT_ID,:PARENT_ELEMENT,v_dtd_elements);
+				  if (lb_return) then
+				     l_unit := ESM_IMP_UTL.F_CHECK_SAME_E2B_CODE('DRUGCUMULATIVEDOSAGEUNIT',v_xml2,'LM_DOSE_UNITS','UNIT_ID','UNIT',:REPORT_ID);
+				     IF l_unit <= 0 THEN
+			          l_unit := ESM_IMP_UTL.F_GET_LM_ID_FROM_E2B_CODE(:REPORT_ID,'DRUGCUMULATIVEDOSAGEUNIT','LM_DOSE_UNITS','E2B_CODE', trim(to_char(to_number(v_xml2),'009')), 'UNIT_ID');
+				     END IF;
+				     l_return :=  ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_PROD_DRUGS','CUMULATIVE_DOSE',v_xml);
+				     l_return :=  ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_PROD_DRUGS','CUMULATIVE_DOSE_UNIT_ID',l_unit);
+				  end if;
+	    end if;
+    end if;
+END;

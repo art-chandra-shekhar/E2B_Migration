@@ -1,0 +1,1949 @@
+<!DOCTYPE ichicsr [ 
+<!-- PUBLIC "-//ICHM2//DTD ICH ICSR Vers. 2.1//EN"  "ich-icsr-v2.1.dtd"  -->
+
+<!--
+  Individual Case Safety Report Document Type Definition
+
+  This DTD is issued by the ICH M2 group and is public domain in
+  nature.
+
+	  No one can claim copyright on this DTD.
+	  No commercial distribution is allowed.
+
+The ICH is not responsible for any damage or financial loss resulting from use of this DTD. This version is tentative in nature and changes are expected. This DTD is subject to the ICH M2 change control procedures.
+  Version 1.0, Release 1.0, October 17, 1997
+   
+1998-04-21 Modifications made by JPMA
+
+1. Changed "resultstestsprocedures" to "resultstestsprocedures?".
+			
+2. Spelling correction "seriousnesslifethreatning" to "seriousnesslifethreatening".
+
+3. Spelling correction "seriousnessconginitalanomali" to "seriousnesscongenitalanomali".
+
+4. Changed ELEMENT "parentmedicalstructure" to "parentmedicalepisodename".
+   
+1998-09-27 Modifications made by FDA 
+
+5. Added lang attribute to ichicsr as #REQUIRED using a %lang.att entity.
+
+6. Added lang attribute to all other elements as #IMPLIED. 
+
+7. Removed all unordered "&" connectors and replaced with the ordered connector "," to be compatible with XML.
+
+8. Changed the names of elements under "ichicsrmessageheader" to comply with group decisions.
+
+9. Removed all "old" elements.
+
+10. Removed all sequence number entities.
+
+11. Added Standard SGML character entities &lt;, &gt;, &amp; so that markup can be escaped as necessary.
+
+12. Removed the %act.rec; and %ope.rec; internal entities, thus removing all support for the "(app | rep | del )" construct.
+
+13. Root element of DTD is now "ichicsr" which allows one "ichicsrmessageheader" followed by "safetyreport+".
+
+14. The relationship between "drug" and "activesubstance" is now one to zero or many.
+
+Version 2.0, Release 1.0, Date to be decided
+
+Version 2.1, Release 1.0, agreed November 2000
+Documentation of changes made in version 2.0 to version 2.1 should be completed for implementation.
+Safety Report Version (ICH ICSR M2 Data Processing element) is not an E2BM data element, but rather 
+should be used for technical transmission purposes.  
+Date of final release of Version 2.1 February 1, 2001
+
+After San Diego ICH 5, this DTD was fixed to be final version for Version 2.1.
+Version 2.1, Release 2.0, agreed Feburary 2001.
+
+
+-->
+
+<!-- TECHNICAL NOTE
+
+			ICH ICSR SGML Declaration
+
+To correctly parse an ICH ICSR SGML message requires the selection of the correct SGML declaration, along with this DTD, and the ICH ICSR SGML instance.  This technical note provides guidance on which of several SGML declarations included with the ICH ICSR application to select based on the language and character set used within the ICH ICSR SGML instance.  The method by which an SGML parser is told to use a specific declaration is parser specific.
+The three most common methods are -
+
+1. Tell the parser via the command line which declaration to use.
+
+2. Tell the parser via a specific environment variable which declaration to use.
+
+3. If the parser supports SGML Open catalogs, within the catalog file is a command that can tell the parser which declaration to use.  SGML catalog files are an industry standard way to tell a parser how to find all of the pieces (declaration, DTD, SGML document instance) needed to successfully parse.
+
+To cover all of the languages necessary to support the ICH ICSR application,ISO 10646 (UNICODE) would have to be used.  If this were the case, then only one SGML declaration would be needed to support all ICH ICSR languages. Because UNICODE support is not available in all popular computer application programs, the ICH M2 EWG has recommended that a variety of character sets be used at this time, instead of a single UNICODE character encoding.  For each of these different character encodings a different SGML declaration needs to be generated and used.      
+
+Five SGML declarations are included with the ICH ICSR distribution.  They are described briefly below.
+
+ich-icsr-latin1.dcl - This SGML declaration supports the ISO 8859-1 (Latin 1) character set.  This character set supports English, and most Western European languages.
+
+ich-icsr-latin7.dcl - This SGML declaration supports the ISO 8859-7 (Latin 7) character set.  This character set supports Greek. 
+
+ich-icsr-sjis.dcl - This SGML declaration supports the Shift JIS character set for encoding Japanese.
+
+ich-icsr-utf8.dcl - This SGML declaration supports the ISO 10646 (UNICODE) UTF-8 character set.  This character set supports almost all of the world's currently written languages.
+
+ich-icsr-mult.dcl - This SGML declaration will support all of the currently defined ICHICSR languages, and it doesn't require the use of UNICODE.  It is however a "hack" that relies on a fortuitous characteristic of the languages currently being used within the ICH ICSR SGML application.  
+
+This hack works because the character set documented within an SGML declaration is for the benefit of both the SGML parser and the programmer who implements the SGML application.  The programmer needs detailed knowledge of all the characters being used to correctly code an application.  The parser only really needs to know about some of the characters.  In particular it needs to know which characters signify an SGML event.  For instance that the "<" character starts an SGML open tag, and the "</" character sequence starts an SGML close tag.  All told, the parser needs to know very little.  Because of the particular combination of character sets being used within the ICH ICSR application, an SGML declaration can be defined that tells the parser just what it needs to know and still work across all of the different  character sets.  The catch is that this SGML declaration doesn't tell the programmer all that she or he needs to know to correctly code the rest of the application.  If this declaration is used, the programmer will have to get this detailed information from another source.
+
+-->
+                          
+<!-- ================================================================== -->
+<!-- Entities                                                           -->
+<!-- ================================================================== -->
+
+<!-- Use the lang attribute to indicate the language of an elements     --
+  -- content via an ISO 639 language Code.                              -->
+ 
+<!ENTITY % lang.att "lang CDATA #IMPLIED">
+
+<!-- Standard Character Entities to escape SGML special characters.     -- 
+  -- When "<", ">", and "&" occur in text, they should be replaced      --
+  -- by "&lt;", "&gt;", and "&amp;" respectively.                       -->
+
+<!-- Less Than "<" -->
+<!ENTITY lt     "&#38;#60;">
+
+<!-- Greater Than ">" -->
+<!ENTITY gt     "&#62;"> 
+
+<!-- Ampersand "&" -->
+<!ENTITY amp    "&#38;#38;"> 
+
+<!-- ================================================================== -->
+<!-- Elements and Attributes                                            -->
+<!-- ================================================================== -->
+
+<!ELEMENT ichicsr               - -	(ichicsrmessageheader, safetyreport+)>
+<!ATTLIST ichicsr
+	lang	CDATA	#REQUIRED
+>
+
+<!-- M.1 ICH ICSR Message Header Information -->
+
+<!ELEMENT ichicsrmessageheader         - -	
+	(messagetype			,
+	messageformatversion		, 
+	messageformatrelease		,
+	messagenumb			,
+	messagesenderidentifier         ,
+	messagereceiveridentifier	,
+        messagedateformat               ,
+	messagedate)>
+<!ATTLIST ichicsrmessageheader
+	%lang.att;
+>
+
+<!-- M.1.1 Message Type -->
+<!ELEMENT messagetype		- - (#PCDATA) >
+<!ATTLIST messagetype
+	%lang.att;
+>
+
+<!-- M.1.2 Message Format Version -->
+<!ELEMENT messageformatversion 	- - (#PCDATA) >
+<!ATTLIST messageformatversion
+	%lang.att;
+>
+
+<!-- M.1.3 Message Format Release -->
+<!ELEMENT messageformatrelease 	- - (#PCDATA) >
+<!ATTLIST messageformatrelease
+	%lang.att;
+>
+
+<!-- M.1.4 Message Number -->
+<!ELEMENT messagenumb	 	- - (#PCDATA) >
+<!ATTLIST messagenumb
+	%lang.att;
+>
+
+<!-- M.1.5 Message Sender Identifier -->
+<!ELEMENT messagesenderidentifier - - (#PCDATA) >		
+<!ATTLIST messagesenderidentifier
+	%lang.att;
+>
+
+<!-- M.1.6 Message Receiver Identifier -->
+<!ELEMENT messagereceiveridentifier - - (#PCDATA) >
+<!ATTLIST messagereceiveridentifier
+	%lang.att;
+>
+
+<!-- M.1.7a Message Date Format -->
+<!ELEMENT messagedateformat     - -     (#PCDATA)>
+<!ATTLIST messagedateformat
+        %lang.att;
+>
+
+<!-- M.1.7b Message Date -->
+<!ELEMENT messagedate	- -	(#PCDATA) >
+<!ATTLIST messagedate
+	%lang.att;
+>
+
+<!-- Individual Case Safety Report(s) Specifications -->
+<!-- A.1 Identification of the case safety report   -->
+
+<!ELEMENT safetyreport		- -     
+        (safetyreportversion?,
+        safetyreportid			,
+	primarysourcecountry?		,
+	occurcountry?                   ,
+        transmissiondateformat?         ,
+	transmissiondate?               ,
+	reporttype?                     ,
+	serious?                        ,
+	seriousnessdeath?               ,
+	seriousnesslifethreatening?     ,
+	seriousnesshospitalization?     ,
+	seriousnessdisabling?           ,
+	seriousnesscongenitalanomali?   ,
+	seriousnessother?               ,
+        receivedateformat?              ,
+	receivedate?                    ,
+        receiptdateformat               ,
+	receiptdate                     ,
+	additionaldocument?             ,
+	documentlist?                   ,
+	fulfillexpeditecriteria?        ,
+	authoritynumb?                  ,
+	companynumb?                    ,
+	duplicate?                     	,
+	casenullification?              ,
+	nullificationreason?            ,
+	medicallyconfirm?               ,
+		(reportduplicate*               ,
+		linkedreport*                   ,
+		primarysource+                  ,
+		sender                          ,
+		receiver                        ,
+		patient))>
+<!ATTLIST safetyreport
+        %lang.att;
+>
+
+<!ELEMENT reportduplicate	- -
+        (duplicatesource?		,
+	duplicatenumb?)>
+<!ATTLIST reportduplicate
+	%lang.att;
+>
+
+<!ELEMENT linkedreport		- -     (linkreportnumb?)>
+<!ATTLIST linkedreport
+	%lang.att;
+>
+
+<!-- A.2 Primary source(s) of information -->
+<!ELEMENT primarysource		- -
+        (reportertitle?                 ,
+	reportergivename?               ,
+	reportermiddlename?             ,
+	reporterfamilyname?             ,
+	reporterorganization?           ,
+	reporterdepartment?             ,
+	reporterstreet?                 ,
+	reportercity?                   ,
+	reporterstate?                  ,
+	reporterpostcode?               ,
+	reportercountry?                ,
+	qualification?                  ,
+	literaturereference?            ,
+	studyname?                      ,
+	sponsorstudynumb?               ,
+	observestudytype?)>
+<!ATTLIST primarysource
+	%lang.att;
+>
+
+<!-- A.3.1 Sender -->
+<!ELEMENT sender                - -
+	(sendertype?                    ,
+	senderorganization              ,
+	senderdepartment?               ,
+	sendertitle?                    ,
+	sendergivename?                 ,
+	sendermiddlename?               ,
+	senderfamilyname?               ,
+	senderstreetaddress?            ,
+	sendercity?                     ,
+	senderstate?                    ,
+	senderpostcode?                 ,
+	sendercountrycode?              ,
+	sendertel?                      ,
+	sendertelextension?             ,
+	sendertelcountrycode?           ,
+	senderfax?                      ,
+	senderfaxextension?             ,
+	senderfaxcountrycode?           ,
+	senderemailaddress?)>
+<!ATTLIST sender
+	%lang.att;
+>
+
+<!-- A.3.2 Receiver -->
+<!ELEMENT receiver              - -
+	(receivertype?                  ,
+	receiverorganization?           ,
+	receiverdepartment?             ,
+	receivertitle?                  ,
+	receivergivename?               ,
+	receivermiddlename?             ,
+	receiverfamilyname?             ,
+	receiverstreetaddress?          ,
+	receivercity?                   ,
+	receiverstate?                  ,
+	receiverpostcode?               ,
+	receivercountrycode?            ,
+	receivertel?                    ,
+	receivertelextension?           ,
+	receivertelcountrycode?         ,
+	receiverfax?                    ,
+	receiverfaxextension?           ,
+	receiverfaxcountrycode?         ,
+	receiveremailaddress?)>
+<!ATTLIST receiver
+	%lang.att;
+>
+
+<!-- B.1 Patient characteristics -->
+<!ELEMENT patient               - -
+	(patientinitial?                ,
+	patientgpmedicalrecordnumb?     ,
+	patientspecialistrecordnumb?    ,
+	patienthospitalrecordnumb?      ,
+	patientinvestigationnumb?       ,
+        patientbirthdateformat?         ,
+	patientbirthdate?               ,
+	patientonsetage?                ,
+        patientonsetageunit?            ,
+	gestationperiod?                ,
+        gestationperiodunit?            ,
+	patientagegroup?                ,
+	patientweight?                  ,
+	patientheight?                  ,
+	patientsex?                     ,
+        lastmenstrualdateformat?	,
+	patientlastmenstrualdate?       ,
+	patientmedicalhistorytext?      ,
+	resultstestsprocedures?         ,
+		(medicalhistoryepisode*         ,
+		patientpastdrugtherapy*         ,
+		patientdeath?                   ,
+		parent?                         ,
+		reaction+                       ,
+		test*                           ,
+		drug+                           ,
+		summary?))>
+<!ATTLIST patient
+	%lang.att;
+>
+
+<!-- B.1.7 Relevant medical history and concurrent -->
+<!ELEMENT medicalhistoryepisode - -
+        (patientepisodenamemeddraversion?,
+        patientepisodename?		 ,
+        patientmedicalstartdateformat?   ,
+	patientmedicalstartdate?         ,
+	patientmedicalcontinue?          ,
+        patientmedicalenddateformat?     ,
+	patientmedicalenddate?           ,
+	patientmedicalcomment?)>
+<!ATTLIST medicalhistoryepisode
+	%lang.att;
+>
+
+<!-- B.1.8 Relevant past drug history -->
+<!ELEMENT patientpastdrugtherapy	- -
+        (patientdrugname?               ,
+        patientdrugstartdateformat?     ,
+	patientdrugstartdate?           ,
+        patientdrugenddateformat?       ,
+	patientdrugenddate?             ,
+	patientindicationmeddraversion?	,
+	patientdrugindication?          ,
+	patientdrgreactionmeddraversion?,
+	patientdrugreaction?)>
+
+<!ATTLIST patientpastdrugtherapy
+	%lang.att;
+>
+
+<!-- B.1.9 In case of death: -->
+<!ELEMENT patientdeath		- -
+        (patientdeathdateformat?        ,
+	patientdeathdate?		,
+	patientautopsyyesno?		,
+		(patientdeathcause*	,
+		patientautopsy*)) >
+<!ATTLIST patientdeath
+	%lang.att;
+>
+
+
+<!ELEMENT patientdeathcause	- -
+	(patientdeathreportmeddraversion?,
+        patientdeathreport?)>
+<!ATTLIST patientdeathcause
+	%lang.att;
+>
+
+<!ELEMENT patientautopsy	- -        
+	 (patientdetermautopsmeddraversion?,
+         patientdetermineautopsy?)>
+<!ATTLIST patientautopsy
+	%lang.att;
+>
+
+<!-- B.1.10 For a parent-child / fetus report, information concerning the parent: -->
+<!ELEMENT parent                - -
+	(parentidentification?          ,
+        parentbirthdateformat?          ,
+	parentbirthdate?                ,
+	parentage?                      ,
+        parentageunit?                  ,
+        parentlastmenstrualdateformat?  ,
+	parentlastmenstrualdate?	,
+	parentweight?                   ,
+	parentheight?                   ,
+	parentsex?                      ,
+	parentmedicalrelevanttext?      ,
+		(parentmedicalhistoryepisode*   ,
+		parentpastdrugtherapy*))>
+<!ATTLIST parent
+	%lang.att;
+>
+
+<!-- B.1.10.7 Relevant medical history and concurrent conditions of parent -->
+<!ELEMENT parentmedicalhistoryepisode - -
+        (parentmdepisodemeddraversion?	,
+	parentmedicalepisodename?               ,
+        parentmedicalstartdateformat?           ,
+	parentmedicalstartdate?                 ,
+	parentmedicalcontinue?                  ,
+        parentmedicalenddateformat?             ,
+	parentmedicalenddate?                   ,
+	parentmedicalcomment?)>
+<!ATTLIST parentmedicalhistoryepisode
+	%lang.att;
+>
+
+<!-- B.1.10.8 Relevant past drug history -->
+<!ELEMENT parentpastdrugtherapy - -
+        (parentdrugname?                  ,
+        parentdrugstartdateformat?        ,
+	parentdrugstartdate?              ,
+        parentdrugenddateformat?          ,
+	parentdrugenddate?                ,
+	parentdrgindicationmeddraversion? ,
+	parentdrugindication?             ,
+	parentdrgreactionmeddraversion?   ,
+	parentdrugreaction?)>
+<!ATTLIST parentpastdrugtherapy
+	%lang.att;
+>
+
+<!-- B.2 Reaction(s) / Event(s) -->
+<!ELEMENT reaction		- -
+        (primarysourcereaction?         ,
+	reactionmeddraversionllt?       ,
+    	reactionmeddrallt?		,
+    	reactionmeddraversionpt?        ,
+    	reactionmeddrapt?           	,
+	termhighlighted?                ,
+        reactionstartdateformat?        ,
+	reactionstartdate?              ,
+        reactionenddateformat?          ,
+	reactionenddate?                ,
+	reactionduration?               ,
+        reactiondurationunit?           ,
+	reactionfirsttime?              ,
+        reactionfirsttimeunit?          ,
+	reactionlasttime?               ,
+        reactionlasttimeunit?           ,
+	reactionoutcome?)>
+<!ATTLIST reaction
+	%lang.att;
+>
+
+<!-- B.3 Results of tests and procedures relevant to the investigation of the patient: -->
+<!ELEMENT test			- -
+
+        (testdateformat?                ,
+        testdate?                       ,
+	testname?                       ,
+	testresult?                     ,
+	testunit?                       ,
+	lowtestrange?                   ,
+	hightestrange?                  ,
+	moreinformation?)>
+<!ATTLIST test
+	%lang.att;
+>
+
+<!ELEMENT drug			- -
+	(drugcharacterization?          ,
+	medicinalproduct?               ,
+	obtaindrugcountry?              ,
+	drugbatchnumb?                  ,
+	drugauthorizationnumb?          ,
+	drugauthorizationcountry?       ,
+	drugauthorizationholder?        ,
+	drugstructuredosagenumb?        ,
+	drugstructuredosageunit?        ,
+	drugseparatedosagenumb?         ,
+	drugintervaldosageunitnumb?     ,
+	drugintervaldosagedefinition?   ,
+	drugcumulativedosagenumb?       ,
+	drugcumulativedosageunit?       ,
+	drugdosagetext?                 ,
+	drugdosageform?                 ,
+	drugadministrationroute?        ,
+	drugparadministration?          ,
+	reactiongestationperiod?        ,
+        reactiongestationperiodunit?    ,
+    	drugindicationmeddraversion?	,
+	drugindication?                 ,
+        drugstartdateformat?            ,
+	drugstartdate?                  ,
+	drugstartperiod?		,
+        drugstartperiodunit?            ,
+	druglastperiod?			,
+        druglastperiodunit?             ,
+        drugenddateformat?              ,
+	drugenddate?                    ,
+	drugtreatmentduration?          ,
+        drugtreatmentdurationunit?      ,
+	actiondrug?                     ,
+	drugrecurreadministration?      ,
+	drugadditional?                 ,
+		(activesubstance*               ,
+		drugrecurrence*                 ,
+		drugreactionrelatedness*))>
+<!ATTLIST drug
+	%lang.att;
+>
+
+<!ELEMENT activesubstance	- -     (activesubstancename)>
+<!ATTLIST activesubstance
+	%lang.att;
+>
+
+<!ELEMENT drugrecurrence        - -       
+	(drugrecuractionmeddraversion?    ,
+         drugrecuraction)>
+<!ATTLIST drugrecurrence
+	%lang.att;
+>
+
+<!-- B.4.k.18 Relatedness of drug to reaction / event -->
+<!ELEMENT drugreactionrelatedness - -
+        (drugreactionassesmeddraversion? ,
+	drugreactionasses?               ,
+	drugassessmentsource?            ,
+	drugassessmentmethod?            ,
+	drugresult?)>
+<!ATTLIST drugreactionrelatedness
+	%lang.att;
+>
+
+<!-- B.5 Narrative case summary and further information: -->
+<!ELEMENT summary               - -
+	(narrativeincludeclinical?      ,
+	reportercomment?                ,
+	senderdiagnosismeddraversion?                ,
+	senderdiagnosis?                ,
+	sendercomment?)>
+<!ATTLIST summary
+	%lang.att;
+>
+
+<!ELEMENT safetyreportversion	- -	(#PCDATA)>
+<!ATTLIST safetyreportversion
+	%lang.att;
+>
+
+<!-- A.1.0.1 Sender's(case) Safety Report Unique Identifier -->
+<!ELEMENT safetyreportid	- -	(#PCDATA)>
+<!ATTLIST safetyreportid
+	%lang.att;
+>
+
+
+<!-- A.1.1 Identification of the country of the primary -->
+<!ELEMENT primarysourcecountry  - -     (#PCDATA)>
+<!ATTLIST primarysourcecountry
+	%lang.att;
+>
+
+<!-- A.1.2 Identification of the country where the reaction / event occurred -->
+<!ELEMENT occurcountry          - -     (#PCDATA)>
+<!ATTLIST occurcountry
+	%lang.att;
+>
+
+
+<!-- A.1.3a Date of this transmission format -->
+<!ELEMENT transmissiondateformat - -    (#PCDATA)>
+<!ATTLIST transmissiondateformat
+        %lang.att;
+>
+
+<!-- A.1.3b Date of this transmission -->
+<!ELEMENT transmissiondate      - -     (#PCDATA)>
+<!ATTLIST transmissiondate
+	%lang.att;
+>
+
+<!-- A.1.4 Type of report -->
+<!ELEMENT reporttype            - -     (#PCDATA)>
+<!ATTLIST reporttype
+	%lang.att;
+>
+
+<!-- A.1.5.1 Serious -->
+<!ELEMENT serious               - -     (#PCDATA)>
+<!ATTLIST serious
+	%lang.att;
+>
+
+<!-- A.1.5.2 Seriousness criteria -->
+<!ELEMENT seriousnessdeath      - -     (#PCDATA)>
+<!ATTLIST seriousnessdeath
+	%lang.att;
+>
+<!ELEMENT seriousnesslifethreatening - -        (#PCDATA)>
+<!ATTLIST seriousnesslifethreatening
+	%lang.att;
+>
+<!ELEMENT seriousnesshospitalization - -        (#PCDATA)>
+<!ATTLIST seriousnesshospitalization
+	%lang.att;
+>
+<!ELEMENT seriousnessdisabling  - -     (#PCDATA)>
+<!ATTLIST seriousnessdisabling
+	%lang.att;
+>
+<!ELEMENT seriousnesscongenitalanomali - -      (#PCDATA)>
+<!ATTLIST seriousnesscongenitalanomali
+	%lang.att;
+>
+<!ELEMENT seriousnessother      - -     (#PCDATA)>
+<!ATTLIST seriousnessother
+	%lang.att;
+>
+
+<!-- A.1.6a Date report was first received from source format -->
+<!ELEMENT receivedateformat     - -     (#PCDATA)>
+<!ATTLIST receivedateformat
+        %lang.att;
+>
+
+<!-- A.1.6b Date report was first received from source -->
+<!ELEMENT receivedate           - -     (#PCDATA)>
+<!ATTLIST receivedate
+	%lang.att;
+>
+
+<!-- A.1.7a Date of receipt of the most recent information for this report -->
+<!ELEMENT receiptdateformat     - -     (#PCDATA)>
+<!ATTLIST receiptdateformat
+        %lang.att;
+>
+
+<!-- A.1.7b Date of receipt of the most recent information for this report -->
+<!ELEMENT receiptdate           - -     (#PCDATA)>
+<!ATTLIST receiptdate
+	%lang.att;
+>
+
+<!-- A.1.8.1 Are additional documents available -->
+<!ELEMENT additionaldocument    - -     (#PCDATA)>
+<!ATTLIST additionaldocument
+	%lang.att;
+>
+
+<!-- A.1.8.2 List of documents held by sender -->
+<!ELEMENT documentlist          - -     (#PCDATA)>
+<!ATTLIST documentlist
+	%lang.att;
+>
+
+<!-- A.1.9 Does this case fulfill the local criteria for an expedited report -->
+<!ELEMENT fulfillexpeditecriteria - -   (#PCDATA)>
+<!ATTLIST fulfillexpeditecriteria
+	%lang.att;
+>
+
+<!--
+The A.1.10 - The worldwide unique case identification number must be populated as per the following user guidance:
+
+Only A.1.10.1 or A.1.10.2 should be used.  No case should ever have more than one of these items completed.  The contents of whichever item is used should remain unchanged for any transmissions subsequent to the original transmission. When a regulator is the initial sender A.1.10.1 should be used. When an entity other than a regulator is the initial sender, A.1.10.2 should be used. When a sender has not previously received a valid E2B/M2 report electronically, the identifiers (content and format) in A.1.0.1 and A.1.10.1 or A.1.10.2 should be identical.  Retransmitters should use their own sender's (case) safety report unique identifier (A.1.0.1), but not change A.1.10.1 or A.1.10.2. Examples are available in attachment 3 of the E2BM document.
+ The contents of the fields A.1.10.1 and/or A.1.10.2 should first list A.1.1 - Identification of the country of primary source and secondly list A.3.1.2 - Sender Identifier, Sender Organization, and lastly, the company international case report number, delimited by hyphens.
+
+For example, a report transmitted by a US company to a regulatory authority would populate A.1.10.2 with "US-Company Name-12345", where "12345" is the company's unique case report number.  In the event that the regulatory authority transmitted this ICSR to another regulatory authority, A.1.10.2 would remain the same.  The regulatory authority would not populate A.1.10.1.
+
+If the situation occurs where multiple reports are received about the same case, such as a report from a physician and a report from another company, the information may be merged.  One number will be maintained as the case number in its original field and the second number will be listed as a suspected duplicate. 
+-->
+<!-- A.1.10.1 Regulatory authority's case report number -->
+<!ELEMENT authoritynumb         - -     (#PCDATA)>
+<!ATTLIST authoritynumb
+	%lang.att;
+>
+
+<!-- A.1.10.2 Other sender's case report number -->
+<!ELEMENT companynumb           - -     (#PCDATA)>
+<!ATTLIST companynumb
+	%lang.att;
+>
+
+<!-- A.1.11 Other case identifiers in previous transmissions -->
+<!ELEMENT duplicate             - -     (#PCDATA)>
+<!ATTLIST duplicate
+	%lang.att;
+>
+
+<!-- A.1.11.1 Source(s) of the case identifier -->
+<!ELEMENT duplicatesource       - -     (#PCDATA)>
+<!ATTLIST duplicatesource
+	%lang.att;
+>
+
+<!-- A.1.11.2 Case identifier(s) -->
+<!ELEMENT duplicatenumb         - -     (#PCDATA)>
+<!ATTLIST duplicatenumb
+	%lang.att;
+>
+
+<!-- A.1.12 Identification number of the report which is linked to this report -->
+<!ELEMENT linkreportnumb        - -     (#PCDATA)>
+<!ATTLIST linkreportnumb
+	%lang.att;
+>
+
+<!-- A.1.13 Report nullification -->
+<!ELEMENT casenullification     - -     (#PCDATA)>
+<!ATTLIST casenullification
+	%lang.att;
+>
+
+<!-- A.1.13.1 Reason for nullification -->
+<!ELEMENT nullificationreason   - -     (#PCDATA)>
+<!ATTLIST nullificationreason
+	%lang.att;
+>
+
+<!-- A.1.14 Was the case medically confirmed, if not initially from health professional? -->
+<!ELEMENT medicallyconfirm      - -     (#PCDATA)>
+<!ATTLIST medicallyconfirm
+	%lang.att;
+>
+
+<!-- A.2.1.1a Reporter identifier -->
+<!ELEMENT reportertitle         - -     (#PCDATA)>
+<!ATTLIST reportertitle
+	%lang.att;
+>
+
+<!-- A.2.1.1b Reporter identifier -->
+<!ELEMENT reportergivename      - -     (#PCDATA)>
+<!ATTLIST reportergivename
+	%lang.att;
+>
+
+<!-- A.2.1.1c Reporter identifier -->
+<!ELEMENT reportermiddlename    - -     (#PCDATA)>
+<!ATTLIST reportermiddlename
+	%lang.att;
+>
+
+<!-- A.2.1.1d Reporter identifier -->
+<!ELEMENT reporterfamilyname    - -     (#PCDATA)>
+<!ATTLIST reporterfamilyname
+	%lang.att;
+>
+
+<!-- A.2.1.2a Reporter's address -->
+<!ELEMENT reporterorganization  - -     (#PCDATA)>
+<!ATTLIST reporterorganization
+	%lang.att;
+>
+
+<!-- A.2.1.2b Reporter's address -->
+<!ELEMENT reporterdepartment    - -     (#PCDATA)>
+<!ATTLIST reporterdepartment
+	%lang.att;
+>
+
+<!-- A.2.1.2c Reporter's address -->
+<!ELEMENT reporterstreet        - -     (#PCDATA)>
+<!ATTLIST reporterstreet
+	%lang.att;
+>
+
+<!-- A.2.1.2d Reporter's address -->
+<!ELEMENT reportercity          - -     (#PCDATA)>
+<!ATTLIST reportercity
+	%lang.att;
+>
+
+<!-- A.2.1.2e Reporter's address -->
+<!ELEMENT reporterstate         - -     (#PCDATA)>
+<!ATTLIST reporterstate
+	%lang.att;
+>
+
+<!-- A.2.1.2f Reporter's address -->
+<!ELEMENT reporterpostcode      - -     (#PCDATA)>
+<!ATTLIST reporterpostcode
+	%lang.att;
+>
+
+<!-- A.2.1.3 Country -->
+<!ELEMENT reportercountry       - -     (#PCDATA)>
+<!ATTLIST reportercountry
+	%lang.att;
+>
+
+<!-- A.2.1.4 Qualification -->
+<!ELEMENT qualification         - -     (#PCDATA)>
+<!ATTLIST qualification
+	%lang.att;
+>
+
+<!-- A.2.2 Literature reference(s) -->
+<!ELEMENT literaturereference   - -     (#PCDATA)>
+<!ATTLIST literaturereference
+	%lang.att;
+>
+
+<!-- A.2.3.1 Study name -->
+<!ELEMENT studyname             - -     (#PCDATA)>
+<!ATTLIST studyname
+	%lang.att;
+>
+
+<!-- A.2.3.2 Sponsor study number -->
+<!ELEMENT sponsorstudynumb      - -     (#PCDATA)>
+<!ATTLIST sponsorstudynumb
+	%lang.att;
+>
+
+<!-- A.2.3.3 Study type in which the reactions / events were observed -->
+<!ELEMENT observestudytype      - -     (#PCDATA)>
+<!ATTLIST observestudytype
+	%lang.att;
+>
+
+<!-- A.3.1.1 Sender type -->
+<!ELEMENT sendertype            - -     (#PCDATA)>
+<!ATTLIST sendertype
+	%lang.att;
+>
+
+<!-- A.3.1.2 Sender organization -->
+<!ELEMENT senderorganization    - -     (#PCDATA)>
+<!ATTLIST senderorganization
+	%lang.att;
+>
+
+<!-- A.3.1.3a Person responsible for sending the report -->
+<!ELEMENT senderdepartment      - -     (#PCDATA)>
+<!ATTLIST senderdepartment
+	%lang.att;
+>
+
+<!-- A.3.1.3b Person responsible for sending the report -->
+<!ELEMENT sendertitle           - -     (#PCDATA)>
+<!ATTLIST sendertitle
+	%lang.att;
+>
+
+<!-- A.3.1.3c Person responsible for sending the report -->
+<!ELEMENT sendergivename        - -     (#PCDATA)>
+<!ATTLIST sendergivename
+	%lang.att;
+>
+
+<!-- A.3.1.3d Person responsible for sending the report -->
+<!ELEMENT sendermiddlename      - -     (#PCDATA)>
+<!ATTLIST sendermiddlename
+	%lang.att;
+>
+
+<!-- A.3.1.3e Person responsible for sending the report -->
+<!ELEMENT senderfamilyname      - -     (#PCDATA)>
+<!ATTLIST senderfamilyname
+	%lang.att;
+>
+
+<!-- A.3.1.4a Address, fax, telephone and E-mail address -->
+<!ELEMENT senderstreetaddress   - -     (#PCDATA)>
+<!ATTLIST senderstreetaddress
+	%lang.att;
+>
+
+<!-- A.3.1.4b Address, fax, telephone and E-mail address -->
+<!ELEMENT sendercity            - -     (#PCDATA)>
+<!ATTLIST sendercity
+	%lang.att;
+>
+
+<!-- A.3.1.4c Address, fax, telephone and E-mail address -->
+<!ELEMENT senderstate           - -     (#PCDATA)>
+<!ATTLIST senderstate
+	%lang.att;
+>
+
+<!-- A.3.1.4d Address, fax, telephone and E-mail address -->
+<!ELEMENT senderpostcode        - -     (#PCDATA)>
+<!ATTLIST senderpostcode
+	%lang.att;
+>
+
+<!-- A.3.1.4e Address, fax, telephone and E-mail address -->
+<!ELEMENT sendercountrycode     - -     (#PCDATA)>
+<!ATTLIST sendercountrycode
+	%lang.att;
+>
+
+<!-- A.3.1.4f Address, fax, telephone and E-mail address -->
+<!ELEMENT sendertel             - -     (#PCDATA)>
+<!ATTLIST sendertel
+	%lang.att;
+>
+
+<!-- A.3.1.4g Address, fax, telephone and E-mail address -->
+<!ELEMENT sendertelextension    - -     (#PCDATA)>
+<!ATTLIST sendertelextension
+	%lang.att;
+>
+
+<!-- A.3.1.4h Address, fax, telephone and E-mail address -->
+<!ELEMENT sendertelcountrycode  - -     (#PCDATA)>
+<!ATTLIST sendertelcountrycode
+	%lang.att;
+>
+
+<!-- A.3.1.4i Address, fax, telephone and E-mail address -->
+<!ELEMENT senderfax             - -     (#PCDATA)>
+<!ATTLIST senderfax
+	%lang.att;
+>
+
+<!-- A.3.1.4j Address, fax, telephone and E-mail address -->
+<!ELEMENT senderfaxextension    - -     (#PCDATA)>
+<!ATTLIST senderfaxextension
+	%lang.att;
+>
+
+<!-- A.3.1.4k Address, fax, telephone and E-mail address -->
+<!ELEMENT senderfaxcountrycode  - -     (#PCDATA)>
+<!ATTLIST senderfaxcountrycode
+	%lang.att;
+>
+
+<!-- A.3.1.4l Address, fax, telephone and E-mail address -->
+<!ELEMENT senderemailaddress    - -     (#PCDATA)>
+<!ATTLIST senderemailaddress
+	%lang.att;
+>
+
+<!-- A.3.2.1 Receiver type -->
+<!ELEMENT receivertype          - -     (#PCDATA)>
+<!ATTLIST receivertype
+	%lang.att;
+>
+
+<!-- A.3.2.2a Receiver identifier -->
+<!ELEMENT receiverorganization  - -     (#PCDATA)>
+<!ATTLIST receiverorganization
+	%lang.att;
+>
+
+<!-- A.3.2.2b Receiver identifier -->
+<!ELEMENT receiverdepartment    - -     (#PCDATA)>
+<!ATTLIST receiverdepartment
+	%lang.att;
+>
+
+<!-- A.3.2.2c Receiver identifier -->
+<!ELEMENT receivertitle         - -     (#PCDATA)>
+<!ATTLIST receivertitle
+	%lang.att;
+>
+
+<!-- A.3.2.2d Receiver identifier -->
+<!ELEMENT receivergivename      - -     (#PCDATA)>
+<!ATTLIST receivergivename
+	%lang.att;
+>
+
+<!-- A.3.2.2e Receiver identifier -->
+<!ELEMENT receivermiddlename    - -     (#PCDATA)>
+<!ATTLIST receivermiddlename
+	%lang.att;
+>
+
+<!-- A.3.2.2f Receiver identifier -->
+<!ELEMENT receiverfamilyname    - -     (#PCDATA)>
+<!ATTLIST receiverfamilyname
+	%lang.att;
+>
+
+<!-- A.3.2.3a Receiver's address, fax, telephone and E-mail address -->
+<!ELEMENT receiverstreetaddress - -     (#PCDATA)>
+<!ATTLIST receiverstreetaddress
+	%lang.att;
+>
+
+<!-- A.3.2.3b Receiver's address, fax, telephone and E-mail address -->
+<!ELEMENT receivercity          - -     (#PCDATA)>
+<!ATTLIST receivercity
+	%lang.att;
+>
+
+<!-- A.3.2.3c Receiver's address, fax, telephone and E-mail address -->
+<!ELEMENT receiverstate         - -     (#PCDATA)>
+<!ATTLIST receiverstate
+	%lang.att;
+>
+
+<!-- A.3.2.3d Receiver's address, fax, telephone and E-mail address -->
+<!ELEMENT receiverpostcode      - -     (#PCDATA)>
+<!ATTLIST receiverpostcode
+	%lang.att;
+>
+
+<!-- A.3.2.3e Receiver's address, fax, telephone and E-mail address -->
+<!ELEMENT receivercountrycode   - -     (#PCDATA)>
+<!ATTLIST receivercountrycode
+	%lang.att;
+>
+
+<!-- A.3.2.3f Receiver's address, fax, telephone and E-mail address -->
+<!ELEMENT receivertel           - -     (#PCDATA)>
+<!ATTLIST receivertel
+	%lang.att;
+>
+
+<!-- A.3.2.3g Receiver's address, fax, telephone and E-mail address -->
+<!ELEMENT receivertelextension  - -     (#PCDATA)>
+<!ATTLIST receivertelextension
+	%lang.att;
+>
+
+<!-- A.3.2.3h Receiver's address, fax, telephone and E-mail address -->
+<!ELEMENT receivertelcountrycode - -    (#PCDATA)>
+<!ATTLIST receivertelcountrycode
+	%lang.att;
+>
+
+<!-- A.3.2.3i Receiver's address, fax, telephone and E-mail address -->
+<!ELEMENT receiverfax           - -     (#PCDATA)>
+<!ATTLIST receiverfax
+	%lang.att;
+>
+
+<!-- A.3.2.3j Receiver's address, fax, telephone and E-mail address -->
+<!ELEMENT receiverfaxextension  - -     (#PCDATA)>
+<!ATTLIST receiverfaxextension
+	%lang.att;
+>
+
+<!-- A.3.2.3k Receiver's address, fax, telephone and E-mail address -->
+<!ELEMENT receiverfaxcountrycode - -    (#PCDATA)>
+<!ATTLIST receiverfaxcountrycode
+	%lang.att;
+>
+
+<!-- A.3.2.3l Receiver's address, fax, telephone and E-mail address -->
+<!ELEMENT receiveremailaddress  - -     (#PCDATA)>
+<!ATTLIST receiveremailaddress
+	%lang.att;
+>
+
+<!-- B.1.1 Patient -->
+<!ELEMENT patientinitial        - -     (#PCDATA)>
+<!ATTLIST patientinitial
+	%lang.att;
+>
+
+<!-- B.1.1.1a Patient medical record number(s) and source(s) -->
+<!ELEMENT patientgpmedicalrecordnumb - -        (#PCDATA)>
+<!ATTLIST patientgpmedicalrecordnumb
+	%lang.att;
+>
+
+<!-- B.1.1.1b Patient medical record number(s) and source(s) -->
+<!ELEMENT patientspecialistrecordnumb - -       (#PCDATA)>
+<!ATTLIST patientspecialistrecordnumb
+	%lang.att;
+>
+
+<!-- B.1.1.1c Patient medical record number(s) and source(s) -->
+<!ELEMENT patienthospitalrecordnumb - - (#PCDATA)>
+<!ATTLIST patienthospitalrecordnumb
+	%lang.att;
+>
+
+<!-- B.1.1.1d Patient medical record number(s) and source(s) -->
+<!ELEMENT patientinvestigationnumb - -  (#PCDATA)>
+<!ATTLIST patientinvestigationnumb
+	%lang.att;
+>
+
+<!-- B.1.2.1a Date of birth format -->
+<!ELEMENT patientbirthdateformat - -    (#PCDATA)>
+<!ATTLIST patientbirthdateformat
+        %lang.att;
+>
+
+<!-- B.1.2.1b Date of birth -->
+<!ELEMENT patientbirthdate      - -     (#PCDATA)>
+<!ATTLIST patientbirthdate
+	%lang.att;
+>
+
+<!-- B.1.2.2a Age at time of onset of reaction / event -->
+<!ELEMENT patientonsetage       - -     (#PCDATA)>
+<!ATTLIST patientonsetage
+	%lang.att;
+>
+
+<!-- B.1.2.2b Age at time of onset of reaction / event unit -->
+<!ELEMENT patientonsetageunit   - -     (#PCDATA)>
+<!ATTLIST patientonsetageunit
+        %lang.att;
+>
+
+<!-- B.1.2.2.1a Gestation period when reaction / event was observed in the fetus -->
+<!ELEMENT gestationperiod       - -     (#PCDATA)>
+<!ATTLIST gestationperiod
+	%lang.att;
+>
+
+<!-- B.1.2.2.1b Gestation period when reaction / event was observed in the fetus unit -->
+<!ELEMENT gestationperiodunit  - -     (#PCDATA)>
+<!ATTLIST gestationperiodunit
+        %lang.att;
+>
+
+<!-- B.1.2.3 Patient age group -->
+<!ELEMENT patientagegroup       - -     (#PCDATA)>
+<!ATTLIST patientagegroup
+	%lang.att;
+>
+
+<!-- B.1.3 Weight (kg) -->
+<!ELEMENT patientweight         - -     (#PCDATA)>
+<!ATTLIST patientweight
+	%lang.att;
+>
+
+<!-- B.1.4 Height (cm) -->
+<!ELEMENT patientheight         - -     (#PCDATA)>
+<!ATTLIST patientheight
+	%lang.att;
+>
+
+<!-- B.1.5 Sex -->
+<!ELEMENT patientsex            - -     (#PCDATA)>
+<!ATTLIST patientsex
+	%lang.att;
+>
+
+<!-- B.1.6a Last menstrual period date format -->
+<!ELEMENT lastmenstrualdateformat - - (#PCDATA)>
+<!ATTLIST lastmenstrualdateformat
+        %lang.att;
+>
+
+<!-- B.1.6b Last menstrual period date -->
+<!ELEMENT patientlastmenstrualdate - -  (#PCDATA)>
+<!ATTLIST patientlastmenstrualdate
+	%lang.att;
+>
+
+<!-- B.1.7.1a.2 Structured information -->
+<!ELEMENT patientepisodename - - (#PCDATA)>
+<!ATTLIST patientepisodename
+	%lang.att;
+>
+
+<!-- B.1.7.1b Start date format -->
+<!ELEMENT patientmedicalstartdateformat - - (#PCDATA)>
+<!ATTLIST patientmedicalstartdateformat
+        %lang.att;
+>
+
+<!-- B.1.7.1c Start date -->
+<!ELEMENT patientmedicalstartdate - -   (#PCDATA)>
+<!ATTLIST patientmedicalstartdate
+	%lang.att;
+>
+
+<!-- B.1.7.1d Continuing -->
+<!ELEMENT patientmedicalcontinue - -    (#PCDATA)>
+<!ATTLIST patientmedicalcontinue
+	%lang.att;
+>
+
+<!-- B.1.7.1e End date format -->
+<!ELEMENT patientmedicalenddateformat - - (#PCDATA)>
+<!ATTLIST patientmedicalenddateformat
+        %lang.att;
+>
+
+<!-- B.1.7.1f End date -->
+<!ELEMENT patientmedicalenddate - -     (#PCDATA)>
+<!ATTLIST patientmedicalenddate
+	%lang.att;
+>
+
+<!-- B.1.7.1g Comments -->
+<!ELEMENT patientmedicalcomment - -     (#PCDATA)>
+<!ATTLIST patientmedicalcomment
+	%lang.att;
+>
+
+<!-- B.1.7.2 Text for relevant medical history and concurrent conditions -->
+<!ELEMENT patientmedicalhistorytext - - (#PCDATA)>
+<!ATTLIST patientmedicalhistorytext
+	%lang.att;
+>
+
+<!-- B.1.8a Name of drug -->
+<!ELEMENT patientdrugname       - -     (#PCDATA)>
+<!ATTLIST patientdrugname
+	%lang.att;
+>
+
+<!-- B.1.8b Start date format -->
+<!ELEMENT patientdrugstartdateformat - - (#PCDATA)>
+<!ATTLIST patientdrugstartdateformat
+        %lang.att;
+>
+
+<!-- B.1.8c Start date -->
+<!ELEMENT patientdrugstartdate  - -     (#PCDATA)>
+<!ATTLIST patientdrugstartdate
+	%lang.att;
+>
+
+<!-- B.1.8d End date format -->
+<!ELEMENT patientdrugenddateformat - -  (#PCDATA)>
+<!ATTLIST patientdrugenddateformat
+        %lang.att;
+>
+
+<!-- B.1.8e End date -->
+<!ELEMENT patientdrugenddate    - -     (#PCDATA)>
+<!ATTLIST patientdrugenddate
+	%lang.att;
+>
+
+<!-- B.1.8f.2 Indication -->
+<!ELEMENT patientdrugindication - -     (#PCDATA)>
+<!ATTLIST patientdrugindication
+	%lang.att;
+>
+
+<!-- B.1.8g.2 Reaction     -->
+<!-- Added in version V2.1 -->
+<!ELEMENT patientdrugreaction   - -     (#PCDATA)>
+<!ATTLIST patientdrugreaction
+	%lang.att;
+>
+<!-- B.1.9.1a Date of death format -->
+<!ELEMENT patientdeathdateformat - -    (#PCDATA)>
+<!ATTLIST patientdeathdateformat
+        %lang.att;
+>
+
+<!-- B.1.9.1b Date of death -->
+<!ELEMENT patientdeathdate      - -     (#PCDATA)>
+<!ATTLIST patientdeathdate
+	%lang.att;
+>
+
+<!-- B.1.9.2b Reported cause of death -->
+<!ELEMENT patientdeathreport    - -     (#PCDATA)>
+<!ATTLIST patientdeathreport
+	%lang.att;
+>
+
+<!-- B.1.9.3 Was autopsy done? -->
+<!ELEMENT patientautopsyyesno   - -     (#PCDATA)>
+<!ATTLIST patientautopsyyesno
+	%lang.att;
+>
+
+<!-- B.1.9.4b Autopsy-determined causes(s) of death -->
+<!ELEMENT patientdetermineautopsy - -   (#PCDATA)>
+<!ATTLIST patientdetermineautopsy
+	%lang.att;
+>
+
+<!-- B.1.10.1 Parent identification -->
+<!ELEMENT parentidentification  - -     (#PCDATA)>
+<!ATTLIST parentidentification
+	%lang.att;
+>
+
+<!-- B.1.10.2.1a Date of birth of parent format -->
+<!ELEMENT parentbirthdateformat - -     (#PCDATA)>
+<!ATTLIST parentbirthdateformat
+        %lang.att;
+>
+
+<!-- B.1.10.2.1b Date of birth of parent -->
+<!ELEMENT parentbirthdate       - -     (#PCDATA)>
+<!ATTLIST parentbirthdate
+	%lang.att;
+>
+
+<!-- B.1.10.2.2a Age of parent -->
+<!ELEMENT parentage             - -     (#PCDATA)>
+<!ATTLIST parentage
+	%lang.att;
+>
+
+<!-- B.1.10.2.2b Age of parent unit -->
+<!ELEMENT parentageunit         - -     (#PCDATA)>
+<!ATTLIST parentageunit
+        %lang.att;
+>
+
+<!-- B.1.10.3a Last menstrual period format -->
+<!ELEMENT parentlastmenstrualdateformat - -   (#PCDATA)>
+<!ATTLIST parentlastmenstrualdateformat
+        %lang.att;
+>
+
+<!-- B.1.10.3b Last menstrual period -->
+<!ELEMENT parentlastmenstrualdate - -   (#PCDATA)>
+<!ATTLIST parentlastmenstrualdate
+	%lang.att;
+>
+
+<!-- B.1.10.4 Weight (kg) of parent -->
+<!ELEMENT parentweight          - -     (#PCDATA)>
+<!ATTLIST parentweight
+	%lang.att;
+>
+
+<!-- B.1.10.5 Height (cm) of parent -->
+<!ELEMENT parentheight          - -     (#PCDATA)>
+<!ATTLIST parentheight
+	%lang.att;
+>
+
+<!-- B.1.10.6 Sex of parent -->
+<!ELEMENT parentsex             - -     (#PCDATA)>
+<!ATTLIST parentsex
+	%lang.att;
+>
+
+<!-- B.1.10.7.1a.2 Structured information -->
+<!ELEMENT parentmedicalepisodename - -  (#PCDATA)>
+<!ATTLIST parentmedicalepisodename
+	%lang.att;
+>
+<!-- B.1.10.7.1b Start date format -->
+<!ELEMENT parentmedicalstartdateformat - - (#PCDATA)>
+<!ATTLIST parentmedicalstartdateformat
+        %lang.att;
+>
+
+<!-- B.1.10.7.1c Start date -->
+<!ELEMENT parentmedicalstartdate - -    (#PCDATA)>
+<!ATTLIST parentmedicalstartdate
+	%lang.att;
+>
+
+<!-- B.1.10.7.1d Continuing -->
+<!ELEMENT parentmedicalcontinue - -     (#PCDATA)>
+<!ATTLIST parentmedicalcontinue
+	%lang.att;
+>
+<!-- B.1.10.7.1e End date format -->
+<!ELEMENT parentmedicalenddateformat - - (#PCDATA)>
+<!ATTLIST parentmedicalenddateformat
+        %lang.att;
+>
+
+<!-- B.1.10.7.1f End date -->
+<!ELEMENT parentmedicalenddate  - -     (#PCDATA)>
+<!ATTLIST parentmedicalenddate
+	%lang.att;
+>
+
+<!-- B.1.10.7.1g Comments -->
+<!ELEMENT parentmedicalcomment  - -     (#PCDATA)>
+<!ATTLIST parentmedicalcomment
+	%lang.att;
+>
+
+<!-- B.1.10.7.2 Text for relevant medical history and concurrent conditions (not including reaction / event) of parent -->
+<!ELEMENT parentmedicalrelevanttext - - (#PCDATA)>
+<!ATTLIST parentmedicalrelevanttext
+	%lang.att;
+>
+
+<!-- B.1.10.8a Name of drug as -->
+<!ELEMENT parentdrugname        - -     (#PCDATA)>
+<!ATTLIST parentdrugname
+	%lang.att;
+>
+
+<!-- B.1.10.8b Start date format -->
+<!ELEMENT parentdrugstartdateformat - - (#PCDATA)>
+<!ATTLIST parentdrugstartdateformat
+        %lang.att;
+>
+
+<!-- B.1.10.8c Start date -->
+<!ELEMENT parentdrugstartdate   - -     (#PCDATA)>
+<!ATTLIST parentdrugstartdate
+	%lang.att;
+>
+<!-- B.1.10.8d End date format -->
+<!ELEMENT parentdrugenddateformat - -   (#PCDATA)>
+<!ATTLIST parentdrugenddateformat
+        %lang.att;
+>
+
+<!-- B.1.10.8e End date --> 
+<!ELEMENT parentdrugenddate     - -     (#PCDATA)>
+<!ATTLIST parentdrugenddate
+	%lang.att;
+>
+
+<!-- B.1.10.8f.2 Indication -->
+<!ELEMENT parentdrugindication  - -     (#PCDATA)>
+<!ATTLIST parentdrugindication
+	%lang.att;
+>
+
+<!-- B.1.10.8g.2 Reactions (if any and known) -->
+<!ELEMENT parentdrugreaction    - -     (#PCDATA)>
+<!ATTLIST parentdrugreaction
+	%lang.att;
+>
+
+<!-- B.2.i.0 Reaction / event as reported by primary -->
+<!ELEMENT primarysourcereaction - -     (#PCDATA)>
+<!ATTLIST primarysourcereaction
+	%lang.att;
+>
+
+<!-- B.2.i.3 Term highlighted by the reporter -->
+<!ELEMENT termhighlighted       - -     (#PCDATA)>
+<!ATTLIST termhighlighted
+	%lang.att;
+>
+
+<!-- B.2.i.4a Date of start of reaction / event format -->
+<!ELEMENT reactionstartdateformat - -   (#PCDATA)>
+<!ATTLIST reactionstartdateformat
+        %lang.att;
+>
+
+<!-- B.2.i.4b Date of start of reaction / event -->
+<!ELEMENT reactionstartdate     - -     (#PCDATA)>
+<!ATTLIST reactionstartdate
+	%lang.att;
+>
+<!-- B.2.i.5a Date of end of reaction / event format -->
+<!ELEMENT reactionenddateformat - -     (#PCDATA)>
+<!ATTLIST reactionenddateformat
+        %lang.att;
+>
+
+<!-- B.2.i.5b Date of end of reaction / event -->
+<!ELEMENT reactionenddate       - -     (#PCDATA)>
+<!ATTLIST reactionenddate
+	%lang.att;
+>
+
+<!-- B.2.i.6a Duration of reaction / event -->
+<!ELEMENT reactionduration      - -     (#PCDATA)>
+<!ATTLIST reactionduration
+	%lang.att;
+>
+
+<!-- B.2.i.6b Duration of reaction / event unit -->
+<!ELEMENT reactiondurationunit   - -     (#PCDATA)>
+<!ATTLIST reactiondurationunit
+        %lang.att;
+>
+
+<!-- B.2.i.7.1a Time interval between beginning of suspect drug administration and start of reaction / event -->
+<!ELEMENT reactionfirsttime     - -     (#PCDATA)>
+<!ATTLIST reactionfirsttime
+	%lang.att;
+>
+
+<!-- B.2.i.7.1b Time interval between beginning of suspect drug administration and start of reaction / event unit -->
+<!ELEMENT reactionfirsttimeunit - -     (#PCDATA)>
+<!ATTLIST reactionfirsttimeunit
+        %lang.att;
+>
+
+<!-- B.2.i.7.2a Time interval between last dose and start of reaction / event -->
+<!ELEMENT reactionlasttime      - -     (#PCDATA)>
+<!ATTLIST reactionlasttime
+	%lang.att;
+>
+
+<!-- B.2.i.7.2b Time interval between last dose and start of reaction / event unit -->
+<!ELEMENT reactionlasttimeunit  - -     (#PCDATA)>
+<!ATTLIST reactionlasttimeunit
+        %lang.att;
+>
+
+<!-- B.2.i.8 Outcome of reaction / event at the time of last observation -->
+<!ELEMENT reactionoutcome       - -     (#PCDATA)>
+<!ATTLIST reactionoutcome
+	%lang.att;
+>
+
+<!-- B.3.1a Date format -->
+<!ELEMENT testdateformat        - -     (#PCDATA)>
+<!ATTLIST testdateformat
+        %lang.att;
+>
+
+<!-- B.3.1b Date -->
+<!ELEMENT testdate              - -     (#PCDATA)>
+<!ATTLIST testdate
+	%lang.att;
+>
+
+<!-- B.3.1c Test -->
+<!ELEMENT testname              - -     (#PCDATA)>
+<!ATTLIST testname
+	%lang.att;
+>
+
+<!-- B.3.1d Result -->
+<!ELEMENT testresult            - -     (#PCDATA)>
+<!ATTLIST testresult
+	%lang.att;
+>
+
+<!-- B.3.1e Unit -->
+<!ELEMENT testunit              - -     (#PCDATA)>
+<!ATTLIST testunit
+	%lang.att;
+>
+
+<!-- B.3.1.1 Normal low range -->
+<!ELEMENT lowtestrange          - -     (#PCDATA)>
+<!ATTLIST lowtestrange
+	%lang.att;
+>
+
+<!-- B.3.1.2 Normal high range -->
+<!ELEMENT hightestrange         - -     (#PCDATA)>
+<!ATTLIST hightestrange
+	%lang.att;
+>
+
+<!-- B.3.1.3 More information available (Y/N) -->
+<!ELEMENT moreinformation       - -     (#PCDATA)>
+<!ATTLIST moreinformation
+	%lang.att;
+>
+
+<!-- B.3.2 Results of tests and procedures relevant to the investigation of the patient -->
+<!ELEMENT resultstestsprocedures - -    (#PCDATA)>
+<!ATTLIST resultstestsprocedures
+	%lang.att;
+>
+
+<!-- B.4.k.1 Characterization of drug -->
+<!ELEMENT drugcharacterization  - -     (#PCDATA)>
+<!ATTLIST drugcharacterization
+	%lang.att;
+>
+
+<!-- B.4.k.2.1 Proprietary medicinal product name -->
+<!ELEMENT medicinalproduct      - -     (#PCDATA)>
+<!ATTLIST medicinalproduct
+	%lang.att;
+>
+
+<!-- B.4.k.2.2 Active drug substance names -->
+<!ELEMENT activesubstancename   - -     (#PCDATA)>
+<!ATTLIST activesubstancename
+	%lang.att;
+>
+
+<!-- B.4.k.2.3 Identification of the country where the drug was obtained -->
+<!ELEMENT obtaindrugcountry     - -     (#PCDATA)>
+<!ATTLIST obtaindrugcountry
+	%lang.att;
+>
+
+<!-- B.4.k.3 Batch / lot number -->
+<!ELEMENT drugbatchnumb         - -     (#PCDATA)>
+<!ATTLIST drugbatchnumb
+	%lang.att;
+>
+
+<!-- B.4.k.4.1 Authorization / application number -->
+<!ELEMENT drugauthorizationnumb - -     (#PCDATA)>
+<!ATTLIST drugauthorizationnumb
+	%lang.att;
+>
+
+<!-- B.4.k.4.2 Country of authorization / application -->
+<!ELEMENT drugauthorizationcountry - -  (#PCDATA)>
+<!ATTLIST drugauthorizationcountry
+	%lang.att;
+>
+
+<!-- B.4.k.4.3 Name of holder/applicant -->
+<!ELEMENT drugauthorizationholder - -   (#PCDATA)>
+<!ATTLIST drugauthorizationholder
+	%lang.att;
+>
+
+<!-- B.4.k.5.1 Dose (number) -->
+<!ELEMENT drugstructuredosagenumb - -   (#PCDATA)>
+<!ATTLIST drugstructuredosagenumb
+	%lang.att;
+>
+
+<!-- B.4.k.5.2 Dose (unit) -->
+<!ELEMENT drugstructuredosageunit - -   (#PCDATA)>
+<!ATTLIST drugstructuredosageunit
+	%lang.att;
+>
+
+<!-- B.4.k.5.3 Number of separate -->
+<!ELEMENT drugseparatedosagenumb - -    (#PCDATA)>
+<!ATTLIST drugseparatedosagenumb
+	%lang.att;
+>
+
+<!-- B.4.k.5.4 Number of units in the interval -->
+<!ELEMENT drugintervaldosageunitnumb - -        (#PCDATA)>
+<!ATTLIST drugintervaldosageunitnumb
+	%lang.att;
+>
+
+<!-- B.4.k.5.5 Definition of the interval -->
+<!ELEMENT drugintervaldosagedefinition - -      (#PCDATA)>
+<!ATTLIST drugintervaldosagedefinition
+	%lang.att;
+>
+
+<!-- B.4.k.5.6 Cumulative dose to first reaction (number) -->
+<!ELEMENT drugcumulativedosagenumb - -  (#PCDATA)>
+<!ATTLIST drugcumulativedosagenumb
+	%lang.att;
+>
+
+<!-- B.4.k.5.7 Cumulative dose to first reaction (unit) -->
+<!ELEMENT drugcumulativedosageunit - -  (#PCDATA)>
+<!ATTLIST drugcumulativedosageunit
+	%lang.att;
+>
+
+<!-- B.4.k.6 Dosage text -->
+<!ELEMENT drugdosagetext        - -     (#PCDATA)>
+<!ATTLIST drugdosagetext
+	%lang.att;
+>
+
+<!-- B.4.k.7 Pharmaceutical form (Dosage form) -->
+<!ELEMENT drugdosageform        - -     (#PCDATA)>
+<!ATTLIST drugdosageform
+	%lang.att;
+>
+
+<!-- B.4.k.8 Route of administration -->
+<!ELEMENT drugadministrationroute - -   (#PCDATA)>
+<!ATTLIST drugadministrationroute
+
+	%lang.att;
+>
+
+<!-- B.4.k.9 Parent route of administration (in case of a parent child / fetus report) -->
+<!ELEMENT drugparadministration - -     (#PCDATA)>
+<!ATTLIST drugparadministration
+	%lang.att;
+>
+
+<!-- B.4.k.10a Gestation period at time of exposure -->
+<!ELEMENT reactiongestationperiod - -   (#PCDATA)>
+<!ATTLIST reactiongestationperiod
+	%lang.att;
+>
+
+<!-- B.4.k.10b Gestation period at time of exposure unit -->
+<!ELEMENT reactiongestationperiodunit   - -     (#PCDATA)>
+<!ATTLIST reactiongestationperiodunit
+        %lang.att;
+>
+
+<!-- B.4.k.11b Indication for use in the case -->
+<!ELEMENT drugindication        - -     (#PCDATA)>
+<!ATTLIST drugindication
+	%lang.att;
+>
+
+<!-- B.4.k.12a Date of start of drug format -->
+<!ELEMENT drugstartdateformat   - -     (#PCDATA)>
+<!ATTLIST drugstartdateformat
+        %lang.att;
+>
+
+<!-- B.4.k.12b Date of start of drug -->
+<!ELEMENT drugstartdate         - -     (#PCDATA)>
+<!ATTLIST drugstartdate
+	%lang.att;
+>
+
+<!-- B.4.k.13.1a Time interval between beginning of drug administration and start of reaction / event -->
+<!ELEMENT drugstartperiod	- -     (#PCDATA)>
+<!ATTLIST drugstartperiod
+	%lang.att;
+>
+
+<!-- B.4.k.13.1b Time interval between beginning of drug administration and start of reaction / event unit -->
+<!ELEMENT drugstartperiodunit   - -     (#PCDATA)>
+<!ATTLIST drugstartperiodunit
+        %lang.att;
+>
+
+<!-- B.4.k.13.2a Time interval between last dose of drug and start of reaction / event -->
+<!ELEMENT druglastperiod	- -     (#PCDATA)>
+<!ATTLIST druglastperiod
+	%lang.att;
+>
+
+<!-- B.4.k.13.2b Time interval between last dose of drug and start of reaction / event unit -->
+<!ELEMENT druglastperiodunit    - -     (#PCDATA)>
+<!ATTLIST druglastperiodunit
+        %lang.att;
+>
+
+<!-- B.4.k.14a Date of last administration format -->
+<!ELEMENT drugenddateformat     - -     (#PCDATA)>
+<!ATTLIST drugenddateformat
+        %lang.att;
+>
+
+<!-- B.4.k.14b Date of last administration -->
+<!ELEMENT drugenddate           - -     (#PCDATA)>
+<!ATTLIST drugenddate
+	%lang.att;
+>
+
+<!-- B.4.k.15a Duration of drug administration unit -->
+<!ELEMENT drugtreatmentduration - -     (#PCDATA)>
+<!ATTLIST drugtreatmentduration
+	%lang.att;
+>
+
+<!-- B.4.k.15b Duration of drug administration unit -->
+<!ELEMENT drugtreatmentdurationunit - - (#PCDATA)>
+<!ATTLIST drugtreatmentdurationunit
+        %lang.att;
+>
+
+<!-- B.4.k.16 Action(s) taken with drug -->
+<!ELEMENT actiondrug            - -     (#PCDATA)>
+<!ATTLIST actiondrug
+	%lang.att;
+>
+
+<!-- B.4.k.17.1 Did reaction recur on readministration? -->
+<!ELEMENT drugrecurreadministration - - (#PCDATA)>
+<!ATTLIST drugrecurreadministration
+	%lang.att;
+>
+
+<!-- B.4.k.17.2b If yes, which reaction / event recurred? -->
+<!ELEMENT drugrecuraction       - -     (#PCDATA)>
+<!ATTLIST drugrecuraction
+	%lang.att;
+>
+
+<!-- B.4.k.18.1b Reaction assessed -->
+<!ELEMENT drugreactionasses     - -     (#PCDATA)>
+<!ATTLIST drugreactionasses
+	%lang.att;
+>
+
+<!-- B.4.k.18.2 Source of assessment -->
+<!ELEMENT drugassessmentsource  - -     (#PCDATA)>
+<!ATTLIST drugassessmentsource
+	%lang.att;
+>
+
+<!-- B.4.k.18.3 Method of assessment -->
+<!ELEMENT drugassessmentmethod  - -     (#PCDATA)>
+<!ATTLIST drugassessmentmethod
+	%lang.att;
+>
+
+<!-- B.4.k.18.4 Result -->
+<!ELEMENT drugresult            - -     (#PCDATA)>
+<!ATTLIST drugresult
+	%lang.att;
+> 
+
+<!-- B.4.k.19 Additional information on drug -->
+<!ELEMENT drugadditional        - -     (#PCDATA)>
+<!ATTLIST drugadditional
+	%lang.att;
+>
+
+<!-- B.5.1 Case narrative including clinical course, therapeutic measures, outcome and additional relevant information -->
+<!ELEMENT narrativeincludeclinical - -  (#PCDATA)>
+<!ATTLIST narrativeincludeclinical
+	%lang.att;
+>
+
+<!-- B.5.2 Reporter's comments -->
+<!ELEMENT reportercomment       - -     (#PCDATA)>
+<!ATTLIST reportercomment
+	%lang.att;
+>
+
+<!-- B.5.3b Sender's diagnosis / syndrome and / or reclassification of reaction / event -->
+<!ELEMENT senderdiagnosis       - -     (#PCDATA)>
+<!ATTLIST senderdiagnosis
+	%lang.att;
+>
+
+<!-- B.5.4 Sender's comments -->
+<!ELEMENT sendercomment         - -     (#PCDATA)>
+<!ATTLIST sendercomment
+	%lang.att;
+>
+
+<!-- B.1.7.1a.1 MedDRA version for medical history -->
+<!-- Added in version V2.1                         -->
+
+<!ELEMENT patientepisodenamemeddraversion         - -     (#PCDATA)>
+<!ATTLIST patientepisodenamemeddraversion
+    %lang.att;
+>
+
+<!-- B.1.9.2a MedDRA version for reported cause(s) of death -->
+<!-- Added in version V2.1                                  -->
+<!ELEMENT patientdeathreportmeddraversion        - -     (#PCDATA)>
+<!ATTLIST patientdeathreportmeddraversion
+    %lang.att;
+>
+
+<!-- B.1.9.4a MedDRA version for autopsy-determined cause(s) of death -->
+<!-- Added in version V2.1                                            -->
+<!ELEMENT patientdetermautopsmeddraversion        - -     (#PCDATA)>
+<!ATTLIST patientdetermautopsmeddraversion
+    %lang.att;
+>
+
+<!-- B.1.10.7.1a.1 MedDRA version for parent medical history -->
+<!-- Added in version V2.1                                   -->
+<!ELEMENT parentmdepisodemeddraversion         - -     (#PCDATA)>
+<!ATTLIST parentmdepisodemeddraversion
+    %lang.att;
+>
+
+<!-- B.1.8f.1 MedDRA version for indication -->
+<!-- Added in version V2.1                  -->
+<!ELEMENT patientindicationmeddraversion         - -     (#PCDATA)>
+<!ATTLIST patientindicationmeddraversion
+    %lang.att;
+>
+<!-- B.1.10.8g.1 MedDRA version for indication -->
+<!-- Added in version V2.1                     -->
+<!ELEMENT parentdrgreactionmeddraversion         - -     (#PCDATA)>
+<!ATTLIST parentdrgreactionmeddraversion
+    %lang.att;
+>
+<!-- B.1.10.8f.1 MedDRA version for indication -->
+<!-- Added in version V2.1                     -->
+<!ELEMENT parentdrgindicationmeddraversion         - -     (#PCDATA)>
+<!ATTLIST parentdrgindicationmeddraversion
+    %lang.att;
+>
+
+<!-- B.4.k.11a MedDRA version for indication -->
+<!-- Added in version V2.1                   -->
+<!ELEMENT drugindicationmeddraversion         - -     (#PCDATA)>
+<!ATTLIST drugindicationmeddraversion
+    %lang.att;
+>
+
+<!-- B.1.8g.1 MedDRA version for reaction -->
+<!-- Added in version V2.1                -->
+<!ELEMENT patientdrgreactionmeddraversion         - -     (#PCDATA)>
+<!ATTLIST patientdrgreactionmeddraversion
+    %lang.att;
+>
+
+<!-- B.4.k.18.1a MedDRA version for reaction assessed -->
+<!-- Added in version V2.1                            -->
+<!ELEMENT drugreactionassesmeddraversion         - -     (#PCDATA)>
+<!ATTLIST drugreactionassesmeddraversion
+    %lang.att;
+>
+
+
+<!-- B.2.i.2a MedDRA version for reaction/event term PT -->
+<!-- Added in version V2.1                              -->
+<!ELEMENT reactionmeddraversionpt         - -     (#PCDATA)>
+<!ATTLIST reactionmeddraversionpt
+    %lang.att;
+>
+
+<!-- B.2.i.2b MedDRA PT for reaction/event term -->
+<!-- Added in version V2.1                      -->
+<!ELEMENT reactionmeddrapt         - -     (#PCDATA)>
+<!ATTLIST reactionmeddrapt
+    %lang.att;
+>
+
+<!-- B.2.i.1a MedDRA version for reaction/event term LLT -->
+<!-- Added in version V2.1                               -->
+<!ELEMENT reactionmeddraversionllt         - -     (#PCDATA)>
+<!ATTLIST reactionmeddraversionllt
+    %lang.att;
+>
+
+<!-- B.2.i.1b MedDRA LLT for reaction/event term -->
+<!-- Added in version V2.1                       -->
+<!ELEMENT reactionmeddrallt         - -     (#PCDATA)>
+<!ATTLIST reactionmeddrallt
+    %lang.att;
+>
+
+<!-- B.4.k.17.2a MedDRA version for reaction/event recurred -->
+<!-- Added in version V2.1                                  -->
+<!ELEMENT drugrecuractionmeddraversion        - -     (#PCDATA)>
+<!ATTLIST drugrecuractionmeddraversion
+    %lang.att;
+>
+
+
+<!-- B.5.3a MedDRA version for senders diagnosis or syndrome -->
+<!-- Added in version V2.1                                   -->
+<!ELEMENT senderdiagnosismeddraversion         - -     (#PCDATA)>
+<!ATTLIST senderdiagnosismeddraversion
+    %lang.att;
+>
+
+
+]>
+

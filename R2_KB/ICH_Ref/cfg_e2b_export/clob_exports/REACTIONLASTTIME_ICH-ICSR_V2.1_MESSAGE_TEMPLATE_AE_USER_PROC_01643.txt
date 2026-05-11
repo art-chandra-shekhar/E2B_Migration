@@ -1,0 +1,18 @@
+DECLARE
+  v_xml         varchar2(32767);
+  v_xml2        varchar2(32767);
+  l_return      number := 0;
+  v_duration    varchar2(32767);
+  l_minutes    number;
+BEGIN
+  v_xml    := ESM_IMP.F_READ(:REPORT_ID,:DTD_ELEMENT);
+  v_xml2   := ESM_IMP.F_READ(:REPORT_ID,'REACTIONLASTTIMEUNIT');
+  l_return := ESM_IMP_UTL.F_CHECK_UNIT_VALUE(:DTD_ELEMENT,v_xml,'REACTIONLASTTIMEUNIT',v_xml2, :REPORT_ID);
+  if l_return = 0 then
+      l_minutes := ESM_IMP_UTL.F_CONVERT_TO_MINUTES(v_xml,v_xml2);
+      l_return :=  ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_EVENT','ONSET_DELAY_SECONDS',l_minutes*60);
+      v_duration := ESM_AE.f_combine_unit_value(v_xml2,v_xml,:REPORT_ID);
+    l_return :=  ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_EVENT','ONSET_DELAY',v_duration);
+    l_return :=  ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_EVENT','ONSET_DELAY_UNIT_E2B',v_xml2);
+  end if;
+END;

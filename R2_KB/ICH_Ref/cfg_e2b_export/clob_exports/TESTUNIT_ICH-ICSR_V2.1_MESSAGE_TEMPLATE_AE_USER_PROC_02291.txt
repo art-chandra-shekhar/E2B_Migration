@@ -1,0 +1,6 @@
+DECLARE
+   v_xml    varchar2(32767);
+BEGIN
+   null;
+   /* TESTUNIT element processed in TESTRESULT */
+END;

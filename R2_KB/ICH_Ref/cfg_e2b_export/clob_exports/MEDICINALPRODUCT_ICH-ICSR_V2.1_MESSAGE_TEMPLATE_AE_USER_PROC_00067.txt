@@ -1,0 +1,453 @@
+DECLARE
+  CURSOR c1 (arg_product_id IN NUMBER)
+  IS
+    SELECT
+      ingredient_id
+    FROM
+      LM_PF_INGREDIENTS A,
+      LM_PRODUCT B
+    WHERE
+      B.PRODUCT_ID  = arg_product_id
+    AND B.FAMILY_ID = A.FAMILY_ID;
+  CURSOR as_not_in_pf (arg_report_id IN NUMBER, arg_drug_id IN NUMBER,
+    arg_product_id                   IN NUMBER, arg_ingredient_list IN VARCHAR2
+    )
+  IS
+    SELECT
+      UPPER(activesubstancename) activesubstancename
+    FROM
+      activesubstance
+    WHERE
+      report_id =arg_report_id
+    AND DRUG_ID = arg_drug_id
+  MINUS
+    (
+      SELECT
+        UPPER(NVL(ingredient, ingredient_j)) activesubstancename
+      FROM
+        LM_PF_INGREDIENTS A,
+        LM_PRODUCT B,
+        LM_INGREDIENTS c
+      WHERE
+        B.PRODUCT_ID      = arg_product_id
+      AND B.FAMILY_ID     = A.FAMILY_ID
+      AND C.ingredient_id = A.ingredient_id
+      UNION
+      SELECT
+        UPPER(ingredient) activesubstancename
+      FROM
+        LM_INGREDIENTS
+      WHERE
+        INSTR ( ', '
+        || arg_ingredient_list
+        || ', ' , ', '
+        || INGREDIENT_ID
+        || ', ') > 0
+    );
+  CURSOR as_cl_list_noncdd (arg_report_id IN NUMBER, arg_drug_id IN NUMBER,
+    arg_product_id                        IN NUMBER)
+  IS
+    SELECT
+      UPPER(activesubstancename) activesubstancename
+    FROM
+      activesubstance
+    WHERE
+      report_id          =arg_report_id
+    AND DRUG_ID          = arg_drug_id
+    AND arg_product_id   = 0;
+  v_xml     VARCHAR2(32767) := NULL;
+  v_xml_AS  VARCHAR2(32767) := NULL;
+  v_xml_DF  VARCHAR2(32767) := NULL;
+  v_xml_DC  VARCHAR2(32767) := NULL;
+  v_xml_DAC VARCHAR2(10)    := NULL;
+  v_xml_ODC VARCHAR2(10)    := NULL;
+  lb_return BOOLEAN         := FALSE;
+  v_dtd_elements esm_imp.vtab;
+  l_product_id NUMBER;
+  v_trade_name VARCHAR2(4000);
+  l_trade_name lm_license.trade_name%type;
+  l_trade_name_j lm_license.trade_name_j%type;
+  l_country_id      NUMBER;
+  l_manufacturer_id NUMBER;
+  l_co_drug_code case_product.co_drug_code%type;
+  l_who_drug_code case_product.who_drug_code%type;
+  l_drug_code_j case_product.drug_code_j%type := NULL;
+  v_error_message  VARCHAR2(4000);
+  l_formulation_id NUMBER := NULL;
+  l_grpcountry_id  NUMBER := NULL;
+  l_xmlcountry_id  NUMBER := NULL;
+  l_odccountry_id  NUMBER := NULL;
+  v_concentration lm_product.concentration%type;
+  l_con_unit_id NUMBER                              := NULL;
+  v_generic_name case_product.generic_name%type     := NULL;
+  v_generic_name_j case_product.generic_name_j%type := NULL;
+  v_LLT              VARCHAR2(250)                               := NULL;
+  v_LLT_J            VARCHAR2(400)                               := NULL;
+  v_SOC              VARCHAR2(250)                               := NULL;
+  v_SOC_J            VARCHAR2(400)                               := NULL;
+  v_HLT              VARCHAR2(250)                               := NULL;
+  v_HLT_J            VARCHAR2(400)                               := NULL;
+  v_HLGT             VARCHAR2(250)                               := NULL;
+  v_HLGT_J           VARCHAR2(400)                               := NULL;
+  V_PT_CODE          VARCHAR2(50)                                := NULL;
+  v_LLT_CODE         VARCHAR2(50)                                := NULL;
+  v_LLT_CODE_J       VARCHAR2(50)                                := NULL;
+  v_HLGT_CODE        VARCHAR2(50)                                := NULL;
+  v_SOC_CODE         VARCHAR2(50)                                := NULL;
+  v_HLT_CODE         VARCHAR2(50)                                := NULL;
+  V_PT               VARCHAR2(250)                               := NULL;
+  V_PT_J             VARCHAR2(400)                               := NULL;
+  l_item_coded       NUMBER;
+  l_item_coded_j     NUMBER;
+  l_dict_id          NUMBER;
+  l_multiple         NUMBER := 0;
+  l_multiple_c 		 NUMBER := 0;
+  l_blinded          NUMBER := 0;
+  l_selected_view    NUMBER;
+  l_ret              NUMBER;
+  l_form_id          NUMBER;
+  wdelim             VARCHAR2(3) := esm_imp_utl.wdelim;
+  l_drug_code_type_j NUMBER      := NULL;
+  l_family_id        NUMBER      := NULL;
+  v_ingredient_list  VARCHAR2(32767);
+  v_ingredientlist_xml VARCHAR2(32767) := NULL;
+  l_views_available  NUMBER := 7;  
+  l_all_ing_present    NUMBER := 1;
+  l_who_ing_count      NUMBER := 0;
+  v_ingredientlist_who    VARCHAR2(32767):= NULL;
+  l_match_found      NUMBER := 0;
+  v_medicinal_prod_id varchar2(10) := NULL;
+  l_ingredient_id    NUMBER;
+BEGIN
+  v_dtd_elements(1) := 'DRUGCHARACTERIZATION';
+  v_dtd_elements(2) := 'MEDICINALPRODUCT';
+  v_dtd_elements(3) := 'DRUGDOSAGEFORM';
+  v_xml             := ESM_IMP.F_READ(:REPORT_ID,'MEDICINALPRODUCT');
+  ESM_IMP_UTL.p_get_activesubstance(:REPORT_ID, :DRUG_ID, v_xml_AS, l_multiple);
+  v_trade_name        := v_xml;
+  l_multiple_c := l_multiple;
+  IF v_xml            IS NULL THEN
+    v_dtd_elements(2) := 'ACTIVESUBSTANCENAME';
+    v_trade_name      := v_xml_AS;
+  ELSE
+    l_multiple := 0;
+  END IF;
+  v_xml_DF         := ESM_IMP.F_READ(:REPORT_ID,'DRUGDOSAGEFORM');
+  v_xml_DC         := ESM_IMP.F_READ(:REPORT_ID,'DRUGCHARACTERIZATION');
+  v_xml_DAC        := ESM_IMP.F_READ(:REPORT_ID,'DRUGAUTHORIZATIONCOUNTRY');
+  v_xml_ODC        := ESM_IMP.F_READ(:REPORT_ID,'OBTAINDRUGCOUNTRY');
+  IF v_xml_DAC     IS NULL THEN
+    v_xml_DAC      := v_xml_ODC;
+    IF v_xml_DAC   IS NULL THEN
+      v_xml_DAC    := ESM_IMP.F_READ(:REPORT_ID,'OCCURCOUNTRY');
+      IF v_xml_DAC IS NULL THEN
+        v_xml_DAC  := ESM_IMP.F_READ(:REPORT_ID,'PRIMARYSOURCECOUNTRY');
+      END IF;
+    END IF;
+  END IF;
+  IF v_xml_ODC IS NULL THEN
+    v_xml_ODC  := v_xml_DAC;
+  END IF;
+  lb_return := ESM_IMP.F_CHECK_AND_BUILD_KEY(:REPORT_ID,:PARENT_ELEMENT,
+  v_dtd_elements);
+  IF lb_return THEN
+    IF v_xml_DF IS NOT NULL THEN
+      BEGIN
+        SELECT
+          formulation_id
+        INTO
+          l_formulation_id
+        FROM
+          lm_formulation
+        WHERE
+          upper(formulation) = upper(v_xml_DF)
+        AND rownum           = 1;
+      EXCEPTION
+      WHEN no_data_found THEN
+        l_formulation_id := NULL;
+        v_error_message  := 'MEDICINALPRODUCT' || wdelim || v_xml_DF;
+        ESM_IMP_UTL.WRITE_ERROR_MSG('BAD_FORM','MEDICINALPRODUCT', v_xml_DF, ''
+        , v_error_message, :REPORT_ID);
+      END;
+    END IF;
+    IF v_xml_DAC IS NOT NULL THEN
+      BEGIN
+        SELECT
+          country_id,
+          country_group_id
+        INTO
+          l_xmlcountry_id,
+          l_grpcountry_id
+        FROM
+          lm_countries
+        WHERE
+          A2       = upper(v_xml_DAC)
+        AND rownum = 1;
+      EXCEPTION
+      WHEN no_data_found THEN
+        l_xmlcountry_id := NULL;
+        l_grpcountry_id := NULL;
+        v_error_message := 'MEDICINALPRODUCT' || wdelim || v_xml_DAC;
+        ESM_IMP_UTL.WRITE_ERROR_MSG('BAD_COUNTRY','MEDICINALPRODUCT', v_xml_DAC
+        , '', v_error_message , :REPORT_ID);
+      END;
+    END IF;
+    IF v_xml_ODC IS NOT NULL THEN
+      BEGIN
+        SELECT
+          country_id
+        INTO
+          l_odccountry_id
+        FROM
+          lm_countries
+        WHERE
+          A2       = upper(v_xml_ODC)
+        AND rownum = 1;
+      EXCEPTION
+      WHEN OTHERS THEN
+        l_odccountry_id := NULL;
+      END;
+    END IF;
+    IF v_xml_DC IN (1, 3) THEN
+      l_blinded   := esm_imp_utl.Is_Blinded_Drug(v_trade_name, 'BLINDED');
+      IF l_blinded = 1 THEN
+        esm_imp_utl.p_study_product (:REPORT_ID, l_trade_name, l_trade_name_j,
+        l_product_id, l_form_id);
+        v_generic_name   := l_trade_name;
+        v_generic_name_j := l_trade_name_j;
+        IF l_product_id   > 0 THEN
+          SELECT
+            INDICATION_TEXT,
+            INDICATION_TEXT_J,
+            INDICATION_ID,
+            IND_HLGT,
+            IND_HLGT_J,
+            IND_HLGT_CODE,
+            IND_HLT,
+            IND_HLT_J,
+            IND_HLT_CODE,
+            IND_LLT,
+            IND_LLT_J,
+            IND_LLT_CODE,
+            IND_LLT_CODE_J,
+            IND_SOC,
+            IND_SOC_J,
+            IND_SOC_CODE,
+            CODE_DICT,
+            IND_CODE_STATUS,
+            IND_CODE_STATUS_J,
+            FAMILY_ID
+          INTO
+            V_PT,
+            V_PT_J,
+            V_PT_CODE,
+            v_HLGT,
+            v_HLGT_J,
+            v_HLGT_CODE,
+            v_HLT,
+            v_HLT_J,
+            v_HLT_CODE,
+            v_LLT,
+            v_LLT_J,
+            v_LLT_CODE,
+            v_LLT_CODE_J,
+            v_SOC,
+            v_SOC_J,
+            v_SOC_CODE,
+            l_dict_id,
+            l_item_coded,
+            l_item_coded_j,
+            l_family_id
+          FROM
+            lm_product
+          WHERE
+            product_id    = l_product_id;
+          l_co_drug_code := 'Study Drug';
+        END IF;
+      ELSE
+        esm_imp_utl.p_encode_drug( :DTD_ELEMENT, :REPORT_ID, :DRUG_ID,
+        v_trade_name, l_multiple, l_formulation_id, l_grpcountry_id,
+        l_xmlcountry_id, l_product_id, l_trade_name, l_trade_name_j,
+        l_country_id, l_manufacturer_id, l_co_drug_code, l_who_drug_code,
+        l_drug_code_j, l_drug_code_type_j, l_form_id, v_concentration,
+        l_con_unit_id, v_generic_name, v_generic_name_j, v_LLT, v_LLT_J, v_SOC,
+        v_SOC_J, v_HLT, v_HLT_J, v_HLGT, v_HLGT_J, V_PT_CODE, v_LLT_CODE,
+        v_LLT_CODE_J, v_HLGT_CODE, v_SOC_CODE, v_HLT_CODE, V_PT, V_PT_J,
+        l_dict_id, l_item_coded, l_item_coded_j, l_selected_view, l_family_id);
+      END IF;
+    END IF;
+    IF l_trade_name IS NULL THEN
+		BEGIN
+			SELECT
+				LISTAGG(''''
+						|| UPPER(activesubstancename)
+						|| '''', ',') WITHIN GROUP(
+					ORDER BY
+						activesubstancename
+				),
+				COUNT(1)
+			INTO
+				v_ingredientlist_xml,
+				l_multiple_c
+			FROM
+				activesubstance
+			WHERE
+			report_id = :report_id
+			AND drug_id = :drug_id;
+
+		EXCEPTION
+			WHEN no_data_found THEN
+				v_ingredientlist_xml := NULL;
+				l_multiple_c := 0;
+		END;
+		esm_utl.p_encode_who_drug(v_trade_name, v_xml, l_multiple, l_multiple_c, :REPORT_ID, :DRUG_ID, v_ingredientlist_xml, l_who_drug_code,  
+		l_trade_name, v_generic_name, v_ingredient_list, v_medicinal_prod_id, l_match_found); 
+		IF ((l_who_drug_code IS NULL) OR (l_match_found = 0)) THEN
+			esm_imp_utl.write_error_msg(:dtd_element, '', v_xml, 'MEDICINALPRODUCT (B.4.k.2.1) is not part of WHO Drug. Ingredient(s) ' || v_ingredientlist_xml ,:report_id);
+		ELSE
+			IF (l_match_found = 2) THEN
+				esm_imp_utl.write_error_msg(:dtd_element, '', v_xml, 'MEDICINALPRODUCT (B.4.k.2.1) has multiple matches in WHO Drug. Ingredient(s) ' || v_ingredientlist_xml ,:report_id);
+				v_medicinal_prod_id := NULL;
+				IF (v_xml IS NULL) THEN
+					l_trade_name := v_generic_name;				
+				END IF;
+			END IF;
+			l_all_ing_present := 1;
+			l_who_ing_count   := 0;
+			IF ( v_ingredient_list IS NOT NULL ) THEN
+				FOR Ingred IN (
+					SELECT
+						Ingredient_id,
+						UPPER(ingredient) ingredient
+					FROM
+						LM_INGREDIENTS
+					WHERE
+						INSTR(', '
+							  || v_ingredient_list
+							  || ', ', ', '
+									   || INGREDIENT_ID
+									   || ', ') > 0
+					ORDER BY
+						INGREDIENT
+				)
+				LOOP
+				  l_ret := ESM_IMP.F_WRITE('CASE_PROD_INGREDIENT','INGREDIENT_ID',
+				  Ingred.ingredient_id);
+				  IF (l_all_ing_present = 1 AND instr(',' || v_ingredientlist_xml || ',', ','''||ingred.ingredient|| ''',') <= 0) THEN
+						l_all_ing_present := 0;
+				  END IF;
+				  IF l_who_ing_count = 0 THEN
+					   v_ingredientlist_who := ''''||ingred.ingredient|| ''''; 
+				  ELSE
+					   v_ingredientlist_who := v_ingredientlist_who || ','''||ingred.ingredient|| ''''; 
+				  END IF;
+				  l_who_ing_count   := l_who_ing_count + 1;
+				END LOOP;
+				FOR ing IN as_not_in_pf(:REPORT_ID, :DRUG_ID, l_product_id,
+				v_ingredient_list)
+				LOOP 
+					esm_imp_utl.write_error_msg(:dtd_element, '', v_xml, 'Ingredient '||ing.activesubstancename || ' not part of WHO Drug.',:report_id);
+					IF (l_all_ing_present = 1 AND instr(',' || v_ingredientlist_xml || ',', ','''||ing.activesubstancename|| ''',') <= 0) THEN
+						l_all_ing_present := 0;
+					END IF;
+					IF l_who_ing_count = 0 THEN
+						v_ingredientlist_who := ''''||ing.activesubstancename|| ''''; 
+					ELSE
+						v_ingredientlist_who := v_ingredientlist_who || ','''||ing.activesubstancename|| ''''; 
+					END IF;       
+					l_who_ing_count   := l_who_ing_count + 1;                     
+				END LOOP;
+				IF ((l_who_ing_count <> l_multiple_c) OR (l_all_ing_present = 0)) THEN
+					esm_imp_utl.write_error_msg(:dtd_element, '', v_xml, 'Ingredient(s) from report '||v_ingredientlist_xml || ' are not matching with Ingredient(s) from WHO Drug ' || v_ingredientlist_who,:report_id);
+				END IF;                   
+			ELSE
+				esm_imp_utl.write_error_msg(:dtd_element, '', v_xml, 'Ingredient(s) '||v_ingredientlist_xml || ' are not part of WHO Drug.',:report_id);
+			END IF;    
+			l_trade_name_j := l_trade_name;  
+			v_generic_name_j := v_generic_name;
+	    END IF;
+    END IF;
+    IF l_product_id      > 0 THEN
+      l_views_available := esm_imp_utl.f_views_available(l_product_id);
+      l_ret             := ESM_IMP.F_WRITE('CASE_PRODUCT','PRODUCT_ID',
+      l_product_id);
+      l_ret := ESM_IMP.F_WRITE('FAMILY_ID',l_family_id);
+      l_ret := ESM_IMP.F_WRITE('MANUFACTURER_ID',l_manufacturer_id);
+      IF (l_co_drug_code = 'Study Drug') THEN
+        l_ret := ESM_IMP.F_WRITE('CO_DRUG_CODE',l_co_drug_code);
+      END IF;
+      l_ret := ESM_IMP.F_WRITE('SELECTED_VIEW',l_selected_view);
+      l_ret := ESM_IMP.F_WRITE('CASE_PROD_DRUGS','CONCENTRATION',
+      v_concentration);
+      l_ret := ESM_IMP.F_WRITE('CONC_UNITS_ID',l_con_unit_id);
+      FOR Z IN c1(l_product_id)
+      LOOP
+        l_ret := ESM_IMP.F_WRITE('CASE_PROD_INGREDIENT','INGREDIENT_ID',
+        z.ingredient_id);
+      END LOOP;
+      FOR ing IN as_not_in_pf(:REPORT_ID, :DRUG_ID, l_product_id, NULL)
+      LOOP
+        ESM_IMP_UTL.WRITE_ERROR_MSG(:DTD_ELEMENT,'',v_xml,
+        'Ingredient not part of Product Family ' || ing.activesubstancename ||
+        ' found.', :REPORT_ID);
+      END LOOP;
+    END IF;
+    l_ret := ESM_IMP.F_WRITE('CASE_PRODUCT','PRODUCT_NAME',SUBSTR(NVL(
+    l_trade_name, v_trade_name),1,70));
+    l_ret              := ESM_IMP.F_WRITE('VIEWS_AVAILABLE',l_views_available);
+    l_ret              := ESM_IMP.F_WRITE('GENERIC_NAME',NVL(v_generic_name,v_xml_AS));
+    IF l_who_drug_code IS NOT NULL THEN
+      l_ret            := ESM_IMP.F_WRITE('WHO_DRUG_CODE',l_who_drug_code);
+    END IF;
+	IF v_medicinal_prod_id IS NOT NULL THEN
+      l_ret            := ESM_IMP.F_WRITE('MEDICINAL_PROD_ID',v_medicinal_prod_id);
+    END IF;
+    IF l_country_id IS NOT NULL THEN
+      l_ret         := ESM_IMP.F_WRITE('COUNTRY_ID', l_country_id);
+    END IF;
+    IF NVL(l_form_id, l_formulation_id) > 0 THEN
+      l_ret                            := ESM_IMP.F_WRITE('CASE_PROD_DRUGS',
+      'FORMULATION_ID',NVL(l_form_id, l_formulation_id));
+    END IF;
+    IF l_xmlcountry_id IS NOT NULL THEN
+      l_ret            := ESM_IMP.F_WRITE('CASE_PROD_DRUGS',
+      'DRUG_AUTH_COUNTRY_ID',l_xmlcountry_id);
+    END IF;
+    IF l_odccountry_id IS NOT NULL THEN
+      l_ret            := ESM_IMP.F_WRITE('CASE_PROD_DRUGS',
+      'OBTAIN_DRUG_COUNTRY_ID',l_odccountry_id);
+    END IF;
+    IF :ARGUS_J = 1 AND l_product_id > 0 THEN
+      l_ret    := ESM_IMP.F_WRITE('CASE_PRODUCT','PRODUCT_NAME_J',SUBSTR(
+      l_trade_name_j,1,70));
+      l_ret            := ESM_IMP.F_WRITE('GENERIC_NAME_J',v_generic_name_j);
+      IF l_drug_code_j IS NOT NULL THEN
+        l_ret          := ESM_IMP.F_WRITE('DRUG_CODE_J', l_drug_code_j);
+        l_ret          := ESM_IMP.F_WRITE('DRUG_CODE_TYPE_J',
+        l_drug_code_type_j);
+      END IF;
+    END IF;
+    IF (NVL(l_product_id,0) <= 0 AND l_who_drug_code IS NULL) THEN
+      FOR ing IN as_cl_list_noncdd(:REPORT_ID, :DRUG_ID, 0)
+      LOOP
+        l_ingredient_id := esm_imp_utl.f_get_ingredient_id(:REPORT_ID,
+        :DTD_ELEMENT, ing.activesubstancename);
+        IF (l_ingredient_id > 0) THEN
+          l_ret            := ESM_IMP.F_WRITE('CASE_PROD_INGREDIENT',
+          'INGREDIENT_ID',l_ingredient_id);
+        ELSE
+          ESM_IMP_UTL.WRITE_ERROR_MSG(:DTD_ELEMENT,'',v_xml,
+          'Ingredient is not part of Factory code list ' ||
+          ing.activesubstancename || ' found.', :REPORT_ID);
+        END IF;
+      END LOOP;
+    END IF;
+    IF V_PT_CODE IS NOT NULL THEN
+      ESM_IMP.p_insert_indication ( :REPORT_ID, :PARENT_ELEMENT, :DTD_ELEMENT,
+      :PROFILE, :ARGUS_J, v_LLT, v_LLT_J, v_SOC, v_SOC_J, v_HLT, v_HLT_J,
+      v_HLGT, v_HLGT_J, V_PT_CODE, v_LLT_CODE, v_LLT_CODE_J, v_HLGT_CODE,
+      v_SOC_CODE, v_HLT_CODE, V_PT, V_PT_J, l_item_coded, l_item_coded_j,
+      l_dict_id, l_ret );
+    END IF;
+  END IF;
+END;

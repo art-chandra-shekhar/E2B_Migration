@@ -1,0 +1,28 @@
+WITH case_prod_ing_vw AS
+  (SELECT case_id, Seq_num,ingredient_id
+  FROM case_prod_ingredient
+  WHERE case_id = :Case_Id
+  AND Seq_num   = :Dummy1
+  ),
+case_product_vw AS 
+(
+  select case_id,Seq_num, co_drug_code, NVl(pat_exposure,0) pat_exposure from case_product where case_id = :Case_Id and seq_num = :Dummy1
+)
+SELECT 
+    substr(CASE when (upper(cp.co_drug_code) = 'STUDY DRUG') AND cp.pat_exposure IN (0,-1) THEN
+            'BLINDED ' || Lmi.Ingredient
+        ELSE
+            Lmi.Ingredient
+        END, 1, 100) Activesubstancename
+FROM case_product_vw cp,
+    case_prod_ing_vw Cpi,
+    Lm_Ingredients Lmi
+WHERE cp.case_id = cpi.case_id
+AND cp.seq_num = cpi.seq_num
+AND Cpi.Ingredient_Id = Lmi.Ingredient_Id
+UNION
+SELECT Esm_Utl.F_Get_Activesubstance_Generic( :Case_Id, :Dummy1, :Dummy2) Activesubstancename
+FROM Dual
+WHERE NOT EXISTS
+  (SELECT 1 FROM case_prod_ing_vw
+  )

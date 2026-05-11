@@ -1,0 +1,25 @@
+DECLARE
+   v_xml1  varchar2(32767);
+   v_xml2  varchar2(32767);
+   l_countryid number := 0;
+   l_return number := 0;
+   v_error_message VARCHAR2(4000);
+   v_stored_procedure  varchar2(30) := 'CREATE_CASE_MASTER';
+BEGIN
+   v_xml1 := ESM_IMP.F_READ(:REPORT_ID,:DTD_ELEMENT);
+   v_xml2 := ESM_IMP.F_READ(:REPORT_ID,'PRIMARYSOURCECOUNTRY');
+     IF v_xml1 is null and v_xml2 IS NOT NULL THEN
+        l_countryid := ESM_AE.translate_country(v_xml2);
+        ESM_IMP_UTL.WRITE_ERROR_MSG('NO_OCCUR_COUNTRY', 'OCCURCOUNTRY','','',v_stored_procedure,:report_id);
+     ELSIF v_xml1 is not null and v_xml2 IS NULL THEN
+        l_countryid := ESM_AE.translate_country(v_xml1);
+        ESM_IMP_UTL.WRITE_ERROR_MSG('NO_SRC_COUNTRY','PRIMARYSOURCECOUNTRY','','',v_stored_procedure,:report_id);
+     ELSIF v_xml1 is not null and v_xml2 IS NOT NULL THEN
+        l_countryid := ESM_AE.translate_country(v_xml1);
+     ELSIF v_xml1 is null and v_xml2 IS NULL THEN
+        ESM_IMP_UTL.WRITE_ERROR_MSG('NO_COUNTRY','','','',v_stored_procedure,:report_id);
+     END IF;
+   if l_countryid > 0 then
+      l_return :=  ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_MASTER','COUNTRY_ID',l_countryid);
+   end if;
+END;

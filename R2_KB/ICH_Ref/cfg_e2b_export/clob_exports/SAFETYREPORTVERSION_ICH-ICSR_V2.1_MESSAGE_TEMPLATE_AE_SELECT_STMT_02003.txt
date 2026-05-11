@@ -1,0 +1,1 @@
+select gss_util.get_safetyreportversion(:CASE_ID,:AGENCY_ID, :REG_REPORT_ID) SAFETYREPORTVERSION from dual

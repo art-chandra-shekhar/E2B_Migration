@@ -1,0 +1,1 @@
+select esm_utl.get_version(:CASE_ID,:AGENCY_ID) SAFETYREPORTVERSION from dual

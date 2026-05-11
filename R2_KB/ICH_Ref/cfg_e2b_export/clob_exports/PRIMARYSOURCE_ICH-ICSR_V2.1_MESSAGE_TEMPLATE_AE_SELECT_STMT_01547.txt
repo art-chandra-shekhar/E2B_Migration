@@ -1,0 +1,234 @@
+SELECT reportertitle,
+  reportergivename,
+  reportermiddlename,
+  Reporterfamilyname,
+  reporterorganization,
+  reporterdepartment,
+  reporterstreet,
+  reportercity,
+  reporterstate,
+  reporterpostcode,
+  reportercountry,
+  DECODE(primary_contact,1,NVL(qualification,-99),qualification) qualification,
+  studyname,
+  sponsorstudynumb,
+  observestudytype,
+  literaturereference,
+  primary_contact,
+  rep_seq_num
+FROM
+  (SELECT reportertitle,
+    reportergivename,
+    reportermiddlename,
+    reporterfamilyname,
+    reporterorganization,
+    reporterdepartment,
+    reporterstreet,
+    reportercity,
+    reporterstate,
+    reporterpostcode,
+    reportercountry,
+    qualification,
+    esm_utl.GET_STUDYNAME_EMA (case_id, rep_seq_num, ROWNUM,primary_contact, reporterCountry_id ) studyname,
+    esm_utl.get_sponsorstudynumb (case_id,rep_seq_num,ROWNUM) sponsorstudynumb,
+    esm_utl.get_observestudytype (case_id,rep_seq_num,ROWNUM) observestudytype,
+    literaturereference,
+    primary_contact,
+    rep_seq_num
+  FROM
+    (SELECT case_id,
+      reportertitle,
+      reportergivename,
+      reportermiddlename,
+      reporterfamilyname,
+      reporterorganization,
+      reporterdepartment,
+      reporterstreet,
+      reportercity,
+      reporterstate,
+      reporterpostcode,
+      reportercountry,
+      qualification,
+      literaturereference,
+      primary_contact,
+      rep_seq_num,
+      reporterCountry_id
+    FROM
+      (SELECT m.case_id,
+			DECODE (crr.protect,1, NULL, DECODE (c.confidential, 1, NULL, prefix)) reportertitle,
+			DECODE (crr.protect,1, NULL,DECODE (c.confidential, 1, NULL, SUBSTR(c.first_name,1,35))) reportergivename,
+			DECODE (crr.protect, 1, NULL, DECODE (c.confidential, 1, NULL, SUBSTR(c.middle_name,1,15))) reportermiddlename,
+			DECODE (crr.protect, 1, 'PRIVACY', DECODE (c.confidential, 1, 'PRIVACY', SUBSTR(c.last_name,1,50))) reporterfamilyname,
+			DECODE (crr.protect, 1, NULL, DECODE (c.confidential, 1, NULL, c.institution)) reporterorganization,
+			DECODE (crr.protect, 1, NULL, DECODE (c.confidential, 1, NULL, c.department)) reporterdepartment,
+			DECODE (crr.protect, 1, NULL, DECODE (c.confidential, 1, NULL, esm_utl.get_address(C.ADDRESS,C.ADDRESS_2,100))) reporterstreet,
+			DECODE (crr.protect, 1, NULL, DECODE (c.confidential, 1, NULL, c.city)) reportercity,
+            CASE
+                           WHEN UPPER(lm_countries.a2) = 'ES'
+                              THEN lss.state_code
+                           ELSE DECODE (crr.protect, 1, NULL, DECODE (c.confidential, 1, NULL, c.state)) 
+                        END reporterstate,
+			
+            CASE
+                          WHEN UPPER(lm_countries.a2) = 'ES'
+                              THEN c.postcode
+                          ELSE DECODE (crr.protect, 1, NULL, DECODE (c.confidential, 1, NULL, c.postcode))
+                        END reporterpostcode,
+
+			CASE      
+                            WHEN lm_countries.country_id = 283
+	                       THEN 'XI'
+                             ELSE lm_countries.a2
+                           END reportercountry,
+			l.e2b_code qualification,
+			SUBSTR(esm_utl.f_literature (c.author, c.title, c.journal, c.YEAR, c.vol, c.pgs ), 1, 500) literaturereference,
+			c.primary_contact,
+			c.rep_seq_num,
+			lm_countries.country_id reporterCountry_id 
+		FROM case_reporter_lit_restricted c,
+			lm_occupations,
+			lm_countries,
+			lm_reporter_type l,
+			case_master m,
+			lm_report_type,
+			cmn_reg_reports crr,
+			lm_spanish_states lss
+		WHERE m.case_id       = :CASE_ID
+		  AND c.occupation_id   = lm_occupations.occupation_id(+)
+		  AND c.country_id      = lm_countries.country_id(+)
+		  AND c.reporter_type   = l.rptr_type_id(+)
+		  AND m.rpt_type_id     = lm_report_type.rpt_type_id(+)
+		  AND m.case_id         = c.case_id
+		  AND crr.reg_report_id = :REG_REPORT_ID
+		  AND upper(c.state)   = upper(lss.state_name(+))
+      UNION
+      SELECT m.case_id,
+        DECODE (crr.protect, 1, NULL, DECODE (c.confidential, 1, NULL, prefix)),
+        DECODE (crr.protect, 1, NULL, DECODE (c.confidential, 1, NULL, SUBSTR(c.first_name,1,35))),
+        DECODE (crr.protect, 1, NULL, DECODE (c.confidential, 1, NULL, SUBSTR(c.middle_name,1,15) )),
+        DECODE (crr.protect, 1, 'PRIVACY', DECODE (c.confidential, 1, 'PRIVACY', SUBSTR(c.last_name,1,50) )),
+        DECODE (crr.protect, 1, NULL, DECODE (c.confidential, 1, NULL, c.institution )),
+        DECODE (crr.protect, 1, NULL, DECODE (c.confidential, 1, NULL, c.department )),
+        DECODE (crr.protect, 1, NULL, DECODE (c.confidential, 1, NULL, esm_utl.get_address(C.ADDRESS,C.ADDRESS_2,100))),
+        DECODE (crr.protect, 1, NULL, DECODE (c.confidential, 1, NULL, c.city)),
+        CASE
+                           WHEN UPPER(lm_countries.a2) = 'ES'
+                              THEN lss.state_code
+                           ELSE DECODE (crr.protect, 1, NULL, DECODE (c.confidential, 1, NULL, c.state)) 
+                        END,
+			
+        CASE
+                          WHEN UPPER(lm_countries.a2) = 'ES'
+                              THEN c.postcode
+                          ELSE DECODE (crr.protect, 1, NULL, DECODE (c.confidential, 1, NULL, c.postcode))
+                        END,
+        CASE      
+                            WHEN lm_countries.country_id = 283
+	                       THEN 'XI'
+                             ELSE lm_countries.a2
+                           END,
+        l.e2b_code,
+        SUBSTR (esm_utl.f_literature (c.author, c.title, c.journal, c.YEAR, c.vol, c.pgs ), 1, 500) literaturereference,
+        c.primary_contact,
+        c.rep_seq_num,
+        lm_countries.country_id
+      FROM case_reporter_lit_restricted c,
+        lm_countries,
+        lm_reporter_type l,
+        case_master m,
+        lm_report_type,
+        cmn_reg_reports crr,
+		lm_spanish_states lss
+      WHERE m.case_id       = :CASE_ID
+      AND c.country_id      = lm_countries.country_id(+)
+      AND c.reporter_type   = l.rptr_type_id(+)
+      AND c.case_id         = m.case_id
+      AND m.rpt_type_id(+)  = lm_report_type.rpt_type_id
+      AND crr.reg_report_id = :REG_REPORT_ID
+	  AND upper(c.state)   = upper(lss.state_name(+))
+      )
+    UNION
+    SELECT m.case_id,
+      DECODE (crr.protect, 1, NULL, DECODE (c.confidential, 1, NULL, prefix)),
+      DECODE (crr.protect, 1, NULL, DECODE (c.confidential, 1, NULL, SUBSTR(c.first_name,1,35))),
+      DECODE (crr.protect, 1, NULL, DECODE (c.confidential, 1, NULL, SUBSTR(c.middle_name,1,15))),
+      DECODE (crr.protect, 1, 'PRIVACY', DECODE (c.confidential, 1, 'PRIVACY', SUBSTR(c.last_name,1,50))),
+      DECODE (crr.protect, 1, NULL, DECODE (c.confidential, 1, NULL, c.institution)),
+      DECODE (crr.protect, 1, NULL, DECODE (c.confidential, 1, NULL, c.department)),
+      DECODE (crr.protect, 1, NULL, DECODE (c.confidential, 1, NULL, esm_utl.get_address(C.ADDRESS,C.ADDRESS_2,100))),
+      DECODE (crr.protect, 1, NULL, DECODE (c.confidential, 1, NULL, c.city)),
+      CASE
+                           WHEN UPPER(lm_countries.a2) = 'ES'
+                              THEN lss.state_code
+                           ELSE DECODE (crr.protect, 1, NULL, DECODE (c.confidential, 1, NULL, c.state)) 
+                        END,
+			
+       CASE
+                          WHEN UPPER(lm_countries.a2) = 'ES'
+                              THEN c.postcode
+                          ELSE DECODE (crr.protect, 1, NULL, DECODE (c.confidential, 1, NULL, c.postcode))
+                        END,
+      CASE      
+                            WHEN lm_countries.country_id = 283
+	                       THEN 'XI'
+                             ELSE lm_countries.a2
+                           END,
+      l.e2b_code,
+      SUBSTR (esm_utl.f_literature (c.author, c.title, c.journal, c.YEAR, c.vol, c.pgs ), 1, 500) literaturereference,
+      c.primary_contact,
+      c.rep_seq_num,
+      lm_countries.country_id
+ FROM case_reporter_lit_restricted c,
+      lm_occupations,
+      lm_countries,
+      lm_reporter_type l,
+      case_master m,
+      lm_report_type,
+      cmn_reg_reports crr,
+	  lm_spanish_states lss
+    WHERE m.case_id       = :CASE_ID
+    AND c.occupation_id   = lm_occupations.occupation_id(+)
+    AND c.country_id      = lm_countries.country_id(+)
+    AND c.reporter_type   = l.rptr_type_id(+)
+    AND c.case_id(+)      = m.case_id
+    AND m.rpt_type_id(+)  = lm_report_type.rpt_type_id
+    AND crr.reg_report_id = :REG_REPORT_ID
+	AND upper(c.state)   = upper(lss.state_name(+))
+    AND NOT EXISTS
+      (SELECT 1 FROM case_reporters WHERE case_id = :CASE_ID
+      )
+    AND NOT EXISTS
+      (SELECT 1 FROM case_literature WHERE case_id = :CASE_ID
+      )
+    ORDER BY 15 DESC,
+      16
+    )
+  )
+WHERE (reportertitle           IS NOT NULL
+OR TRIM (reportertitle)        <> '')
+OR (reportergivename           IS NOT NULL
+OR TRIM (reportergivename)     <> '')
+OR (reportermiddlename         IS NOT NULL
+OR TRIM (reportermiddlename)   <> '')
+OR (reporterfamilyname         IS NOT NULL
+OR TRIM (reporterfamilyname)   <> '')
+OR (reporterorganization       IS NOT NULL
+OR TRIM (reporterorganization) <> '')
+OR (reporterstreet             IS NOT NULL
+OR TRIM (reporterstreet)       <> '')
+OR (reportercity               IS NOT NULL
+OR TRIM (reportercity)         <> '')
+OR (reporterstate              IS NOT NULL
+OR TRIM (reporterstate)        <> '')
+OR (reporterpostcode           IS NOT NULL
+OR TRIM (reporterpostcode)     <> '')
+OR (reportercountry            IS NOT NULL
+OR TRIM (reportercountry)      <> '')
+OR (qualification              IS NOT NULL)
+OR (studyname                  IS NOT NULL
+OR TRIM (studyname)            <> '')
+OR (sponsorstudynumb           IS NOT NULL
+OR TRIM (sponsorstudynumb)     <> '')
+OR (observestudytype           IS NOT NULL)
+OR (literaturereference        IS NOT NULL
+OR TRIM(literaturereference)   <> '')

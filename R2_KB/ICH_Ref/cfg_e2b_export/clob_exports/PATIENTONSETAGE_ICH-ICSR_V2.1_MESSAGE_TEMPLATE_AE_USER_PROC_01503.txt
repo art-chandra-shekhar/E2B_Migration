@@ -1,0 +1,21 @@
+DECLARE
+   v_xml    varchar2(32767);
+   v_xml1   varchar2(32767);
+   l_return number := 0;
+   i        number;
+   l_age_unit_id number;
+BEGIN
+   v_xml  := ESM_IMP.F_READ(:REPORT_ID,'PATIENTONSETAGE');
+   v_xml1  := ESM_IMP.F_READ(:REPORT_ID,'PATIENTONSETAGEUNIT');
+   i := ESM_IMP_UTL.F_CHECK_UNIT_VALUE('PATIENTONSETAGE',v_xml,'PATIENTONSETAGEUNIT',v_xml1, :report_id);
+      if i = 0 then
+         if v_xml1 is not null then
+             l_age_unit_id := ESM_IMP_UTL.F_CHECK_SAME_E2B_CODE('PATIENTONSETAGEUNIT',v_xml1,'LM_AGE_UNITS','AGE_UNIT_ID','AGE_UNIT',:report_id);
+             if l_age_unit_id <= 0 then
+                l_age_unit_id := ESM_IMP_UTL.F_GET_LM_ID_FROM_E2B_CODE (:report_id, 'PATIENTONSETAGEUNIT','LM_AGE_UNITS', 'E2B_CODE', v_xml1, 'AGE_UNIT_ID');
+             end if;
+         end if;
+         l_return :=  ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_PAT_INFO','PAT_AGE',v_xml);
+         l_return :=  ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_PAT_INFO','AGE_UNIT_ID',l_age_unit_id);
+      end if;
+END;

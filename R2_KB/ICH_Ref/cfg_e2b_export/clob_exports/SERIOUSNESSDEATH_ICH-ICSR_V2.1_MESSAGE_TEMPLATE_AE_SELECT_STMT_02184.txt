@@ -1,0 +1,21 @@
+SELECT
+  CASE
+    WHEN COUNT (1) > 0
+    THEN 1
+    ELSE 2
+  END seriousnessdeath
+FROM case_event ce
+WHERE ce.case_id         = :case_id
+AND NVL (ce.sc_death, 0) = 1
+AND ce.seq_num          IN
+  (SELECT cea.event_seq_num
+  FROM case_event_assess cea,
+    lm_causality lmc
+  WHERE cea.case_id                                               = :case_id
+  AND cea.event_seq_num                                           = ce.seq_num
+  AND cea.license_id                                              = 0
+  AND ( cea.rpt_causality_id                                      = lmc.causality_id
+  OR cea.det_causality_id                                         = lmc.causality_id)
+  AND (DECODE(cea.rpt_causality_id,NULL,0,-1,0,lmc.reportability) = 1
+  OR DECODE(cea.det_causality_id,NULL,0,  -1,0,lmc.reportability) = 1 )
+  )

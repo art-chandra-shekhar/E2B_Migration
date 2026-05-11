@@ -1,0 +1,62 @@
+DECLARE
+  v_xml                  VARCHAR2(32767);
+  v_xml1                 VARCHAR2(32767);
+  l_return               NUMBER := 0;
+  i                      NUMBER;
+  l_unit_id              NUMBER;
+  l_xml_pt_sex           NUMBER;
+  l_xml_pr_sex           NUMBER;
+  v_xml_pt_lmpdateformat NUMBER;
+  v_xml_pr_lmpdateformat NUMBER;
+  v_xml_pt_lmp           NUMBER;
+  v_xml_pr_lmp           NUMBER;
+  l_parent               NUMBER := 1;
+  l_pregnancy            NUMBER := NULL;
+BEGIN
+  v_xml                  := ESM_IMP.F_READ(:REPORT_ID,'GESTATIONPERIOD');
+  v_xml1                 := ESM_IMP.F_READ(:REPORT_ID,'GESTATIONPERIODUNIT');
+  l_xml_pt_sex           := ESM_IMP.F_READ(:REPORT_ID,'PATIENTSEX');
+  l_xml_pr_sex           := ESM_IMP.F_READ(:REPORT_ID,'PARENTSEX');
+  v_xml_pt_lmpdateformat := ESM_IMP.F_READ(:REPORT_ID,'LASTMENSTRUALDATEFORMAT');
+  v_xml_pr_lmpdateformat := ESM_IMP.F_READ(:REPORT_ID,'PARENTLASTMENSTRUALDATEFORMAT');
+  v_xml_pt_lmp           := ESM_IMP.F_READ(:REPORT_ID,'PATIENTLASTMENSTRUALDATE');
+  v_xml_pr_lmp           := ESM_IMP.F_READ(:REPORT_ID,'PARENTLASTMENSTRUALDATE');
+  i                      := ESM_IMP_UTL.F_CHECK_UNIT_VALUE('GESTATIONPERIOD',v_xml,'GESTATIONPERIODUNIT',v_xml1, :report_id);
+  IF i                    = 0 THEN
+    IF v_xml1            IS NOT NULL THEN
+      l_unit_id          := ESM_IMP_UTL.F_CHECK_SAME_E2B_CODE('GESTATIONPERIODUNIT',v_xml1,'LM_AGE_UNITS','AGE_UNIT_ID','AGE_UNIT',:report_id);
+      IF( l_unit_id      <= 0 ) THEN
+        l_unit_id        := ESM_IMP_UTL.F_GET_LM_ID_FROM_E2B_CODE (:REPORT_ID, 'GESTATIONPERIODUNIT','LM_AGE_UNITS', 'E2B_CODE', v_xml1, 'AGE_UNIT_ID');
+      END IF;
+    END IF;
+    IF( l_unit_id         > 0 ) THEN
+      IF(l_xml_pt_sex     = 2 AND v_xml_pt_lmpdateformat IS NOT NULL AND v_xml_pt_lmp IS NOT NULL) THEN
+        l_return         := ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_PREGNANCY','GEST_PERIOD',v_xml);
+        l_return         := ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_PREGNANCY','GEST_PERIOD_UNIT',l_unit_id);
+        l_parent         := 0;
+        l_return         := ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_PREGNANCY','PARENT',l_parent);
+        l_pregnancy      :=1;
+        l_return         := ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_PAT_INFO','PAT_STAT_PREG',l_pregnancy);
+      elsif (l_xml_pr_sex = 2 AND v_xml_pr_lmp IS NOT NULL AND v_xml_pr_lmpdateformat IS NOT NULL) THEN
+        l_return         := ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_PREGNANCY','GEST_PERIOD',v_xml);
+        l_return         := ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_PREGNANCY','GEST_PERIOD_UNIT',l_unit_id);
+        l_return         := ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_PREGNANCY','PARENT',l_parent);
+      ELSE
+        IF (l_xml_pt_sex    = 2) THEN
+          l_return         := ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_PREGNANCY','GEST_PERIOD',v_xml);
+          l_return         := ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_PREGNANCY','GEST_PERIOD_UNIT',l_unit_id);
+          l_parent         := 0;
+          l_return         := ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_PREGNANCY','PARENT',l_parent);
+          l_pregnancy      :=1;
+          l_return         := ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_PAT_INFO','PAT_STAT_PREG',l_pregnancy);
+        ELSIF (l_xml_pr_sex = 2) THEN
+          l_return         := ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_PREGNANCY','GEST_PERIOD',v_xml);
+          l_return         := ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_PREGNANCY','GEST_PERIOD_UNIT',l_unit_id);
+          l_return         := ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_PREGNANCY','PARENT',l_parent);
+        ELSE
+          ESM_IMP_UTL.WRITE_ERROR_MSG(:DTD_ELEMENT,'',v_xml,'B.1.2.2.1a/b is not imported.  Either B.1.5 or B.1.10.6 are required to import B.1.2.2.1a/b' || v_xml || ' ' || v_xml1,:REPORT_ID);
+        END IF;
+      END IF;
+    END IF;
+  END IF;
+END;

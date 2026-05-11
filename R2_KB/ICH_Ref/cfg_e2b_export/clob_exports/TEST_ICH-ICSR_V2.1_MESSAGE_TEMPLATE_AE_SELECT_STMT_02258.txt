@@ -1,0 +1,21 @@
+SELECT DECODE (test_date, NULL, NULL, DECODE (test_date_res, 5, 602, 7, 610, 102)) testdateformat,
+  DECODE (test_date_res, 5, TO_CHAR (test_date, 'YYYY'), 7, TO_CHAR (test_date, 'YYYYMM'), 8, TO_CHAR (test_date, 'YYYYMMDD'), NULL) testdate,
+  lab_test_name testname,
+  results testresult,
+  DECODE (TRIM (results), NULL, NULL, SUBSTR(l.unit, 1, 35)) testunit,
+  SUBSTR (norm_low, 1, 50) lowtestrange,
+  SUBSTR (norm_high, 1, 50) hightestrange,
+  esm_utl.get_lab_data_notes (case_id, seq_num) moreinformation
+FROM case_lab_data,
+  (select unit ,unit_id from  lm_dose_units  where lab_test_unit= 1) l
+WHERE case_id                                             = :case_id
+AND case_lab_data.unit                                    = l.unit(+)
+AND ( (test_date                                         IS NOT NULL
+AND test_date_res                                        IN (5, 7, 8))
+OR lab_test_name                                         IS NOT NULL
+OR (results                                              IS NOT NULL
+AND l.Unit                                               IS NOT NULL)
+OR norm_low                                              IS NOT NULL
+OR norm_high                                             IS NOT NULL
+OR NVL (esm_utl.get_lab_data_notes (case_id, seq_num), 0) = 1 )
+ORDER BY case_lab_data.sort_id

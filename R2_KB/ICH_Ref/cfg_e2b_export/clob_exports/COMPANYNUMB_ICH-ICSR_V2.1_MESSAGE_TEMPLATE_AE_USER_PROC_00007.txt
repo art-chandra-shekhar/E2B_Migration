@@ -1,0 +1,84 @@
+DECLARE 
+  v_xml1    VARCHAR2(32767); 
+  l_return  NUMBER := 0; 
+  lb_return BOOLEAN; 
+  v_dtd_elements esm_imp.vtab; 
+  l_initial NUMBER; 
+  l_case_id NUMBER; 
+  l_count   NUMBER; 
+BEGIN 
+  v_xml1              := ESM_IMP.F_READ(:REPORT_ID,:DTD_ELEMENT); 
+  IF v_xml1           IS NOT NULL THEN 
+    v_dtd_elements(1) := :DTD_ELEMENT; 
+    lb_return         := ESM_IMP.F_CHECK_AND_BUILD_KEY(:REPORT_ID,:PARENT_ELEMENT,v_dtd_elements); 
+    IF (lb_return) THEN 
+      SELECT COUNT(*) 
+      INTO l_initial 
+      FROM 
+        (SELECT a.case_xref 
+        FROM safetyreport a 
+        WHERE a.report_id = 
+          (SELECT MAX (s.report_id) 
+          FROM safetyreport s 
+          WHERE s.status                                      = 102 
+          AND s.reportacknowledgment.reportacknowledgmentcode = '01' 
+          AND upper(s.companynumb)                                   = 
+            (SELECT upper(ss.companynumb) FROM safetyreport ss WHERE ss.report_id = :REPORT_ID 
+            ) 
+          ) 
+        UNION 
+        SELECT a.case_xref 
+        FROM safetyreport a 
+        WHERE a.report_id = 
+          (SELECT MAX (s.report_id) 
+          FROM safetyreport s 
+          WHERE s.status                                      = 102 
+          AND s.reportacknowledgment.reportacknowledgmentcode = '01' 
+          AND upper(s.authoritynumb)                                 = 
+            (SELECT upper(ss.authoritynumb) FROM safetyreport ss WHERE ss.report_id = :REPORT_ID 
+            ) 
+          ) 
+        ) A; 
+      IF l_initial > 0 THEN 
+        SELECT case_xref 
+        INTO l_case_id 
+        FROM 
+          (SELECT a.case_xref 
+          FROM safetyreport a 
+          WHERE a.report_id = 
+            (SELECT MAX (s.report_id) 
+            FROM safetyreport s 
+            WHERE s.status                                      = 102 
+            AND s.reportacknowledgment.reportacknowledgmentcode = '01' 
+            AND upper(s.companynumb)                                   = 
+              (SELECT upper(ss.companynumb) FROM safetyreport ss WHERE ss.report_id = :REPORT_ID 
+              ) 
+            ) 
+          UNION 
+           SELECT a.case_xref 
+          FROM safetyreport a 
+          WHERE a.report_id = 
+            (SELECT MAX (s.report_id) 
+            FROM safetyreport s 
+            WHERE s.status                                      = 102 
+            AND s.reportacknowledgment.reportacknowledgmentcode = '01' 
+            AND upper(s.authoritynumb)                                 = 
+              (SELECT upper(ss.authoritynumb) FROM safetyreport ss WHERE ss.report_id = :REPORT_ID 
+              ) 
+            ) 
+          ) A 
+        WHERE rownum = 1; 
+      END IF; 
+      SELECT COUNT(*) 
+      INTO l_count 
+      FROM case_reference 
+      WHERE case_id     = l_case_id 
+      AND ref_type_id   = 16 
+      AND upper(ref_no) = upper(v_xml1); 
+      IF l_count        = 0 THEN 
+        l_return       := ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_REFERENCE','REF_NO',v_xml1); 
+        l_return       := ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_REFERENCE','REF_TYPE_ID',16); 
+      END IF; 
+    END IF; 
+  END IF; 
+END; 

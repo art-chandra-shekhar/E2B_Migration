@@ -1,0 +1,31 @@
+DECLARE
+v_xml       VARCHAR2(32767);
+v_xml1      VARCHAR2(32767);
+v_prod_name VARCHAR2(32767);
+lb_return   BOOLEAN := FALSE;
+v_dtd_elements esm_imp.vtab;
+i         NUMBER;
+l_unit_id NUMBER;
+l_return  NUMBER := 0;
+BEGIN
+  v_xml                 := ESM_IMP.F_READ(:REPORT_ID,'REACTIONGESTATIONPERIOD');
+  v_xml1                := ESM_IMP.F_READ(:REPORT_ID,'REACTIONGESTATIONPERIODUNIT');
+  IF v_xml              IS NOT NULL THEN
+    v_dtd_elements(1)   := 'DRUGCHARACTERIZATION';
+    v_dtd_elements(2)   := 'MEDICINALPRODUCT';
+    v_dtd_elements(3)   := 'DRUGDOSAGEFORM';
+    v_prod_name         := ESM_IMP.F_READ(:REPORT_ID,'MEDICINALPRODUCT');
+    IF v_prod_name      IS NULL THEN
+      v_dtd_elements(2) := 'ACTIVESUBSTANCENAME';
+    END IF;
+    lb_return := ESM_IMP.F_CHECK_AND_BUILD_KEY(:REPORT_ID,:PARENT_ELEMENT,v_dtd_elements);
+    IF (lb_return) THEN
+      i           := ESM_IMP_UTL.F_CHECK_UNIT_VALUE('REACTIONGESTATIONPERIOD',v_xml,'REACTIONGESTATIONPERIODUNIT',v_xml1, :report_id);
+      IF i         = 0 THEN
+        l_unit_id := ESM_IMP_UTL.F_GET_LM_ID_FROM_E2B_CODE (:REPORT_ID, 'REACTIONGESTATIONPERIODUNIT','LM_AGE_UNITS', 'E2B_CODE', v_xml1, 'AGE_UNIT_ID');
+        l_return  := ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_PROD_DRUGS','EXPOSURE',v_xml);
+        l_return  := ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_PROD_DRUGS','EXPOSURE_UNIT_ID',l_unit_id);
+      END IF;
+    END IF;
+  END IF;
+END;

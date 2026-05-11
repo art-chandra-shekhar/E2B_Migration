@@ -1,0 +1,46 @@
+DECLARE
+   v_xml					varchar2(32767);
+   v_xml1					varchar2(32767);
+   v_xml2					varchar2(32767);
+   v_xml3					varchar2(32767);
+   v_xml4					varchar2(32767);
+   l_date_format			number;
+   l_length					number := 0;
+   v_date					varchar2(32767);
+   v_stored_procedure		varchar2(30) := 'CREATE_CASE_PAT_INFO';
+   v_error_message			varchar2(4000);
+   l_return					number := 0;
+BEGIN
+   v_xml := trim(ESM_IMP.F_READ_EXTENSION(:REPORT_ID,'PREGDUEDATE_EXTENSION'));
+   v_xml1 := trim(ESM_IMP.F_READ_EXTENSION(:REPORT_ID,'FETUSCOUNT_EXTENSION'));
+   v_xml2 := trim(ESM_IMP.F_READ_EXTENSION(:REPORT_ID,'PROSPECTIVEIND_EXTENSION'));
+   v_xml3 := trim(ESM_IMP.F_READ_EXTENSION(:REPORT_ID,'RETROSPECTIVEIND_EXTENSION'));
+   v_xml4 := trim(ESM_IMP.F_READ_EXTENSION(:REPORT_ID,'GESTATIONPERIOD'));
+   if v_xml is not null then
+	   l_length := length (v_xml);
+	   if l_length in (4,6,8,14) then
+		   if l_length = 4 then
+				l_date_format :=602;
+		   elsif l_length = 6 then
+				l_date_format :=610;
+		   elsif l_length = 8 then
+				l_date_format :=102;
+		   elsif l_length = 14 then
+				l_date_format :=204;
+		   else
+				l_date_format := null;
+		   end if;
+		   if v_xml is not null OR v_xml1 is not null OR v_xml2 is not null OR v_xml3 is not null OR v_xml4 is not null then
+				l_return :=  ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_PAT_INFO','PAT_STAT_PREG',1);
+		   end if;
+		   v_date := ESM_AE.translate_dateformat(v_xml,l_date_format,'N','PREGDUEDATE_EXTENSION','',:REPORT_ID);
+		   if v_date is not null then
+				v_date := to_char(to_date(v_date,'YYYYMMDDHH24MISS'),'DD-MON-YYYY HH24:MI:SS');
+				l_return :=  ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_PREGNANCY','DUE_DATE',v_date);
+		   end if;
+	   else
+		   v_error_message := 'PREGDUEDATE_EXTENSION '||v_xml||': Invalid date. Module : '|| v_stored_procedure;
+		   ESM_IMP_UTL.WRITE_ERROR_MSG('CUSTPATIENTDT1_EXTENSION','','',v_error_message,:REPORT_ID);
+	   end if;	   
+   end if;
+END;

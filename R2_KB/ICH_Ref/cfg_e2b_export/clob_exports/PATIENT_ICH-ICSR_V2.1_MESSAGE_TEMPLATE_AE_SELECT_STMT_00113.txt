@@ -1,0 +1,332 @@
+SELECT
+    substr(
+        DECODE(
+            crr.protect,
+            1,
+            DECODE(
+                esm_utl.f_pat_detail(:case_id),
+                0,
+                'PRIVACY',
+                NULL
+            ),
+            DECODE(
+                a.confidential,
+                1,
+                DECODE(
+                    esm_utl.f_pat_detail(:case_id),
+                    0,
+                    'PRIVACY',
+                    NULL
+                ),
+                a.pat_initials
+            )
+        ),
+        1,
+        10
+    ) patinitial,
+    DECODE(
+        crr.protect,
+        1,
+        NULL,
+        DECODE(
+            a.confidential,
+            1,
+            NULL,
+            esm_utl.get_gpmedicalrecordnumb(a.case_id)
+        )
+    ) patientgpmedicalrecordnumb,
+    DECODE(
+        crr.protect,
+        1,
+        NULL,
+        DECODE(
+            a.confidential,
+            1,
+            NULL,
+            esm_utl.get_specialistrecordnumb(a.case_id)
+        )
+    ) patientspecialistrecordnumb,
+    DECODE(
+        crr.protect,
+        1,
+        NULL,
+        DECODE(
+            a.confidential,
+            1,
+            NULL,
+            esm_utl.get_hospitalrecordnumb(a.case_id)
+        )
+    ) patienthospitalrecordnumb,
+    DECODE(
+        crr.protect,
+        1,
+        NULL,
+        DECODE(
+            a.confidential,
+            1,
+            NULL,
+            a.pat_subj_num
+        )
+    ) patientinvestigationnuumb,
+    DECODE(
+        crr.protect,
+        1,
+        NULL,
+        DECODE(
+            a.confidential,
+            1,
+            NULL,
+            DECODE(
+                a.pat_dob,
+                NULL,
+                NULL,
+                to_number(DECODE(
+                    a.pat_dob_res,
+                    8,
+                    102,
+                    NULL
+                ) )
+            )
+        )
+    ) patientbirthdateformat,
+    DECODE(
+        crr.protect,
+        1,
+        NULL,
+        DECODE(
+            a.confidential,
+            1,
+            NULL,
+            DECODE(
+                a.pat_dob,
+                NULL,
+                NULL,
+                DECODE(
+                    a.pat_dob_res,
+                    8,
+                    to_number(
+                        TO_CHAR(a.pat_dob,'YYYYMMDD'),
+                        99999999
+                    ),
+                    NULL
+                )
+            )
+        )
+    ) patientbirthdate,
+    DECODE(
+        crr.protect,
+        1,
+        NULL,
+        DECODE(
+            a.confidential,
+            1,
+            NULL,
+            DECODE(
+                esm_utl.f_patient_onset_age(a.case_id,'U'),
+                NULL,
+                NULL,
+                -1,
+                NULL,
+                DECODE(
+                    esm_utl.f_patient_onset_age(a.case_id,'N'),
+                    -1,
+                    NULL,
+                    esm_utl.f_patient_onset_age(a.case_id,'N')
+                )
+            )
+        )
+    ) patientonsetage,
+    DECODE(
+        crr.protect,
+        1,
+        NULL,
+        DECODE(
+            a.confidential,
+            1,
+            NULL,
+            DECODE(
+                esm_utl.f_patient_onset_age(a.case_id,'N'),
+                NULL,
+                NULL,
+                -1,
+                NULL,
+                DECODE(
+                    esm_utl.f_patient_onset_age(a.case_id,'U'),
+                    -1,
+                    NULL,
+                    esm_utl.f_patient_onset_age(a.case_id,'U')
+                )
+            )
+        )
+    ) patientonsetageunit,
+        CASE
+            WHEN esm_utl.f_get_gstprd_unit2(:case_id,a.child_only) IS NOT NULL THEN esm_utl.f_get_gstprd2(:case_id,a.child_only)
+        END
+    gestationperiod,
+        CASE
+            WHEN esm_utl.f_get_gstprd2(:case_id,a.child_only) IS NOT NULL THEN esm_utl.f_get_gstprd_unit2(:case_id,a.child_only)
+        END
+    gestationperiodunit,
+    DECODE(
+        crr.protect,
+        1,
+        NULL,
+        DECODE(
+            a.confidential,
+            1,
+            NULL,
+            DECODE(
+                DECODE(
+                    a.pat_dob,
+                    NULL,
+                    0,
+                    DECODE(
+                        a.pat_dob_res,
+                        8,
+                        1,
+                        0
+                    )
+                ) + DECODE(
+                    DECODE(
+                        esm_utl.f_patient_onset_age(a.case_id,'U'),
+                        NULL,
+                        0,
+                        -1,
+                        0,
+                        1
+                    ) + DECODE(
+                        esm_utl.f_patient_onset_age(a.case_id,'N'),
+                        NULL,
+                        0,
+                        -1,
+                        0,
+                        1
+                    ),
+                    2,
+                    1,
+                    0
+                ),
+                0,
+                h.e2b_code,
+                NULL
+            )
+        )
+    ) patientagegroup,
+    DECODE(
+        crr.protect,
+        1,
+        NULL,
+        DECODE(
+            a.confidential,
+            1,
+            NULL,
+            DECODE(
+                a.pat_weight_kg,
+                -1,
+                NULL,
+                0,
+                NULL,
+                esm_utl.f_round(a.pat_weight_kg,6)
+            )
+        )
+    ) patientweight,
+    DECODE(
+        crr.protect,
+        1,
+        NULL,
+        DECODE(
+            a.confidential,
+            1,
+            NULL,
+            DECODE(
+                a.pat_height_cm,
+                -1,
+                NULL,
+                0,
+                NULL,
+                esm_utl.f_round(a.pat_height_cm,3)
+            )
+        )
+    ) patientheight,
+    DECODE(
+        crr.protect,
+        1,
+        NULL,
+        DECODE(
+            a.confidential,
+            1,
+            NULL,
+            d.e2b_code
+        )
+    ) patientsex,
+    DECODE(
+        d.e2b_code,
+        1,
+        NULL,
+        DECODE(
+            b.date_of_lmp_res,
+            8,
+            102,
+            7,
+            610,
+            5,
+            602,
+            NULL
+        )
+    ) lastmenstrualdateformat,
+    DECODE(
+        d.e2b_code,
+        1,
+        NULL,
+        DECODE(
+            b.date_of_lmp_res,
+            8,
+            to_number(
+                TO_CHAR(b.date_of_lmp,'YYYYMMDD'),
+                99999999
+            ),
+            7,
+            to_number(
+                TO_CHAR(b.date_of_lmp,'YYYYMM'),
+                999999
+            ),
+            5,
+            to_number(
+                TO_CHAR(b.date_of_lmp,'YYYY'),
+                9999
+            ),
+            NULL
+        )
+    ) patientlastmenstrualdate,
+    esm_utl.f_pat_notes(:case_id,10000,0) patientmedicalhistorytext,
+    dbms_lob.substr(c.rel_tests,2000) resultstestsprocedures
+FROM
+    case_pat_info a,
+    (
+        SELECT
+            case_id,
+            date_of_lmp,
+            date_of_lmp_res
+        FROM
+            case_pregnancy
+        WHERE
+                case_id =:case_id
+            AND
+                nvl(parent,0) = 0
+    ) b,
+    case_pat_tests c,
+    lm_gender d,
+    cmn_reg_reports crr,
+    lm_age_groups h
+WHERE
+        a.case_id =:case_id
+    AND
+        a.case_id = b.case_id (+)
+    AND
+        a.case_id = c.rel_test_id (+)
+    AND
+        a.gender_id = d.gender_id (+)
+    AND
+        crr.reg_report_id =:reg_report_id
+    AND
+        a.age_group_id = h.age_group_id (+)

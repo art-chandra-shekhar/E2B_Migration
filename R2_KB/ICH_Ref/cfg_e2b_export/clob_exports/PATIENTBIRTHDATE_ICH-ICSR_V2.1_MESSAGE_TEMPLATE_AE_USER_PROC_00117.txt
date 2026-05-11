@@ -1,0 +1,27 @@
+DECLARE
+   v_xml    varchar2(32767);
+   v_xml1   varchar2(32767);
+   l_return number := 0;
+   l_append number := 0;
+   l_date1  date;
+   l_vc1    varchar2(32767);
+   i        number;
+   l_number number;
+   l_date1_vc varchar2(30);
+   l_res         number;   
+BEGIN
+   v_xml   := ESM_IMP.F_READ(:REPORT_ID,:DTD_ELEMENT);
+   v_xml1  := ESM_IMP.F_READ(:REPORT_ID,'PATIENTBIRTHDATEFORMAT');
+IF ( v_xml1  IS NOT NULL) THEN
+   i := ESM_IMP_UTL.F_CHECK_UNIT_VALUE('PATIENTBIRTHDATE',v_xml,'PATIENTBIRTHDATEFORMAT',v_xml1, :report_id);
+   IF i = 0 THEN
+      l_date1  := to_date(ESM_AE.TRANSLATE_DATEFORMAT(v_xml,v_xml1,'N','PATIENTBIRTHDATE','PATIENTBIRTHDATEFORMAT',:report_id),'YYYYMMDDHH24MISS');
+      select to_char(l_date1, 'DD-MON-YYYY HH24:MI:SS') into l_date1_vc from dual;
+      l_vc1    := ESM_AE.TRANSLATE_DATEFORMAT(v_xml,v_xml1,'Y','PATIENTBIRTHDATE','PATIENTBIRTHDATEFORMAT',:report_id);
+      l_res := ESM_IMP_UTL.F_GET_DATE_RES(v_xml1);
+      l_return := ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_PAT_INFO','PAT_DOB',l_date1_vc);
+      l_return := ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_PAT_INFO','PAT_DOB_PARTIAL',l_vc1);
+      l_return :=  ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_PAT_INFO','PAT_DOB_RES',l_res);
+   END IF;   
+END IF;   
+END;

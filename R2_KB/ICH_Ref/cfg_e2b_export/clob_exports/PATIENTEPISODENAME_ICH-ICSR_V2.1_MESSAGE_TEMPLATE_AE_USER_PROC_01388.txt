@@ -1,0 +1,84 @@
+DECLARE 
+   v_xml1               VARCHAR2 (32767); 
+   v_xml3               VARCHAR2 (32767); 
+   v_xml4               VARCHAR2 (32767); 
+   l_return             NUMBER := 0; 
+   l_number             NUMBER; 
+   l_item_coded         NUMBER := 0; 
+   l_item_coded_j       NUMBER := 0; 
+   l_dict_id            NUMBER; 
+   vmeddrauser          VARCHAR2 (500) := NULL; 
+   i_condition_type_id  NUMBER; 
+   v_pref_term          VARCHAR2 (250) := NULL; 
+   v_item_llt           VARCHAR2 (250) := NULL; 
+   v_item_soc           VARCHAR2 (250) := NULL; 
+   v_item_hlt           VARCHAR2 (250) := NULL; 
+   v_item_hlgt          VARCHAR2 (250) := NULL; 
+   v_pref_term_code     VARCHAR2 (50)  := NULL; 
+   v_item_llt_code      VARCHAR2 (50)  := NULL; 
+   v_item_hlgt_code     VARCHAR2 (50)  := NULL; 
+   v_item_soc_code      VARCHAR2 (50)  := NULL; 
+   v_item_hlt_code      VARCHAR2 (50)  := NULL; 
+   v_item_llt_j         VARCHAR2 (400) := NULL; 
+   v_item_soc_j         VARCHAR2 (400) := NULL; 
+   v_item_hlt_j         VARCHAR2 (400) := NULL; 
+   v_item_hlgt_j        VARCHAR2 (400) := NULL; 
+   v_pref_term_j        VARCHAR2 (400) := NULL; 
+   v_non_current_term   VARCHAR2 (250) := NULL; 
+   v_non_current_term_j VARCHAR2 (400) := NULL; 
+ BEGIN 
+   v_xml1      := esm_imp.f_read (:report_id, 'PATIENTEPISODENAME'); 
+   v_xml3      := esm_imp.f_read (:report_id, 'PATIENTEPISODENAMEMEDDRAVERSION'); 
+   IF v_xml1   IS NOT NULL THEN 
+     v_xml4    := esm_imp.f_read (:report_id, 'OCCURCOUNTRY'); 
+     IF v_xml4 IS NULL THEN 
+       v_xml4  := esm_imp.f_read (:report_id, 'PRIMARYSOURCECOUNTRY'); 
+     END IF; 
+     vMedDRAUser    := NULL; 
+     vmeddrauser    := esm_utl.f_get_meddrausername; 
+     IF vmeddrauser IS NOT NULL THEN 
+       vmeddrauser  := vmeddrauser || '.'; 
+     END IF; 
+     esm_utl.get_MedDra_info(vMedDRAUser,v_xml1,v_xml4,v_ITEM_LLT,v_ITEM_LLT_J,v_ITEM_HLT,v_ITEM_HLT_J,v_ITEM_HLGT,v_ITEM_HLGT_J,v_ITEM_SOC,v_ITEM_SOC_J,v_ITEM_LLT_CODE,v_ITEM_HLT_CODE,v_ITEM_HLGT_CODE,v_ITEM_SOC_CODE,v_pref_term,v_pref_term_j,V_PREF_TERM_CODE,v_non_current_term,v_non_current_term_j,l_item_coded,l_item_coded_j); 
+     l_number  := esm_ae.F_CHECK_MedDRA(V_PREF_TERM,'PATIENTEPISODENAME', v_xml1, :REPORT_ID); 
+     l_dict_id := ESM_IMP_UTL.f_get_dict_id(:REPORT_ID, :DTD_ELEMENT, 'AUTOE_P_E_TERM_DIC'); 
+     SELECT condition_type_id 
+     INTO i_condition_type_id 
+     FROM 
+       (SELECT * 
+       FROM lm_condition_type 
+       WHERE cond_category = 1 
+       ORDER BY display DESC, 
+         condition_type_id ASC 
+       ) 
+     WHERE ROWNUM = 1; 
+     l_return    := esm_imp.f_write (:report_id, :parent_element, :dtd_element, :PROFILE, 'CASE_PAT_HIST', 'PARENT', '0' ); 
+     l_return    := esm_imp.f_write (:report_id, :parent_element, :dtd_element, :PROFILE, 'CASE_PAT_HIST', 'CONDITION_TYPE_ID', i_condition_type_id );       IF l_item_coded > 0 THEN 
+       l_return     := esm_imp.f_write (:report_id, :parent_element, :dtd_element, :PROFILE, 'CASE_PAT_HIST', 'ITEM_REPTD', NVL (v_pref_term, v_xml1) ); 
+       l_return     := esm_imp.f_write ('CASE_PAT_HIST', 'CONDITION', NVL (v_pref_term, v_xml1) ); 
+       l_return     := esm_imp.f_write ('CASE_PAT_HIST', 'ITEM_CODE', v_pref_term_code); 
+       l_return     := esm_imp.f_write ('CASE_PAT_HIST', 'ITEM_CODE_J', v_pref_term_code); 
+       l_return     := esm_imp.f_write ('CASE_PAT_HIST', 'ITEM_CODED', v_pref_term); 
+       l_return     := esm_imp.f_write ('CASE_PAT_HIST', 'ITEM_CODED_J', v_pref_term_j); 
+       l_return     := esm_imp.f_write ('CASE_PAT_HIST', 'ITEM_LLT', v_item_llt); 
+       l_return     := esm_imp.f_write ('CASE_PAT_HIST', 'ITEM_LLT_J', v_item_llt_j); 
+       l_return     := esm_imp.f_write ('CASE_PAT_HIST', 'ITEM_LLT_CODE', v_item_llt_code); 
+       l_return     := esm_imp.f_write ('CASE_PAT_HIST', 'ITEM_LLT_CODE_J', v_item_llt_code ); 
+       l_return     := esm_imp.f_write ('CASE_PAT_HIST', 'ITEM_HLT', v_item_hlt); 
+       l_return     := esm_imp.f_write ('CASE_PAT_HIST', 'ITEM_HLT_J', v_item_hlt_j); 
+       l_return     := esm_imp.f_write ('CASE_PAT_HIST', 'ITEM_HLT_CODE', v_item_hlt_code); 
+       l_return     := esm_imp.f_write ('CASE_PAT_HIST', 'ITEM_HLGT', v_item_hlgt); 
+       l_return     := esm_imp.f_write ('CASE_PAT_HIST', 'ITEM_HLGT_J', v_item_hlgt_j); 
+       l_return     := esm_imp.f_write ('CASE_PAT_HIST', 'ITEM_HLGT_CODE', v_item_hlgt_code ); 
+       l_return     := esm_imp.f_write ('CASE_PAT_HIST', 'ITEM_SOC', v_item_soc); 
+       l_return     := esm_imp.f_write ('CASE_PAT_HIST', 'ITEM_SOC_J', v_item_soc_j); 
+       l_return     := esm_imp.f_write ('CASE_PAT_HIST', 'ITEM_SOC_CODE', v_item_soc_code); 
+       l_return     := esm_imp.f_write ('CASE_PAT_HIST', 'ITEM_CODE_STATUS', l_item_coded); 
+       l_return     := esm_imp.f_write ('CASE_PAT_HIST', 'ITEM_CODE_STATUS_J', l_item_coded_j ); 
+       l_return     := esm_imp.f_write ('CASE_PAT_HIST', 'ITEM_DICT', l_dict_id); 
+       l_return     := esm_imp.f_write ('CASE_PAT_HIST', 'ITEM_DICT_J', l_dict_id); 
+     END IF; 
+     l_return := esm_imp.f_write (:report_id, :parent_element, :dtd_element, :PROFILE, 'CASE_PAT_HIST', 'ITEM_REPTD_J', NVL (v_non_current_term_j, v_xml1) ) ; 
+     l_return := esm_imp.f_write (:report_id, :parent_element, :dtd_element, :PROFILE, 'CASE_PAT_HIST', 'CONDITION_J', NVL (v_pref_term_j, NVL (v_non_current_term_j, v_xml1) ) ); 
+   END IF; 
+ END;

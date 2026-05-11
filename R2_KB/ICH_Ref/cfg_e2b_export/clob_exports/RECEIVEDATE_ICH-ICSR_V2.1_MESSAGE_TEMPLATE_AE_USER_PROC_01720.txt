@@ -1,0 +1,64 @@
+DECLARE
+  v_xml1             VARCHAR2(32767) := NULL;
+  v_xml2             VARCHAR2(32767) := NULL;
+  v_xml3             VARCHAR2(32767) := NULL;
+  v_xml4             VARCHAR2(32767) := NULL;
+  v_xml5             VARCHAR2(32767) := NULL;
+  v_xml6             VARCHAR2(32767) := NULL;
+  l_return           NUMBER          := 0;
+  l_followup_date    DATE            := NULL;
+  l_rept_date        DATE            := NULL;
+  l_rept_date_vc     VARCHAR2(30)    := NULL;
+  l_followup_date_vc VARCHAR2(30)    := NULL;
+  l_interchange_date VARCHAR2(30)    := NULL;
+  l_countryid        NUMBER          := 0;
+BEGIN
+  v_xml1 := ESM_IMP.F_READ(:REPORT_ID,'RECEIPTDATE');
+  v_xml2 := ESM_IMP.F_READ(:REPORT_ID,'RECEIPTDATEFORMAT');
+  v_xml3 := ESM_IMP.F_READ(:REPORT_ID,'RECEIVEDATE');
+  v_xml4 := ESM_IMP.F_READ(:REPORT_ID,'RECEIVEDATEFORMAT');
+  v_xml5 := ESM_IMP.F_READ(:REPORT_ID,'SENDERTYPE');
+  v_xml6 := ESM_IMP.F_READ(:REPORT_ID,'OCCURCOUNTRY');
+  BEGIN
+    SELECT to_char(m.date_received,'DD-MON-YYYY') into l_interchange_date
+    FROM messages m,
+      safetyreport s
+    WHERE s.report_id = :report_id
+    AND s.msg_id      = m.msg_id;
+  EXCEPTION
+  WHEN no_data_found THEN
+    l_interchange_date := NULL;
+  END;
+  IF v_xml6     IS NOT NULL THEN
+    l_countryid := ESM_AE.translate_country(v_xml6);
+  END IF;
+  IF v_xml5             = '2' THEN
+    l_rept_date_vc     := l_interchange_date;
+    l_followup_date_vc := l_interchange_date;
+  ELSE
+    l_return         := ESM_IMP_UTL.F_CHECK_UNIT_VALUE('RECEIVEDATE',v_xml3,'RECEIVEDATEFORMAT',v_xml4, :report_id);
+    IF l_return       = 0 THEN
+      l_rept_date    := to_date(ESM_AE.translate_dateformat(v_xml3,v_xml4,'N','RECEIVEDATE','RECEIVEDATEFORMAT',:report_id),'YYYYMMDDHH24MISS');
+      l_rept_date_vc := TO_CHAR(l_rept_date,'DD-MON-YYYY');
+    END IF;
+    l_return             := ESM_IMP_UTL.F_CHECK_UNIT_VALUE('RECEIPTDATE',v_xml1,'RECEIPTDATEFORMAT',v_xml2, :report_id);
+    IF l_return           = 0 THEN
+      l_followup_date    := to_date(ESM_AE.translate_dateformat(v_xml1,v_xml2,'N','RECEIPTDATE','RECEIPTDATEFORMAT',:report_id),'YYYYMMDDHH24MISS');
+      l_followup_date_vc := TO_CHAR(l_followup_date,'DD-MON-YYYY');
+    END IF;
+  END IF;
+  l_return   := ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_MASTER','INIT_REPT_DATE',l_rept_date_vc);
+  l_return   := ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_MASTER','SAFETY_DATE',l_interchange_date);
+  IF :ARGUS_J = 1 AND l_countryid = 107 THEN
+    l_return := ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_MASTER','INIT_REPT_DATE_J',l_rept_date_vc);
+  END IF;
+  IF v_xml1    IS NOT NULL AND v_xml3 IS NOT NULL THEN
+    l_return   := ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_FOLLOWUP','RECEIPT_DATE',l_followup_date_vc);
+    l_return   := ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_FOLLOWUP','SAFETY_DATE',l_interchange_date);
+    l_return   := ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_FOLLOWUP','SIGNIFICANT',0);
+    l_return   := ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_FOLLOWUP','SIGNIFICANT_DEVICE','-1');
+    IF :ARGUS_J = 1 AND l_countryid = 107 THEN
+      l_return := ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_FOLLOWUP','RECEIPT_DATE_J',l_followup_date_vc);
+    END IF;
+  END IF;
+END;

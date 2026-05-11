@@ -1,0 +1,23 @@
+DECLARE
+    v_xml varchar2(32767);
+    v_prod_name varchar2(32767);
+    l_return number := 0;
+    lb_return boolean := FALSE;
+    v_dtd_elements esm_imp.vtab;
+    l_admin_route_id number;
+BEGIN
+    v_xml  := ESM_IMP.F_READ(:REPORT_ID,:DTD_ELEMENT);
+    if v_xml is not null then
+        Select Decode(Length(v_xml), 1, '00'||v_xml, 2, '0'||v_xml, v_xml) into v_xml from dual;
+        v_dtd_elements(1) := 'DRUGCHARACTERIZATION';
+        v_dtd_elements(2) := 'MEDICINALPRODUCT';
+        v_dtd_elements(3) := 'DRUGDOSAGEFORM';
+        v_prod_name  := ESM_IMP.F_READ(:REPORT_ID,'MEDICINALPRODUCT');
+        if v_prod_name is null then
+            v_dtd_elements(2) := 'ACTIVESUBSTANCENAME';
+        end if;
+        lb_return := ESM_IMP.F_CHECK_AND_BUILD_KEY(:REPORT_ID,:PARENT_ELEMENT,v_dtd_elements);
+        l_admin_route_id := ESM_IMP_UTL.F_GET_LM_ID_FROM_E2B_CODE (:REPORT_ID, 'DRUGPARADMINISTRATION','LM_ADMIN_ROUTE', 'E2B_CODE', v_xml, 'ADMIN_ROUTE_ID');
+        l_return :=  ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_DOSE_REGIMENS','PAR_ADMIN_ROUTE',l_admin_route_id);
+  end if;
+END;

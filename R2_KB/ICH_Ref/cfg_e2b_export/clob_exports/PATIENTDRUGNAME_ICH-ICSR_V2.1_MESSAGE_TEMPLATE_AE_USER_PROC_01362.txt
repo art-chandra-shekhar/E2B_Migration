@@ -1,0 +1,30 @@
+DECLARE
+   v_xml varchar2(32767);
+   l_return varchar2(4000) := null;
+   i_condition_type_id number;
+   vdrug_number case_pat_hist.item_code%type;
+   l_dict_id number;
+   v_medicinal_prod_id varchar2(10) := NULL;
+BEGIN
+   v_xml := ESM_IMP.F_READ(:REPORT_ID,'PATIENTDRUGNAME');
+   if v_xml is not null then
+      vdrug_number := esm_utl.f_get_who_drug_code(v_xml, v_medicinal_prod_id);
+      l_dict_id := ESM_IMP_UTL.f_get_dict_id(:REPORT_ID, :DTD_ELEMENT, 'AUTOE_P_SUS_D_DIC');
+      SELECT condition_type_id INTO i_condition_type_id
+      FROM (SELECT * FROM lm_condition_type WHERE cond_category=2 ORDER BY display DESC, condition_type_id ASC)
+      WHERE ROWNUM = 1;
+      l_return :=  ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_PAT_HIST','PARENT','0');
+      l_return :=  ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_PAT_HIST','ITEM_REPTD',v_xml);
+      if vdrug_number is not null then
+         l_return :=  ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_PAT_HIST','CONDITION',v_xml);
+         l_return :=  ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_PAT_HIST','ITEM_CODED',v_xml);
+         l_return :=  ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_PAT_HIST','ITEM_CODE',vdrug_number);
+         l_return :=  ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_PAT_HIST','ITEM_CODE_STATUS','1');
+		 if v_medicinal_prod_id is not null then 
+			l_return :=  ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_PAT_HIST','MEDICINAL_PROD_ID',v_medicinal_prod_id);
+		 end if;
+      end if;
+      l_return :=  ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_PAT_HIST','CONDITION_TYPE_ID',i_condition_type_id);
+      l_return :=  ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_PAT_HIST','ITEM_DICT',l_dict_id);
+   end if;
+END;

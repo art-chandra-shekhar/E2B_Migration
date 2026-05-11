@@ -1,0 +1,65 @@
+DECLARE
+  v_xml         varchar2(32767);
+  v_xml2        varchar2(32767);
+  v_xml3        varchar2(32767);
+  v_xml4        varchar2(32767);
+  v_xml5        varchar2(32767);
+  v_xml6        varchar2(32767);
+  v_prod_name   varchar2(32767);
+  l_return      number := 0;
+  l_freq_id     number;
+  l_freq_value  number;
+  l_unit_id     number;
+  l_daily_dose  number;
+  lb_return     boolean := FALSE;
+  v_dtd_elements esm_imp.vtab;
+  v_error_message VARCHAR2(4000);
+BEGIN
+  /* This Element output to Freq, Dose, Unit , Daily Dose and Daily Dose Unit */
+  v_dtd_elements(1) := 'DRUGCHARACTERIZATION';
+  v_dtd_elements(2) := 'MEDICINALPRODUCT';
+  v_dtd_elements(3) := 'DRUGDOSAGEFORM';
+  v_prod_name  := ESM_IMP.F_READ(:REPORT_ID,'MEDICINALPRODUCT');
+	if v_prod_name is null then
+	   v_dtd_elements(2) := 'ACTIVESUBSTANCENAME';
+	end if;
+  lb_return := ESM_IMP.F_CHECK_AND_BUILD_KEY(:REPORT_ID,:PARENT_ELEMENT,v_dtd_elements);
+  v_xml    := ESM_IMP.F_READ(:REPORT_ID,:DTD_ELEMENT);
+  v_xml2   := ESM_IMP.F_READ(:REPORT_ID,'DRUGSEPARATEDOSAGENUMB');
+  v_xml3   := ESM_IMP.F_READ(:REPORT_ID,'DRUGINTERVALDOSAGEUNITNUMB');
+  v_xml4   := ESM_IMP.F_READ(:REPORT_ID,'DRUGINTERVALDOSAGEDEFINITION');
+  v_xml5   := ESM_IMP.F_READ(:REPORT_ID,'DRUGDOSAGETEXT');
+  v_xml6   := ESM_IMP.F_READ(:REPORT_ID,'DRUGSTRUCTUREDOSAGEUNIT');
+  l_return := ESM_IMP_UTL.F_CHECK_VALIDATION(:PROFILE,'DRUGSTRUCTUREDOSAGEUNIT',trim(to_char(to_number(v_xml6),'009')),:REPORT_ID);
+  IF l_return = 0 THEN
+     l_unit_id := ESM_IMP_UTL.F_CHECK_SAME_E2B_CODE('DRUGSTRUCTUREDOSAGEUNIT',v_xml6,'LM_DOSE_UNITS','UNIT_ID','UNIT',:REPORT_ID);
+     if l_unit_id <= 0 then
+        l_unit_id := ESM_IMP_UTL.F_GET_LM_ID_FROM_E2B_CODE (:REPORT_ID, 'DRUGSTRUCTUREDOSAGEUNIT','LM_DOSE_UNITS', 'E2B_CODE', trim(to_char(to_number(v_xml6),'009')), 'UNIT_ID');
+     end if;
+  ELSE
+     l_unit_id := null;
+  END IF;
+  if v_xml5 is not null then
+     v_xml5 := trim(substr(v_xml5,instr(v_xml5,',')+1));
+  end if;
+  if v_xml is not null then
+     ESM_IMP_UTL.P_GET_FREQ_VALUE(:PROFILE, :REPORT_ID, v_xml2, v_xml3, v_xml4, v_xml5, l_freq_id , l_freq_value);
+     if l_freq_id is null then
+       ESM_IMP_UTL.WRITE_ERROR_MSG('BAD_DOSE_NUM','DRUGSEPARATEDOSAGENUMB',v_xml2,'',v_xml2,:REPORT_ID);
+     end if;
+     if v_xml > 0 then
+        if l_freq_value is not null then
+            l_daily_dose := TO_NUMBER(v_xml) * l_freq_value;
+        end if;
+     else
+        v_xml := '-1';
+     end if;
+     l_return :=  ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_DOSE_REGIMENS','FREQ_ID',l_freq_id);
+     l_return :=  ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_DOSE_REGIMENS','DOSE',v_xml);
+     l_return :=  ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_DOSE_REGIMENS','DOSE_UNIT_ID',l_unit_id);
+     l_return :=  ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_DOSE_REGIMENS','DAILY_DOSE',l_daily_dose);
+     if l_daily_dose is not null then
+        l_return :=  ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_DOSE_REGIMENS','DAILY_DOSE_UNIT_ID',l_unit_id);
+     end if;
+  end if;
+END;

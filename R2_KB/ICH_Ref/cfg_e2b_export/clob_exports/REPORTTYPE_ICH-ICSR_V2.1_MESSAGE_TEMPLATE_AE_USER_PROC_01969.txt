@@ -1,0 +1,20 @@
+DECLARE
+v_xml varchar2(32767);
+l_rpt_id number := 0;
+l_return number := 0;
+l_append NUMBER := 0;
+BEGIN
+v_xml := ESM_IMP.F_READ(:REPORT_ID,'REPORTTYPE');
+if v_xml is not null then
+   l_return := ESM_IMP_UTL.F_CHECK_VALIDATION(:PROFILE,:DTD_ELEMENT,v_xml,:REPORT_ID);
+end if;
+if l_return = 0 then
+   l_rpt_id := ESM_IMP_UTL.F_CHECK_SAME_E2B_CODE(:DTD_ELEMENT,v_xml,'LM_REPORT_TYPE','RPT_TYPE_ID','REPORT_TYPE',:REPORT_ID);
+   if l_rpt_id <= 0 then
+      l_rpt_id := ESM_IMP_UTL.F_GET_LM_ID_FROM_E2B_CODE (:REPORT_ID, :DTD_ELEMENT,'LM_REPORT_TYPE', 'E2B_CODE', v_xml, 'RPT_TYPE_ID');
+   end if;
+end if;
+if l_rpt_id > 0 then
+   l_return :=  ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_MASTER','RPT_TYPE_ID',l_rpt_id);
+end if;
+END;

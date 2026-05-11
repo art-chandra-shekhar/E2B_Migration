@@ -1,0 +1,1 @@
+SELECT DECODE ((SELECT COUNT (1) FROM case_reference WHERE case_id = :case_id AND ref_type_id = 12 AND REF_NO IS NOT NULL), 0, NULL, 1) duplicate FROM DUAL

@@ -1,0 +1,1 @@
+select SUBSTR(esm_utl.get_document_list(:CASE_ID),1,100) DOCUMENTLIST from dual

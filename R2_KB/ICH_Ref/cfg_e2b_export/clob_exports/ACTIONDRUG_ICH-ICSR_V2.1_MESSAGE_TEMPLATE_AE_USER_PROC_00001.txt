@@ -1,0 +1,29 @@
+DECLARE
+  v_xml         varchar2(32767);
+  v_prod_name   varchar2(32767);
+  l_return      number := 0;
+  l_action_id    number;
+  lb_return     boolean := FALSE;
+  v_dtd_elements esm_imp.vtab;
+BEGIN
+
+  	v_xml    := ESM_IMP.F_READ(:REPORT_ID,:DTD_ELEMENT);
+  	if v_xml is not null then
+		  v_dtd_elements(1) := 'DRUGCHARACTERIZATION';
+  	  v_dtd_elements(2) := 'MEDICINALPRODUCT';
+      v_dtd_elements(3) := 'DRUGDOSAGEFORM';
+      v_prod_name  := ESM_IMP.F_READ(:REPORT_ID,'MEDICINALPRODUCT');
+	    if v_prod_name is null then
+	       v_dtd_elements(2) := 'ACTIVESUBSTANCENAME';
+	    end if;
+		  lb_return := ESM_IMP.F_CHECK_AND_BUILD_KEY(:REPORT_ID,:PARENT_ELEMENT,v_dtd_elements);
+		  if (lb_return) then
+	      l_return := ESM_IMP_UTL.F_CHECK_VALIDATION(:PROFILE,'ACTIONDRUG',v_xml,:REPORT_ID);
+		    l_action_id := ESM_IMP_UTL.F_CHECK_SAME_E2B_CODE(:DTD_ELEMENT,v_xml,'LM_ACTION_TAKEN','ACT_TAKEN_ID','ACTION_TAKEN',:REPORT_ID);
+		    if l_action_id < 0 then
+		       l_action_id := ESM_IMP_UTL.F_GET_LM_ID_FROM_E2B_CODE(:REPORT_ID,:DTD_ELEMENT,'LM_ACTION_TAKEN','E2B_CODE',v_xml,'ACT_TAKEN_ID');
+		    end if;
+		    l_return :=  ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_PROD_DRUGS','ACT_TAKEN_ID',l_action_id);
+  		end if;
+  	end if;
+END;

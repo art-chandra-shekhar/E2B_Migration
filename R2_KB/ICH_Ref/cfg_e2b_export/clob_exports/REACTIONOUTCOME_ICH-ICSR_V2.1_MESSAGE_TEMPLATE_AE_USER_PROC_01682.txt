@@ -1,0 +1,32 @@
+DECLARE
+  v_xml         varchar2(32767);
+  l_return      number := 0;
+  l_append      number := 0;
+  l_seriousness number := 0;
+  l_evt_outcome_id    number;
+  l_sc_death    number := 0;
+  lb_exists        boolean; 
+BEGIN
+  v_xml    := ESM_IMP.F_READ(:REPORT_ID,:DTD_ELEMENT);
+  if v_xml is not null then
+     /*BUG 9561680. If the reactionoutome is fatal then mark the seriousness to 1 and sc_death = 1*/
+     if v_xml = '5' then
+     	  l_seriousness := 1;
+     	  l_sc_death := 1;
+     end if;
+     l_evt_outcome_id := ESM_IMP_UTL.F_check_same_e2b_code(:DTD_ELEMENT,v_xml,'LM_EVT_OUTCOME','EVT_OUTCOME_ID','EVT_OUTCOME',:REPORT_ID);
+     if l_evt_outcome_id < 0 then
+        l_evt_outcome_id := ESM_IMP_UTL.F_GET_LM_ID_FROM_E2B_CODE(:REPORT_ID,:DTD_ELEMENT,'LM_EVT_OUTCOME','E2B_CODE',v_xml,'EVT_OUTCOME_ID');
+     end if;
+  	 l_return :=  ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_EVENT','SERIOUSNESS',l_seriousness);
+     l_return :=  ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_EVENT','EVT_OUTCOME_ID',l_evt_outcome_id);
+     l_return :=  ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_EVENT','SC_DEATH',l_sc_death);
+    lb_exists := esm_imp.f_data_exists(:REPORT_ID 
+,:PARENT_ELEMENT,:DTD_ELEMENT, 'CASE_ASSESS','OUTCOME', NULL); 
+      if (lb_exists = false) then 
+     l_return :=   
+ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_ASSESS' 
+,'OUTCOME',l_evt_outcome_id); 
+     END IF; 
+  end if;
+END;

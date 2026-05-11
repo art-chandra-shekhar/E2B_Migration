@@ -1,0 +1,1 @@
+SELECT TO_NUMBER(TO_CHAR((gss_util.to_gmt(SYSDATE) + (select value from cmn_profile where key = 'JPN_OFFSET')/24),'YYYYMMDD'),99999999) TRANSMISSIONDATE FROM DUAL

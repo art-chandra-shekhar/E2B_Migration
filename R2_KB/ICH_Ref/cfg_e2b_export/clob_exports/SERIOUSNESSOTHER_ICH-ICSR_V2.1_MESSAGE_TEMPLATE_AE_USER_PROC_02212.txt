@@ -1,0 +1,17 @@
+DECLARE
+v_xml varchar2(32767);
+v_notes  varchar2(32767);
+l_return number := 0;
+BEGIN
+v_xml := ESM_IMP.F_READ(:REPORT_ID,:DTD_ELEMENT);
+if v_xml is not null then
+   l_return := ESM_IMP_UTL.F_CHECK_VALIDATION(:PROFILE,:DTD_ELEMENT,v_xml,:REPORT_ID);
+   if v_xml = '1' and l_return = 0 then
+      v_notes := 'SERIOUSNESSOTHER';
+      l_return :=  ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_ASSESS','SERIOUS_NOTES',v_notes);
+      IF :ARGUS_J = 1 THEN
+		l_return :=  ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_ASSESS','SERIOUS_NOTES_J',v_notes);
+	  END IF;
+   end if;
+end if;
+END;

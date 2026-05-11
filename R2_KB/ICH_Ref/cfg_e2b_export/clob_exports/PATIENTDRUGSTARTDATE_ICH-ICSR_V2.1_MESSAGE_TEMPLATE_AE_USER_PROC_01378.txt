@@ -1,0 +1,33 @@
+DECLARE
+   v_xml    varchar2(32767);
+   v_xml1   varchar2(32767);
+   l_return number := 0;
+   l_append number := 0;
+   l_date1  date;
+   l_vc1    varchar2(32767);
+   i        number;
+   l_number number;
+BEGIN
+   v_xml   := ESM_IMP.F_READ(:REPORT_ID,'PATIENTDRUGSTARTDATE');
+   v_xml1  := ESM_IMP.F_READ(:REPORT_ID,'PATIENTDRUGSTARTDATEFORMAT');
+   i := ESM_IMP_UTL.F_CHECK_UNIT_VALUE('PATIENTDRUGSTARTDATE',v_xml,'PATIENTDRUGSTARTDATEFORMAT',v_xml1, :REPORT_ID);
+   i := ESM_IMP_UTL.F_CHECK_VALIDATION(:PROFILE,'PATIENTDRUGSTARTDATEFORMAT',v_xml1,:REPORT_ID);
+   IF i = 0 THEN
+      l_date1  := to_date(ESM_AE.TRANSLATE_DATEFORMAT(v_xml,v_xml1,'N','PATIENTDRUGSTARTDATE','PATIENTDRUGSTARTDATEFORMAT',:report_id),'YYYYMMDDHH24MISS');
+      l_vc1    := ESM_AE.TRANSLATE_DATEFORMAT(v_xml,v_xml1,'Y','PATIENTDRUGSTARTDATE','PATIENTDRUGSTARTDATEFORMAT',:report_id);
+
+      IF v_xml1 in (102,203) THEN
+         l_number := 8;
+      ELSIF v_xml1 = 610 THEN
+         l_number := 7;
+      ELSIF v_xml1 = 602 THEN
+         l_number := 5;
+      ELSE 
+         l_number := 0;
+      END IF;
+      v_xml := to_char(l_date1,'DD-MON-YYYY HH24:MI:SS');
+      l_return := ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_PAT_HIST','START_DATE',v_xml);
+      l_return := ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_PAT_HIST','START_DATE_PARTIAL',l_vc1);
+      l_return := ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_PAT_HIST','START_DATE_RES',l_number);
+   END IF;   
+END;

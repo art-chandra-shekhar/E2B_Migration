@@ -1,0 +1,61 @@
+DECLARE
+   v_xml1 varchar2(32767) := null;
+   v_xml2 varchar2(32767) := null;
+   v_xml3 varchar2(32767) := null;
+   v_xml4 varchar2(32767) := null;
+   v_xml5 varchar2(32767) := null;
+   v_xml6 varchar2(32767) := null;
+   l_return        number := 0;
+   l_followup_date date := null;
+   l_rept_date     date := null;
+   l_rept_date_vc     varchar2(30) := null;
+   l_followup_date_vc varchar2(30) := null;
+   l_interchange_date varchar2(30) := null;
+   l_countryid number := 0;
+BEGIN
+   v_xml1  := ESM_IMP.F_READ(:REPORT_ID,'RECEIPTDATE');
+   v_xml2  := ESM_IMP.F_READ(:REPORT_ID,'RECEIPTDATEFORMAT');
+   v_xml3  := ESM_IMP.F_READ(:REPORT_ID,'RECEIVEDATE');
+   v_xml4  := ESM_IMP.F_READ(:REPORT_ID,'RECEIVEDATEFORMAT');
+   v_xml5  := ESM_IMP.F_READ(:REPORT_ID,'SENDERTYPE');
+   v_xml6  := ESM_IMP.F_READ(:REPORT_ID,'OCCURCOUNTRY');
+   BEGIN
+      SELECT to_char(m.date_received - esm_utl.gmt_offset(m.date_received),'DD-MON-YYYY') into l_interchange_date
+      FROM messages m, safetyreport s
+      WHERE s.report_id = :report_id and s.msg_id = m.msg_id;
+   EXCEPTION when no_data_found then
+      l_interchange_date := null;
+   END;
+   if v_xml6 is not null then
+	l_countryid := ESM_AE.translate_country(v_xml6);
+   end if;
+   if v_xml5 = '2' then
+         l_rept_date_vc := l_interchange_date;
+         l_followup_date_vc := l_interchange_date;
+   else
+         l_return := ESM_IMP_UTL.F_CHECK_UNIT_VALUE('RECEIVEDATE',v_xml3,'RECEIVEDATEFORMAT',v_xml4, :report_id);
+      if l_return = 0 then
+         l_rept_date := to_date(ESM_AE.translate_dateformat(v_xml3,v_xml4,'N','RECEIVEDATE','RECEIVEDATEFORMAT',:report_id),'YYYYMMDDHH24MISS');
+         l_rept_date_vc := to_char(l_rept_date,'DD-MON-YYYY');
+         end if;
+         l_return := ESM_IMP_UTL.F_CHECK_UNIT_VALUE('RECEIPTDATE',v_xml1,'RECEIPTDATEFORMAT',v_xml2, :report_id);
+         if l_return = 0 then
+         l_followup_date := to_date(ESM_AE.translate_dateformat(v_xml1,v_xml2,'N','RECEIPTDATE','RECEIPTDATEFORMAT',:report_id),'YYYYMMDDHH24MISS');
+         l_followup_date_vc := to_char(l_followup_date,'DD-MON-YYYY');
+      end if;
+   end if;
+   l_return :=  ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_MASTER','INIT_REPT_DATE',l_rept_date_vc);
+   l_return :=  ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_MASTER','SAFETY_DATE',l_interchange_date);
+   if :ARGUS_J = 1 and l_countryid = 107 then
+        l_return :=  ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_MASTER','INIT_REPT_DATE_J',l_rept_date_vc);
+   end if;
+   if v_xml1 is not null and v_xml3 is not null and to_number(v_xml1) > to_number(v_xml3) then
+      l_return :=  ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_FOLLOWUP','RECEIPT_DATE',l_followup_date_vc);
+      l_return :=  ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_FOLLOWUP','SAFETY_DATE',l_interchange_date);
+      l_return :=  ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_FOLLOWUP','SIGNIFICANT',0);
+      l_return :=  ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_FOLLOWUP','SIGNIFICANT_DEVICE','-1');
+      if :ARGUS_J = 1 and l_countryid = 107 then
+		l_return :=  ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_FOLLOWUP','RECEIPT_DATE_J',l_followup_date_vc);
+      end if;
+   end if;
+END;

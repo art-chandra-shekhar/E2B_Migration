@@ -1,0 +1,18 @@
+DECLARE
+  v_xml				varchar2(32767);
+  l_return			number := 0;
+  l_value			number;
+  v_error_message	varchar2(4000);
+  v_stored_procedure varchar2(30) := 'CREATE_CASE_PAT_INFO';
+BEGIN
+  v_xml    := trim(ESM_IMP.F_READ_EXTENSION(:REPORT_ID,:DTD_ELEMENT));
+  if v_xml is not null then
+    if v_xml in ('1','2') then 
+	   l_value := v_xml;
+       l_return :=  ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_PREGNANCY','PROSPECTIVE',l_value);
+    else
+	   v_error_message := 'Acceptable value for the dtd element PROSPECTIVEIND_EXTENSION is 1,2. Module : '||v_stored_procedure;
+	   ESM_IMP_UTL.WRITE_ERROR_MSG('PROSPECTIVEIND_EXTENSION','','',v_error_message,:REPORT_ID);
+    end if;
+  end if;
+END;

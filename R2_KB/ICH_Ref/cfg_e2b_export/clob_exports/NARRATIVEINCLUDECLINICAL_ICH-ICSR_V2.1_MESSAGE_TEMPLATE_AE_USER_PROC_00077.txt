@@ -1,0 +1,9 @@
+DECLARE
+ v_xml clob:=empty_clob();
+l_return number := 0;
+ BEGIN
+ v_xml  := ESM_IMP.F_READ_CLOB(:REPORT_ID,:DTD_ELEMENT);
+   IF dbms_lob.getlength(v_xml) > 0 then
+ l_return :=  ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_NARRATIVE','NARRATIVE',v_xml);
+ END IF;
+END;

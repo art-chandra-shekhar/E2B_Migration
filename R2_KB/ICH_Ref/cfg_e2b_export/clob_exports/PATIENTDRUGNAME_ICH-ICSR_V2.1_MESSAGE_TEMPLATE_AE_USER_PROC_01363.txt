@@ -1,0 +1,53 @@
+DECLARE
+ v_xml               VARCHAR2(32767);
+ l_drug_name         VARCHAR2(40 CHAR);
+ l_english_name         VARCHAR2(40 CHAR);
+ l_generic_name      VARCHAR2(40 CHAR);
+ l_return            NUMBER := 0;
+ i_condition_type_id NUMBER;
+ vdrug_number case_pat_hist.item_code%type;
+ l_dict_id NUMBER;
+ v_medicinal_prod_id varchar2(10) := NULL;
+ BEGIN
+   v_xml          := ESM_IMP.F_READ(:REPORT_ID,'PATIENTDRUGNAME');
+    IF v_xml       IS NOT NULL THEN
+     vdrug_number := esm_utl.f_get_jpn_drug_code(v_xml, l_drug_name, l_generic_name, l_dict_id, l_english_name);
+      SELECT condition_type_id
+      INTO i_condition_type_id
+      FROM
+       (SELECT *
+        FROM lm_condition_type
+        WHERE cond_category=2
+        ORDER BY display DESC,
+          condition_type_id ASC
+        )
+      WHERE ROWNUM     = 1;
+      l_return        := ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_PAT_HIST','PARENT','0');
+     l_return        := ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_PAT_HIST','CONDITION_TYPE_ID',i_condition_type_id);
+     IF vdrug_number IS NOT NULL THEN
+      l_return      := ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_PAT_HIST','ITEM_REPTD_J',v_xml);
+       l_return      := ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_PAT_HIST','CONDITION_J',v_xml);
+       l_return      := ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_PAT_HIST','CONDITION',l_english_name);
+       l_return      := ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_PAT_HIST','ITEM_CODED_J',v_xml);
+       l_return      := ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_PAT_HIST','ITEM_CODE_J',vdrug_number);
+       l_return      := ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_PAT_HIST','ITEM_CODE_STATUS_J','1');
+       l_return      := ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_PAT_HIST','ITEM_DICT_J',l_dict_id);
+     ELSE
+       vdrug_number    := esm_utl.f_get_who_drug_code(v_xml, v_medicinal_prod_id);
+       l_dict_id       := ESM_IMP_UTL.f_get_dict_id(:REPORT_ID, :DTD_ELEMENT, 'AUTOE_P_SUS_D_DIC');
+      IF vdrug_number IS NOT NULL THEN
+         l_return      := ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_PAT_HIST','ITEM_REPTD',v_xml);
+         l_return      := ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_PAT_HIST','CONDITION',v_xml);
+         l_return      := ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_PAT_HIST','ITEM_CODED',v_xml);
+         l_return      := ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_PAT_HIST','ITEM_CODE',vdrug_number);
+         l_return      := ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_PAT_HIST','ITEM_CODE_STATUS','1');
+         l_return      := ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_PAT_HIST','ITEM_DICT',l_dict_id);
+		 if v_medicinal_prod_id is not null then 
+			l_return :=  ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_PAT_HIST','MEDICINAL_PROD_ID',v_medicinal_prod_id);
+		 end if;
+       ELSE
+         l_return := ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_PAT_HIST','ITEM_REPTD_J',v_xml);
+       END IF;
+     END IF;
+   END IF;
+ END;

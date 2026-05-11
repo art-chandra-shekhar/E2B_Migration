@@ -1,0 +1,26 @@
+DECLARE  
+  v_xml           VARCHAR2(32767); 
+  v_xml1          VARCHAR2(32767); 
+  l_return        NUMBER := 0; 
+  l_append        NUMBER := 0; 
+  i               NUMBER; 
+  l_unit_id       NUMBER; 
+BEGIN 
+  i                   := 1; 
+  l_unit_id           := -1; 
+  v_xml               := ESM_IMP.F_READ(:REPORT_ID,:DTD_ELEMENT); 
+  v_xml1              := ESM_IMP.F_READ(:REPORT_ID,'TESTUNIT'); 
+   i              := ESM_IMP_UTL.F_CHECK_UNIT_VALUE('TESTRESULT',v_xml,'TESTUNIT',v_xml1, :report_id); 
+  IF i            = 0 THEN 
+    l_unit_id    := ESM_IMP_UTL.F_GET_LM_ID_FROM_E2B_CODE(:REPORT_ID,'TESTUNIT','LM_DOSE_UNITS','E2B_CODE', v_xml1, 'UNIT_ID','LAB_TEST_UNIT'); 
+    IF l_unit_id IS NULL THEN 
+      l_unit_id  := ESM_IMP_UTL.F_GET_LM_ID_FROM_E2B_CODE(:REPORT_ID,'TESTUNIT','LM_DOSE_UNITS','UNIT', v_xml1, 'UNIT_ID','LAB_TEST_UNIT'); 
+    END IF; 
+    IF l_unit_id IS NULL THEN 
+      l_unit_id  := -1; 
+    END IF; 
+    l_return := ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_LAB_DATA','RESULTS',v_xml); 
+    l_return := ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_LAB_DATA','UNIT_ID',l_unit_id); 
+    l_return := ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_LAB_DATA','UNIT',v_xml1); 
+  END IF; 
+END; 

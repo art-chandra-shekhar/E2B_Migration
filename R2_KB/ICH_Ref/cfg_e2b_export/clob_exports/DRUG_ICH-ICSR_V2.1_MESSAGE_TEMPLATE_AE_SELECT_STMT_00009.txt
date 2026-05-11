@@ -1,0 +1,828 @@
+WITH case_dose_regimens_vw AS (
+    SELECT
+        *
+    FROM
+        case_dose_regimens
+    WHERE
+        case_id = :case_id
+        AND deleted IS NULL
+), prod_dosage_indication_vw AS (
+    SELECT
+        pdi.case_id,
+        pdi.seq_num,
+        pdi.sort_id,
+        pdi.log_no,
+        pdi.start_datetime,
+        pdi.start_datetime_res,
+        pdi.stop_datetime,
+        pdi.stop_datetime_res,
+        pdi.ongoing,
+        pdi.off_label,
+        pdi.duration_seconds,
+        pdi.dose,
+        pdi.dose_unit_id,
+        pdi.freq_id,
+        pdi.admin_route_id,
+        pdi.daily_dose,
+        pdi.daily_dose_unit_id,
+        pdi.exp_date,
+        pdi.exp_date_res,
+        pdi.total_reg_dose,
+        pdi.tot_reg_dose_unit_id,
+        pdi.parent_seq_num,
+        pdi.location_id,
+        pdi.dose_no,
+        pdi.par_admin_route,
+        pdi.exp_date_partial,
+        pdi.start_date_partial,
+        pdi.stop_date_partial,
+        pdi.package_id,
+        pdi.lot_no,
+        pdi.pack_units,
+        pdi.accidental_exposure,
+        pdi.lot_id,
+        pdi.lot_just,
+        pdi.lot_status,
+        pdi.ind_seq_num,
+        pdi.ind_reptd,
+        pdi.ind_coded,
+        pdi.ind_code,
+        pdi.ind_pref_term,
+        pdi.ind_llt_code,
+        pdi.ind_llt,
+        pdi.ind_hlt_code,
+        pdi.ind_hlt,
+        pdi.ind_hlgt_code,
+        pdi.ind_hlgt,
+        pdi.ind_soc_code,
+        pdi.ind_soc,
+        pdi.ind_syn_code,
+        pdi.ind_code_dict,
+        pdi.ind_code_status,
+        pdi.duration,
+        cdr.dose_description,
+        pdi.sr_no
+    FROM
+        ( (
+            SELECT
+                nvl(cdrg.case_id, cpi.case_id) case_id,
+                nvl(cdrg.seq_num, cpi.prod_seq_num) seq_num,
+                nvl(cdrg.sort_id, cpi.sort_id) sort_id,
+                cdrg.log_no,
+                cdrg.start_datetime,
+                cdrg.start_datetime_res,
+                cdrg.stop_datetime,
+                cdrg.stop_datetime_res,
+                cdrg.ongoing,
+                cdrg.off_label,
+                cdrg.duration_seconds,
+                cdrg.dose,
+                cdrg.dose_unit_id,
+                cdrg.freq_id,
+                cdrg.admin_route_id,
+                cdrg.daily_dose,
+                cdrg.daily_dose_unit_id,
+                cdrg.exp_date,
+                cdrg.exp_date_res,
+                cdrg.total_reg_dose,
+                cdrg.tot_reg_dose_unit_id,
+                cdrg.parent_seq_num,
+                cdrg.location_id,
+                cdrg.dose_no,
+                cdrg.par_admin_route,
+                cdrg.exp_date_partial,
+                cdrg.start_date_partial,
+                cdrg.stop_date_partial,
+                cdrg.package_id,
+                cdrg.lot_no,
+                cdrg.pack_units,
+                cdrg.accidental_exposure,
+                cdrg.lot_id,
+                cdrg.lot_just,
+                cdrg.lot_status,
+                cpi.seq_num ind_seq_num,
+                cpi.ind_reptd,
+                cpi.ind_coded,
+                cpi.ind_code,
+                cpi.ind_pref_term,
+                cpi.ind_llt_code,
+                cpi.ind_llt,
+                cpi.ind_hlt_code,
+                cpi.ind_hlt,
+                cpi.ind_hlgt_code,
+                cpi.ind_hlgt,
+                cpi.ind_soc_code,
+                cpi.ind_soc,
+                cpi.ind_syn_code,
+                cpi.ind_code_dict,
+                cpi.ind_code_status,
+                cdrg.duration,
+                nvl(cdrg.sr_no, cpi.sr_no) sr_no
+            FROM
+                (
+                    SELECT
+                        case_id,
+                        seq_num,
+                        log_no,
+                        start_datetime,
+                        start_datetime_res,
+                        stop_datetime,
+                        stop_datetime_res,
+                        ongoing,
+                        off_label,
+                        duration_seconds,
+                        dose,
+                        dose_unit_id,
+                        freq_id,
+                        admin_route_id,
+                        daily_dose,
+                        daily_dose_unit_id,
+                        exp_date,
+                        exp_date_res,
+                        total_reg_dose,
+                        tot_reg_dose_unit_id,
+                        sort_id,
+                        parent_seq_num,
+                        location_id,
+                        dose_no,
+                        par_admin_route,
+                        exp_date_partial,
+                        start_date_partial,
+                        stop_date_partial,
+                        package_id,
+                        lot_no,
+                        pack_units,
+                        accidental_exposure,
+                        lot_id,
+                        lot_just,
+                        lot_status,
+                        duration,
+                        SUM(1) OVER(
+                            PARTITION BY case_id, seq_num
+                            ORDER BY
+                                case_id, seq_num, sort_id
+                        ) sr_no
+                    FROM
+                        case_dose_regimens_vw
+                    WHERE
+                        case_id = :case_id
+                        AND deleted IS NULL
+                ) cdrg
+                FULL OUTER JOIN (
+                    SELECT
+                        case_id,
+                        prod_seq_num,
+                        seq_num,
+                        sort_id,
+                        ind_reptd,
+                        ind_coded,
+                        ind_code,
+                        ind_pref_term,
+                        ind_llt_code,
+                        ind_llt,
+                        ind_hlt_code,
+                        ind_hlt,
+                        ind_hlgt_code,
+                        ind_hlgt,
+                        ind_soc_code,
+                        ind_soc,
+                        ind_syn_code,
+                        ind_code_dict,
+                        ind_code_status,
+                        SUM(1) OVER(
+                            PARTITION BY case_id, prod_seq_num
+                            ORDER BY
+                                case_id, prod_seq_num, sort_id
+                        ) sr_no
+                    FROM
+                        case_prod_indications
+                    WHERE
+                        case_id = :case_id
+                        AND deleted IS NULL
+                        AND ( ind_code_status = 1
+                              OR ind_code_status = 2 )
+                ) cpi ON cdrg.case_id = cpi.case_id
+                         AND cdrg.seq_num = cpi.prod_seq_num
+                         AND cdrg.sr_no = cpi.sr_no
+        ) ) pdi,
+        (
+            SELECT
+                case_id,
+                seq_num,
+                log_no,
+                CASE
+                    WHEN dbms_lob.getlength(dose_description) > 0 THEN
+                        dbms_lob.substr(dose_description, 100)
+                    ELSE
+                        NULL
+                END dose_description
+            FROM
+                case_dose_regimens_vw
+            WHERE
+                case_id = :case_id
+        ) cdr
+    WHERE
+        pdi.case_id = :case_id
+        AND pdi.case_id = cdr.case_id (+)
+        AND pdi.seq_num = cdr.seq_num (+)
+        AND pdi.log_no = cdr.log_no (+)
+)
+SELECT
+    esm_utl.get_drgty(:case_id, p.seq_num) drugcharacterization,
+    substr(decode(upper(p.co_drug_code), 'STUDY DRUG', decode(p.pat_exposure, - 1, 'BLINDED ' || prod_name, 0, 'BLINDED ' || prod_name
+    ,
+                                                              NULL, 'BLINDED ' || prod_name, prod_name), p.product_name), 1, 70) medicinalproduct
+                                                              ,
+    odc.a2      obtaindrugcountry,
+    d.lot_no    drugbatchnumb,
+    substr(esm_utl.f_lic(:case_id, p.seq_num, :reg_report_id), 1, 35) drugauthorizationnumb,
+    esm_utl.f_cntr(:case_id, p.seq_num, :reg_report_id) drugauthorizationcountry,
+    substr(esm_utl.f_mfg(:case_id, p.seq_num, :reg_report_id), 1, 60) drugauthorizationholder,
+    decode(esm_utl.get_due2b(d.dose_unit_id), NULL, NULL, decode(nvl(d.dose, - 1), - 1, NULL, 0, NULL,
+                                                                 esm_utl.f_round_str(d.dose, 8))) drugstructuredosagenumb,
+    decode(nvl(d.dose, - 1), - 1, NULL, 0, NULL,
+           esm_utl.get_due2b(d.dose_unit_id)) drugstructuredosageunit,
+    decode(decode(elu.e2b_code, 807, NULL, 810, NULL,
+                  811, NULL, 812, NULL, 813,
+                  NULL, elu.e2b_code), NULL, NULL, ldf.separate_dosage_numb_e2b) drugseparatedosagenumb,
+    decode(decode(elu.e2b_code, 807, NULL, 810, NULL,
+                  811, NULL, 812, NULL, 813,
+                  NULL, elu.e2b_code), NULL, NULL, ldf.interval_dosage_unit_e2b) drugintervaldosageunitnumb,
+    decode(ldf.interval_dosage_unit_e2b, NULL, NULL, decode(elu.e2b_code, 807, NULL, 810, NULL,
+                                                            811, NULL, 812, NULL, 813,
+                                                            NULL, elu.e2b_code)) drugintervaldosagedefinition,
+    decode(esm_utl.f_cdu(c.case_id, c.seq_num), NULL, NULL, decode(c.cumulative_dose, - 1, NULL, 0, NULL,
+                                                                   NULL, NULL, esm_utl.f_round(c.cumulative_dose, 10))) drugcumulativedosagenumb
+                                                                   ,
+    decode(c.cumulative_dose, - 1, NULL, 0, NULL,
+           NULL, NULL, esm_utl.f_cdu(c.case_id, c.seq_num)) drugcumulativedosageunit,
+    CASE
+        WHEN p.views_available IN (
+            1,
+            3,
+            5,
+            7
+        ) THEN
+            d.dose_description
+        ELSE
+            decode(d.dose, NULL, NULL, decode(lmd.unit, NULL, NULL, d.dose
+                                                                    || ' '
+                                                                    || lmd.unit))
+    END drugdosagetext,
+    esm_utl.get_frm(c.formulation_id) drugdosageform,
+    esm_utl.get_rt_e2b(d.admin_route_id) drugadministrationroute,
+    esm_utl.get_rt_e2b(d.par_admin_route) drugparadministration,
+    CASE
+        WHEN c.exposure IS NOT NULL THEN
+            c.exposure
+        ELSE
+            NULL
+    END reactiongestationperiod,
+    CASE
+        WHEN c.exposure_unit_id IS NOT NULL THEN
+            esm_utl.get_react_gest_period_unit(c.exposure_unit_id)
+        ELSE
+            NULL
+    END reactiongestationperiodunit,
+    decode(d.ind_pref_term, NULL, NULL, esm_utl.get_meddra_version(d.ind_code_dict, 2)) drugindicationmeddraversion,
+    decode(esm_utl.get_meddra_version(d.ind_code_dict, 2), NULL, NULL, substr(d.ind_pref_term, 1, 250)) drugindication,
+    decode(d.start_datetime, NULL, NULL, decode(d.start_datetime_res, 5, 602, 7, 610,
+                                                102)) drugstartdateformat,
+    decode(d.start_datetime_res, 5, to_char(d.start_datetime, 'YYYY'), 7, to_char(d.start_datetime, 'YYYYMM'), 8, to_char(d.start_datetime
+    , 'YYYYMMDD'), NULL) drugstartdate,
+    CASE
+        WHEN ( p.views_available IN (
+            1,
+            3,
+            5,
+            7
+        )
+              AND c.delay_seconds IS NULL
+               AND c.delay IS NULL
+               AND ( TO_NUMBER(ESM_UTL.F_GET_SAFETY_CONTEXT('PI_TRANSMIT_CAUSALITY_STUDY')) = 1 or NVL(p.product_id , p.pat_exposure) > 0 or TO_NUMBER(ESM_UTL.F_GET_SAFETY_CONTEXT('PI_TRANSMIT_CAUSALITY_NONSTUDY')) = 1)) THEN
+            esm_utl2.f_get_latency(:case_id, p.seq_num, 1, 1, 0,
+                                   NULL)
+        ELSE
+            decode(p.views_available, 1, esm_utl.f_duration(c.delay_seconds, c.delay), 3, esm_utl.f_duration(c.delay_seconds, c.delay
+            ), 5, esm_utl.f_duration(c.delay_seconds, c.delay), 7, esm_utl.f_duration(c.delay_seconds, c.delay), esm_utl.f_vacc_start_period
+            (:case_id, 5, 'N', d.seq_num, d.log_no))
+    END drugstartperiod,
+    CASE
+        WHEN ( p.views_available IN (
+            1,
+            3,
+            5,
+            7
+        )
+               AND c.delay_seconds IS NULL
+               AND c.delay IS NULL  
+               AND ( TO_NUMBER(ESM_UTL.F_GET_SAFETY_CONTEXT('PI_TRANSMIT_CAUSALITY_STUDY')) = 1 or NVL(p.product_id , p.pat_exposure) > 0 or TO_NUMBER(ESM_UTL.F_GET_SAFETY_CONTEXT('PI_TRANSMIT_CAUSALITY_NONSTUDY')) = 1)) THEN
+            esm_utl2.f_get_latency(:case_id, p.seq_num, 0, 1, 0,
+                                   NULL)
+        ELSE
+            decode(p.views_available, 1, esm_utl.f_duration_unit(c.delay_seconds, c.delay), 3, esm_utl.f_duration_unit(c.delay_seconds
+            , c.delay), 5, esm_utl.f_duration_unit(c.delay_seconds, c.delay), 7, esm_utl.f_duration_unit(c.delay_seconds, c.delay
+            ), esm_utl.f_vacc_start_period(:case_id, 5, 'U', d.seq_num, d.log_no))
+    END drugstartperiodunit,
+    CASE
+        WHEN ( p.views_available IN (
+            1,
+            3,
+            5,
+            7
+        )
+               AND c.latency_seconds IS NULL
+               AND c.latency IS NULL  
+               AND ( TO_NUMBER(ESM_UTL.F_GET_SAFETY_CONTEXT('PI_TRANSMIT_CAUSALITY_STUDY')) = 1 or NVL(p.product_id , p.pat_exposure) > 0 or TO_NUMBER(ESM_UTL.F_GET_SAFETY_CONTEXT('PI_TRANSMIT_CAUSALITY_NONSTUDY')) = 1)) THEN
+            esm_utl2.f_get_latency(:case_id, p.seq_num, 1, 0, 0,
+                                   NULL)
+        ELSE
+            decode(p.views_available, 1, esm_utl.f_duration(c.latency_seconds, c.latency), 3, esm_utl.f_duration(c.latency_seconds
+            , c.latency), 5, esm_utl.f_duration(c.latency_seconds, c.latency), 7, esm_utl.f_duration(c.latency_seconds, c.latency
+            ), esm_utl.f_vacc_last_period(:case_id, 5, 'N', d.seq_num))
+    END druglastperiod,
+    CASE
+        WHEN ( p.views_available IN (
+            1,
+            3,
+            5,
+            7
+        )
+              AND c.latency_seconds IS NULL
+               AND c.latency IS NULL  
+               AND ( TO_NUMBER(ESM_UTL.F_GET_SAFETY_CONTEXT('PI_TRANSMIT_CAUSALITY_STUDY')) = 1 or NVL(p.product_id , p.pat_exposure) > 0 or TO_NUMBER(ESM_UTL.F_GET_SAFETY_CONTEXT('PI_TRANSMIT_CAUSALITY_NONSTUDY')) = 1) ) THEN
+            esm_utl2.f_get_latency(:case_id, p.seq_num, 0, 0, 0,
+                                   NULL)
+        ELSE
+            decode(p.views_available, 1, esm_utl.f_duration_unit(c.latency_seconds, c.latency), 3, esm_utl.f_duration_unit(c.latency_seconds
+            , c.latency), 5, esm_utl.f_duration_unit(c.latency_seconds, c.latency), 7, esm_utl.f_duration_unit(c.latency_seconds,
+            c.latency), esm_utl.f_vacc_last_period(:case_id, 5, 'U', d.seq_num))
+    END druglastperiodunit,
+    decode(d.stop_datetime, NULL, NULL, decode(d.stop_datetime_res, 5, 602, 7, 610,
+                                               102)) drugenddateformat,
+    decode(d.stop_datetime_res, 5, to_char(d.stop_datetime, 'YYYY'), 7, to_char(d.stop_datetime, 'YYYYMM'), 8, to_char(d.stop_datetime
+    , 'YYYYMMDD'), NULL) drugenddate,
+    esm_utl.f_duration(d.duration_seconds, d.duration, 0) drugtreatmentduration,
+    esm_utl.f_duration_unit(d.duration_seconds, d.duration, 0) drugtreatmentdurationunit,
+    esm_utl.get_act_e2b(c.act_taken_id) actiondrug,
+    CASE
+        WHEN c.rechallenge IS NULL 
+           AND ( TO_NUMBER(ESM_UTL.F_GET_SAFETY_CONTEXT('PI_TRANSMIT_CAUSALITY_STUDY')) = 1 or NVL(p.product_id , p.pat_exposure) > 0 or TO_NUMBER(ESM_UTL.F_GET_SAFETY_CONTEXT('PI_TRANSMIT_CAUSALITY_NONSTUDY')) = 1) THEN
+                  esm_utl2.f_get_rechallenge(:case_id, p.seq_num)
+        ELSE
+            decode(c.rechallenge, 0, 2, 1, 1,
+                   2, 3, 3, NULL)
+    END drugrecurreadministration,
+    esm_utl.f_product_notes(:case_id, p.seq_num, d.seq_num, d.log_no, 100) drugadditional,
+    p.seq_num   seq_num,
+    nvl(lmp.product_id, - 1) dummy2,
+    p.sort_id   psort_id,
+    d.sort_id   dsort_id
+FROM
+    case_product                p,
+    case_prod_drugs             c,
+    prod_dosage_indication_vw   d,
+    case_pat_info               pi,
+    lm_gender                   lg,
+    lm_countries                lmc,
+    lm_manufacturer             lmm,
+    lm_product                  lmp,
+    (
+        SELECT
+            unit,
+            unit_id
+        FROM
+            lm_dose_units
+        WHERE
+            dosage_unit = 1
+    ) lmd,
+    lm_dose_frequency           ldf,
+    esm_lm_units                elu,
+    lm_countries                odc,
+    lm_countries                dac
+WHERE
+    p.case_id = :case_id
+    AND p.drug_type IN (
+        1,
+        2
+    )
+    AND p.views_available <> 2
+    AND p.case_id = c.case_id (+)
+    AND p.seq_num = c.seq_num (+)
+    AND p.case_id = d.case_id (+)
+    AND p.seq_num = d.seq_num (+)
+    AND p.case_id = pi.case_id (+)
+    AND pi.gender_id = lg.gender_id (+)
+    AND p.country_id = lmc.country_id (+)
+    AND p.manufacturer_id = lmm.manufacturer_id (+)
+    AND nvl(p.product_id, p.pat_exposure) = lmp.product_id (+)
+    AND d.dose_unit_id = lmd.unit_id (+)
+    AND d.freq_id = ldf.freq_id (+)
+    AND ldf.interval_dosage_def_e2b = elu.id (+)
+    AND c.obtain_drug_country_id = odc.country_id (+)
+    AND c.drug_auth_country_id = dac.country_id (+)
+    AND esm_utl.f_blind(:case_id, p.seq_num) = 0
+UNION
+SELECT
+    esm_utl.get_drgty(:case_id, p.seq_num) drugcharacterization,
+    substr('BLINDED ' || prod_name, 1, 70) medicinalproduct,
+    odc.a2      obtaindrugcountry,
+    d.lot_no    drugbatchnumb,
+    substr(esm_utl.f_lic(:case_id, p.seq_num, :reg_report_id), 1, 35) drugauthorizationnumb,
+    esm_utl.f_cntr(:case_id, p.seq_num, :reg_report_id) drugauthorizationcountry,
+    substr(esm_utl.f_mfg(:case_id, p.seq_num, :reg_report_id), 1, 60) drugauthorizationholder,
+    decode(esm_utl.get_due2b(d.dose_unit_id), NULL, NULL, decode(nvl(d.dose, - 1), - 1, NULL, 0, NULL,
+                                                                 esm_utl.f_round_str(d.dose, 8))) drugstructuredosagenumb,
+    decode(nvl(d.dose, - 1), - 1, NULL, 0, NULL,
+           esm_utl.get_due2b(d.dose_unit_id)) drugstructuredosageunit,
+    decode(decode(elu.e2b_code, 807, NULL, 810, NULL,
+                  811, NULL, 812, NULL, 813,
+                  NULL, elu.e2b_code), NULL, NULL, ldf.separate_dosage_numb_e2b) drugseparatedosagenumb,
+    decode(decode(elu.e2b_code, 807, NULL, 810, NULL,
+                  811, NULL, 812, NULL, 813,
+                  NULL, elu.e2b_code), NULL, NULL, ldf.interval_dosage_unit_e2b) drugintervaldosageunitnumb,
+    decode(ldf.interval_dosage_unit_e2b, NULL, NULL, decode(elu.e2b_code, 807, NULL, 810, NULL,
+                                                            811, NULL, 812, NULL, 813,
+                                                            NULL, elu.e2b_code)) drugintervaldosagedefinition,
+    decode(esm_utl.f_cdu(c.case_id, c.seq_num), NULL, NULL, decode(c.cumulative_dose, - 1, NULL, 0, NULL,
+                                                                   NULL, NULL, esm_utl.f_round(c.cumulative_dose, 10))) drugcumulativedosagenumb
+                                                                   ,
+    decode(c.cumulative_dose, - 1, NULL, 0, NULL,
+           NULL, NULL, esm_utl.f_cdu(c.case_id, c.seq_num)) drugcumulativedosageunit,
+    CASE
+        WHEN p.views_available IN (
+            1,
+            3,
+            5,
+            7
+        ) THEN
+            d.dose_description
+        ELSE
+            decode(d.dose, NULL, NULL, decode(lmd.unit, NULL, NULL, d.dose
+                                                                    || ' '
+                                                                    || lmd.unit))
+    END drugdosagetext,
+    esm_utl.get_frm(c.formulation_id) drugdosageform,
+    esm_utl.get_rt_e2b(d.admin_route_id) drugadministrationroute,
+    esm_utl.get_rt_e2b(d.par_admin_route) drugparadministration,
+    CASE
+        WHEN c.exposure IS NOT NULL THEN
+            c.exposure
+        ELSE
+            NULL
+    END reactiongestationperiod,
+    CASE
+        WHEN c.exposure_unit_id IS NOT NULL THEN
+            esm_utl.get_react_gest_period_unit(c.exposure_unit_id)
+        ELSE
+            NULL
+    END reactiongestationperiodunit,
+    decode(d.ind_pref_term, NULL, NULL, esm_utl.get_meddra_version(d.ind_code_dict, 2)) drugindicationmeddraversion,
+    decode(esm_utl.get_meddra_version(d.ind_code_dict, 2), NULL, NULL, substr(d.ind_pref_term, 1, 250)) drugindication,
+    decode(d.start_datetime, NULL, NULL, decode(d.start_datetime_res, 5, 602, 7, 610,
+                                                102)) drugstartdateformat,
+    decode(d.start_datetime_res, 5, to_char(d.start_datetime, 'YYYY'), 7, to_char(d.start_datetime, 'YYYYMM'), 8, to_char(d.start_datetime
+    , 'YYYYMMDD'), NULL) drugstartdate,
+    CASE
+        WHEN ( p.views_available IN (
+            1,
+            3,
+            5,
+            7
+        )
+               AND c.delay_seconds IS NULL
+               AND c.delay IS NULL 
+               AND ( TO_NUMBER(ESM_UTL.F_GET_SAFETY_CONTEXT('PI_TRANSMIT_CAUSALITY_STUDY')) = 1 or NVL(p.product_id , p.pat_exposure) > 0 or TO_NUMBER(ESM_UTL.F_GET_SAFETY_CONTEXT('PI_TRANSMIT_CAUSALITY_NONSTUDY')) = 1)) THEN
+            esm_utl2.f_get_latency(:case_id, p.seq_num, 1, 1, 0,
+                                   NULL)
+        ELSE
+            decode(p.views_available, 1, esm_utl.f_duration(c.delay_seconds, c.delay), 3, esm_utl.f_duration(c.delay_seconds, c.delay
+            ), 5, esm_utl.f_duration(c.delay_seconds, c.delay), 7, esm_utl.f_duration(c.delay_seconds, c.delay), esm_utl.f_vacc_start_period
+            (:case_id, 5, 'N', d.seq_num, d.log_no))
+    END drugstartperiod,
+    CASE
+        WHEN ( p.views_available IN (
+            1,
+            3,
+            5,
+            7
+        )
+               AND c.delay_seconds IS NULL
+               AND c.delay IS NULL 
+               AND ( TO_NUMBER(ESM_UTL.F_GET_SAFETY_CONTEXT('PI_TRANSMIT_CAUSALITY_STUDY')) = 1 or NVL(p.product_id , p.pat_exposure) > 0 or TO_NUMBER(ESM_UTL.F_GET_SAFETY_CONTEXT('PI_TRANSMIT_CAUSALITY_NONSTUDY')) = 1)) THEN
+            esm_utl2.f_get_latency(:case_id, p.seq_num, 0, 1, 0,
+                                   NULL)
+        ELSE
+            decode(p.views_available, 1, esm_utl.f_duration_unit(c.delay_seconds, c.delay), 3, esm_utl.f_duration_unit(c.delay_seconds
+            , c.delay), 5, esm_utl.f_duration_unit(c.delay_seconds, c.delay), 7, esm_utl.f_duration_unit(c.delay_seconds, c.delay
+            ), esm_utl.f_vacc_start_period(:case_id, 5, 'U', d.seq_num, d.log_no))
+    END drugstartperiodunit,
+    CASE
+        WHEN ( p.views_available IN (
+            1,
+            3,
+            5,
+            7
+        )
+               AND c.latency_seconds IS NULL
+               AND c.latency IS NULL 
+               AND ( TO_NUMBER(ESM_UTL.F_GET_SAFETY_CONTEXT('PI_TRANSMIT_CAUSALITY_STUDY')) = 1 or NVL(p.product_id , p.pat_exposure) > 0 or TO_NUMBER(ESM_UTL.F_GET_SAFETY_CONTEXT('PI_TRANSMIT_CAUSALITY_NONSTUDY')) = 1)) THEN
+            esm_utl2.f_get_latency(:case_id, p.seq_num, 1, 0, 0,
+                                   NULL)
+        ELSE
+            decode(p.views_available, 1, esm_utl.f_duration(c.latency_seconds, c.latency), 3, esm_utl.f_duration(c.latency_seconds
+            , c.latency), 5, esm_utl.f_duration(c.latency_seconds, c.latency), 7, esm_utl.f_duration(c.latency_seconds, c.latency
+            ), esm_utl.f_vacc_last_period(:case_id, 5, 'N', d.seq_num))
+    END druglastperiod,
+    CASE
+        WHEN ( p.views_available IN (
+            1,
+            3,
+            5,
+            7
+        )
+               AND c.latency_seconds IS NULL
+               AND c.latency IS NULL
+               AND ( TO_NUMBER(ESM_UTL.F_GET_SAFETY_CONTEXT('PI_TRANSMIT_CAUSALITY_STUDY')) = 1 or NVL(p.product_id , p.pat_exposure) > 0 or TO_NUMBER(ESM_UTL.F_GET_SAFETY_CONTEXT('PI_TRANSMIT_CAUSALITY_NONSTUDY')) = 1)) THEN
+            esm_utl2.f_get_latency(:case_id, p.seq_num, 0, 0, 0,
+                                   NULL)
+        ELSE
+            decode(p.views_available, 1, esm_utl.f_duration_unit(c.latency_seconds, c.latency), 3, esm_utl.f_duration_unit(c.latency_seconds
+            , c.latency), 5, esm_utl.f_duration_unit(c.latency_seconds, c.latency), 7, esm_utl.f_duration_unit(c.latency_seconds,
+            c.latency), esm_utl.f_vacc_last_period(:case_id, 5, 'U', d.seq_num))
+    END druglastperiodunit,
+    decode(d.stop_datetime, NULL, NULL, decode(d.stop_datetime_res, 5, 602, 7, 610,
+                                               102)) drugenddateformat,
+    decode(d.stop_datetime_res, 5, to_char(d.stop_datetime, 'YYYY'), 7, to_char(d.stop_datetime, 'YYYYMM'), 8, to_char(d.stop_datetime
+    , 'YYYYMMDD'), NULL) drugenddate,
+    esm_utl.f_duration(d.duration_seconds, d.duration, 0) drugtreatmentduration,
+    esm_utl.f_duration_unit(d.duration_seconds, d.duration, 0) drugtreatmentdurationunit,
+    esm_utl.get_act_e2b(c.act_taken_id) actiondrug,
+    CASE
+        WHEN c.rechallenge IS NULL 
+               AND ( TO_NUMBER(ESM_UTL.F_GET_SAFETY_CONTEXT('PI_TRANSMIT_CAUSALITY_STUDY')) = 1 or NVL(p.product_id , p.pat_exposure) > 0 or TO_NUMBER(ESM_UTL.F_GET_SAFETY_CONTEXT('PI_TRANSMIT_CAUSALITY_NONSTUDY')) = 1) THEN
+            esm_utl2.f_get_rechallenge(:case_id, p.seq_num)
+        ELSE
+            decode(c.rechallenge, 0, 2, 1, 1,
+                   2, 3, 3, NULL)
+    END drugrecurreadministration,
+    esm_utl.f_product_notes(:case_id, p.seq_num, d.seq_num, d.log_no, 100) drugadditional,
+    p.seq_num   seq_num,
+    nvl(lmp.product_id, - 1) dummy2,
+    p.sort_id   psort_id,
+    d.sort_id   dsort_id
+FROM
+    case_product                p,
+    case_prod_drugs             c,
+    prod_dosage_indication_vw   d,
+    case_pat_info               pi,
+    lm_gender                   lg,
+    lm_countries                lmc,
+    lm_manufacturer             lmm,
+    lm_product                  lmp,
+    case_study                  cs,
+    lm_study_products           lmsp,
+    (
+        SELECT
+            unit_id,
+            unit
+        FROM
+            lm_dose_units
+        WHERE
+            dosage_unit = 1
+    ) lmd,
+    lm_dose_frequency           ldf,
+    esm_lm_units                elu,
+    lm_countries                odc,
+    lm_countries                dac
+WHERE
+    p.case_id = :case_id
+    AND p.drug_type IN (
+        1,
+        2
+    )
+    AND p.views_available <> 2
+    AND p.case_id = c.case_id (+)
+    AND p.seq_num = c.seq_num (+)
+    AND p.case_id = pi.case_id (+)
+    AND pi.gender_id = lg.gender_id (+)
+    AND p.country_id = lmc.country_id (+)
+    AND p.manufacturer_id = lmm.manufacturer_id (+)
+    AND p.case_id = cs.case_id
+    AND cs.cohort_id = lmsp.cohort_id
+    AND lmsp.product_id = lmp.product_id
+    AND esm_utl.f_blind(:case_id, p.seq_num) = 1
+    AND ( ( cs.code_broken = 0
+            AND lmsp.blinded = 1 and p.treat_group_id is null )
+          OR ( cs.code_broken <> 0 ) )
+    AND p.case_id = d.case_id (+)
+    AND p.seq_num = d.seq_num (+)
+    AND d.dose_unit_id = lmd.unit_id (+)
+    AND d.freq_id = ldf.freq_id (+)
+    AND ldf.interval_dosage_def_e2b = elu.id (+)
+    AND c.obtain_drug_country_id = odc.country_id (+)
+    AND c.drug_auth_country_id = dac.country_id (+)
+UNION
+SELECT
+    esm_utl.get_drgty(:case_id, p.seq_num) drugcharacterization,
+    substr('BLINDED ' || prod_name, 1, 70) medicinalproduct,
+    odc.a2      obtaindrugcountry,
+    d.lot_no    drugbatchnumb,
+    substr(esm_utl.f_lic(:case_id, p.seq_num, :reg_report_id), 1, 35) drugauthorizationnumb,
+    esm_utl.f_cntr(:case_id, p.seq_num, :reg_report_id) drugauthorizationcountry,
+    substr(esm_utl.f_mfg(:case_id, p.seq_num, :reg_report_id), 1, 60) drugauthorizationholder,
+    decode(esm_utl.get_due2b(d.dose_unit_id), NULL, NULL, decode(nvl(d.dose, - 1), - 1, NULL, 0, NULL,
+                                                                 esm_utl.f_round_str(d.dose, 8))) drugstructuredosagenumb,
+    decode(nvl(d.dose, - 1), - 1, NULL, 0, NULL,
+           esm_utl.get_due2b(d.dose_unit_id)) drugstructuredosageunit,
+    decode(decode(elu.e2b_code, 807, NULL, 810, NULL,
+                  811, NULL, 812, NULL, 813,
+                  NULL, elu.e2b_code), NULL, NULL, ldf.separate_dosage_numb_e2b) drugseparatedosagenumb,
+    decode(decode(elu.e2b_code, 807, NULL, 810, NULL,
+                  811, NULL, 812, NULL, 813,
+                  NULL, elu.e2b_code), NULL, NULL, ldf.interval_dosage_unit_e2b) drugintervaldosageunitnumb,
+    decode(ldf.interval_dosage_unit_e2b, NULL, NULL, decode(elu.e2b_code, 807, NULL, 810, NULL,
+                                                            811, NULL, 812, NULL, 813,
+                                                            NULL, elu.e2b_code)) drugintervaldosagedefinition,
+    decode(esm_utl.f_cdu(c.case_id, c.seq_num), NULL, NULL, decode(c.cumulative_dose, - 1, NULL, 0, NULL,
+                                                                   NULL, NULL, esm_utl.f_round(c.cumulative_dose, 10))) drugcumulativedosagenumb
+                                                                   ,
+    decode(c.cumulative_dose, - 1, NULL, 0, NULL,
+           NULL, NULL, esm_utl.f_cdu(c.case_id, c.seq_num)) drugcumulativedosageunit,
+    CASE
+        WHEN p.views_available IN (
+            1,
+            3,
+            5,
+            7
+        ) THEN
+            d.dose_description
+        ELSE
+            decode(d.dose, NULL, NULL, decode(lmd.unit, NULL, NULL, d.dose
+                                                                    || ' '
+                                                                    || lmd.unit))
+    END drugdosagetext,
+    esm_utl.get_frm(c.formulation_id) drugdosageform,
+    esm_utl.get_rt_e2b(d.admin_route_id) drugadministrationroute,
+    esm_utl.get_rt_e2b(d.par_admin_route) drugparadministration,
+    CASE
+        WHEN c.exposure IS NOT NULL THEN
+            c.exposure
+        ELSE
+            NULL
+    END reactiongestationperiod,
+    CASE
+        WHEN c.exposure_unit_id IS NOT NULL THEN
+            esm_utl.get_react_gest_period_unit(c.exposure_unit_id)
+        ELSE
+            NULL
+    END reactiongestationperiodunit,
+    decode(d.ind_pref_term, NULL, NULL, esm_utl.get_meddra_version(d.ind_code_dict, 2)) drugindicationmeddraversion,
+    decode(esm_utl.get_meddra_version(d.ind_code_dict, 2), NULL, NULL, substr(d.ind_pref_term, 1, 250)) drugindication,
+    decode(d.start_datetime, NULL, NULL, decode(d.start_datetime_res, 5, 602, 7, 610,
+                                                102)) drugstartdateformat,
+    decode(d.start_datetime_res, 5, to_char(d.start_datetime, 'YYYY'), 7, to_char(d.start_datetime, 'YYYYMM'), 8, to_char(d.start_datetime
+    , 'YYYYMMDD'), NULL) drugstartdate,
+    CASE
+        WHEN ( p.views_available IN (
+            1,
+            3,
+            5,
+            7
+        )
+               AND c.delay_seconds IS NULL
+               AND c.delay IS NULL 
+               AND ( TO_NUMBER(ESM_UTL.F_GET_SAFETY_CONTEXT('PI_TRANSMIT_CAUSALITY_STUDY')) = 1 or NVL(p.product_id , p.pat_exposure) > 0 or TO_NUMBER(ESM_UTL.F_GET_SAFETY_CONTEXT('PI_TRANSMIT_CAUSALITY_NONSTUDY')) = 1)) THEN
+            esm_utl2.f_get_latency(:case_id, p.seq_num, 1, 1, 0,
+                                   NULL)
+        ELSE
+            decode(p.views_available, 1, esm_utl.f_duration(c.delay_seconds, c.delay), 3, esm_utl.f_duration(c.delay_seconds, c.delay
+            ), 5, esm_utl.f_duration(c.delay_seconds, c.delay), 7, esm_utl.f_duration(c.delay_seconds, c.delay), esm_utl.f_vacc_start_period
+            (:case_id, 5, 'N', d.seq_num, d.log_no))
+    END drugstartperiod,
+    CASE
+        WHEN ( p.views_available IN (
+            1,
+            3,
+            5,
+            7
+        )
+               AND c.delay_seconds IS NULL
+               AND c.delay IS NULL 
+               AND ( TO_NUMBER(ESM_UTL.F_GET_SAFETY_CONTEXT('PI_TRANSMIT_CAUSALITY_STUDY')) = 1 or NVL(p.product_id , p.pat_exposure) > 0 or TO_NUMBER(ESM_UTL.F_GET_SAFETY_CONTEXT('PI_TRANSMIT_CAUSALITY_NONSTUDY')) = 1)) THEN
+            esm_utl2.f_get_latency(:case_id, p.seq_num, 0, 1, 0,
+                                   NULL)
+        ELSE
+            decode(p.views_available, 1, esm_utl.f_duration_unit(c.delay_seconds, c.delay), 3, esm_utl.f_duration_unit(c.delay_seconds
+            , c.delay), 5, esm_utl.f_duration_unit(c.delay_seconds, c.delay), 7, esm_utl.f_duration_unit(c.delay_seconds, c.delay
+            ), esm_utl.f_vacc_start_period(:case_id, 5, 'U', d.seq_num, d.log_no))
+    END drugstartperiodunit,
+    CASE
+        WHEN ( p.views_available IN (
+            1,
+            3,
+            5,
+            7
+        )
+               AND c.latency_seconds IS NULL
+               AND c.latency IS NULL 
+               AND ( TO_NUMBER(ESM_UTL.F_GET_SAFETY_CONTEXT('PI_TRANSMIT_CAUSALITY_STUDY')) = 1 or NVL(p.product_id , p.pat_exposure) > 0 or TO_NUMBER(ESM_UTL.F_GET_SAFETY_CONTEXT('PI_TRANSMIT_CAUSALITY_NONSTUDY')) = 1)) THEN
+            esm_utl2.f_get_latency(:case_id, p.seq_num, 1, 0, 0,
+                                   NULL)
+        ELSE
+            decode(p.views_available, 1, esm_utl.f_duration(c.latency_seconds, c.latency), 3, esm_utl.f_duration(c.latency_seconds
+            , c.latency), 5, esm_utl.f_duration(c.latency_seconds, c.latency), 7, esm_utl.f_duration(c.latency_seconds, c.latency
+            ), esm_utl.f_vacc_last_period(:case_id, 5, 'N', d.seq_num))
+    END druglastperiod,
+    CASE
+        WHEN ( p.views_available IN (
+            1,
+            3,
+            5,
+            7
+        )
+               AND c.latency_seconds IS NULL
+               AND c.latency IS NULL
+               AND ( TO_NUMBER(ESM_UTL.F_GET_SAFETY_CONTEXT('PI_TRANSMIT_CAUSALITY_STUDY')) = 1 or NVL(p.product_id , p.pat_exposure) > 0 or TO_NUMBER(ESM_UTL.F_GET_SAFETY_CONTEXT('PI_TRANSMIT_CAUSALITY_NONSTUDY')) = 1)) THEN
+            esm_utl2.f_get_latency(:case_id, p.seq_num, 0, 0, 0,
+                                   NULL)
+        ELSE
+            decode(p.views_available, 1, esm_utl.f_duration_unit(c.latency_seconds, c.latency), 3, esm_utl.f_duration_unit(c.latency_seconds
+            , c.latency), 5, esm_utl.f_duration_unit(c.latency_seconds, c.latency), 7, esm_utl.f_duration_unit(c.latency_seconds,
+            c.latency), esm_utl.f_vacc_last_period(:case_id, 5, 'U', d.seq_num))
+    END druglastperiodunit,
+    decode(d.stop_datetime, NULL, NULL, decode(d.stop_datetime_res, 5, 602, 7, 610,
+                                               102)) drugenddateformat,
+    decode(d.stop_datetime_res, 5, to_char(d.stop_datetime, 'YYYY'), 7, to_char(d.stop_datetime, 'YYYYMM'), 8, to_char(d.stop_datetime
+    , 'YYYYMMDD'), NULL) drugenddate,
+    esm_utl.f_duration(d.duration_seconds, d.duration, 0) drugtreatmentduration,
+    esm_utl.f_duration_unit(d.duration_seconds, d.duration, 0) drugtreatmentdurationunit,
+    esm_utl.get_act_e2b(c.act_taken_id) actiondrug,
+    CASE
+        WHEN c.rechallenge IS NULL 
+               AND ( TO_NUMBER(ESM_UTL.F_GET_SAFETY_CONTEXT('PI_TRANSMIT_CAUSALITY_STUDY')) = 1 or NVL(p.product_id , p.pat_exposure) > 0 or TO_NUMBER(ESM_UTL.F_GET_SAFETY_CONTEXT('PI_TRANSMIT_CAUSALITY_NONSTUDY')) = 1) THEN
+            esm_utl2.f_get_rechallenge(:case_id, p.seq_num)
+        ELSE
+            decode(c.rechallenge, 0, 2, 1, 1,
+                   2, 3, 3, NULL)
+    END drugrecurreadministration,
+    esm_utl.f_product_notes(:case_id, p.seq_num, d.seq_num, d.log_no, 100) drugadditional,
+    p.seq_num   seq_num,
+    nvl(lmp.product_id, - 1) dummy2,
+    p.sort_id   psort_id,
+    d.sort_id   dsort_id
+FROM
+    case_product                p,
+    case_prod_drugs             c,
+    prod_dosage_indication_vw   d,
+    case_pat_info               pi,
+    lm_gender                   lg,
+    lm_countries                lmc,
+    lm_manufacturer             lmm,
+    lm_product                  lmp,
+    case_study                  cs,
+    lm_study_groups     lsg,
+    lm_study_group_products     lsgp,
+    (
+        SELECT
+            unit_id,
+            unit
+        FROM
+            lm_dose_units
+        WHERE
+            dosage_unit = 1
+    ) lmd,
+    lm_dose_frequency           ldf,
+    esm_lm_units                elu,
+    lm_countries                odc,
+    lm_countries                dac
+WHERE
+    p.case_id = :case_id
+    AND p.drug_type IN (
+        1,
+        2
+    )
+    AND p.views_available <> 2
+    AND p.case_id = c.case_id (+)
+    AND p.seq_num = c.seq_num (+)
+    AND p.case_id = pi.case_id (+)
+    AND pi.gender_id = lg.gender_id (+)
+    AND p.country_id = lmc.country_id (+)
+    AND p.manufacturer_id = lmm.manufacturer_id (+)
+    AND p.case_id = cs.case_id
+    AND cs.code_broken = 0    
+    AND cs.cohort_id = lsg.cohort_id
+    AND lsg.treat_group_id = lsgp.treat_group_id 
+    AND p.treat_group_id = lsgp.treat_group_id   
+    AND lsgp.product_id = lmp.product_id
+    AND esm_utl.f_blind(:case_id, p.seq_num) = 1
+    AND p.case_id = d.case_id (+)
+    AND p.seq_num = d.seq_num (+)
+    AND d.dose_unit_id = lmd.unit_id (+)
+    AND d.freq_id = ldf.freq_id (+)
+    AND ldf.interval_dosage_def_e2b = elu.id (+)
+    AND c.obtain_drug_country_id = odc.country_id (+)
+    AND c.drug_auth_country_id = dac.country_id (+)
+ORDER BY
+    38,
+    39

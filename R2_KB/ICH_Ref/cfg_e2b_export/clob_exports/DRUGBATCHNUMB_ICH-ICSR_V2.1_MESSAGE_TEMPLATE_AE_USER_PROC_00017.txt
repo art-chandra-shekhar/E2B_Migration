@@ -1,0 +1,20 @@
+DECLARE
+  v_xml         varchar2(32767);
+  v_prod_name   varchar2(32767);
+  l_return      number := 0;
+  lb_return     boolean := FALSE;
+  v_dtd_elements esm_imp.vtab;
+BEGIN
+  v_xml    := ESM_IMP.F_READ(:REPORT_ID,:DTD_ELEMENT);
+  if v_xml is not null then
+	  	v_dtd_elements(1) := 'DRUGCHARACTERIZATION';
+  	  v_dtd_elements(2) := 'MEDICINALPRODUCT';
+      v_dtd_elements(3) := 'DRUGDOSAGEFORM';
+      v_prod_name  := ESM_IMP.F_READ(:REPORT_ID,'MEDICINALPRODUCT');
+	    if v_prod_name is null then
+	       v_dtd_elements(2) := 'ACTIVESUBSTANCENAME';
+	    end if;
+	  lb_return := ESM_IMP.F_CHECK_AND_BUILD_KEY(:REPORT_ID,:PARENT_ELEMENT,v_dtd_elements);
+  	l_return :=  ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_DOSE_REGIMENS','LOT_NO',v_xml);     
+  end if;
+END;

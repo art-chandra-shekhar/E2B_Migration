@@ -1,0 +1,375 @@
+DECLARE
+   v_xml                  VARCHAR2 (32767);
+   v_xml1                 VARCHAR2 (32767);
+   v_xml2                 VARCHAR2 (32767);
+   l_return               NUMBER                                  := 0;
+   v_pref_term            VARCHAR2 (250);
+   v_pref_term_j          VARCHAR2 (400);
+   v_item_llt             VARCHAR2 (250);
+   v_item_llt_j           VARCHAR2 (400);
+   v_item_soc             VARCHAR2 (250);
+   v_item_soc_j           VARCHAR2 (400);
+   v_item_hlt             VARCHAR2 (250);
+   v_item_hlt_j           VARCHAR2 (400);
+   v_item_hlgt            VARCHAR2 (250);
+   v_item_hlgt_j          VARCHAR2 (400);
+   v_pref_term_code       VARCHAR2 (50);
+   v_item_llt_code        VARCHAR2 (50);
+   v_item_hlgt_code       VARCHAR2 (50);
+   v_item_soc_code        VARCHAR2 (50);
+   v_item_hlt_code        VARCHAR2 (50);
+   v_dtd_version          cfg_profile.profile_version%TYPE;
+   vmeddrauser            VARCHAR2 (500)                          := NULL;
+   l_item_coded           NUMBER;
+   l_item_coded_j         NUMBER;
+   l_dict_id              NUMBER;
+   v_cause_reptd          case_death_details.cause_reptd%TYPE;
+   v_cause_reptd_j        case_death_details.cause_reptd_j%TYPE;
+   v_non_current_term     VARCHAR2 (250);
+   v_non_current_term_j   VARCHAR2 (400);
+   ln_rank          	  NUMBER  := -1;
+BEGIN
+   v_item_llt := NULL;
+   v_item_llt_j := NULL;
+   v_item_hlt := NULL;
+   v_item_hlt_j := NULL;
+   v_item_hlgt := NULL;
+   v_item_hlgt_j := NULL;
+   v_item_soc := NULL;
+   v_item_soc_j := NULL;
+   v_item_llt_code := NULL;
+   v_item_hlt_code := NULL;
+   v_item_hlgt_code := NULL;
+   v_item_soc_code := NULL;
+   v_pref_term := NULL;
+   v_pref_term_j := NULL;
+   v_pref_term_code := NULL;
+   l_item_coded := NULL;
+   l_item_coded_j := NULL;
+   l_dict_id := NULL;
+   v_cause_reptd := NULL;
+   v_cause_reptd_j := NULL;
+   v_non_current_term := NULL;
+   v_non_current_term_j := NULL;
+   v_xml := esm_imp.f_read (:report_id, :dtd_element);
+   v_xml1 := esm_imp.f_read (:report_id, 'PATIENTDETERMAUTOPSMEDDRAVER');
+   IF v_xml IS NOT NULL
+   THEN
+      v_xml2 := esm_imp.f_read (:report_id, 'OCCURCOUNTRY');
+      IF v_xml2 IS NULL
+      THEN
+         v_xml2 := esm_imp.f_read (:report_id, 'PRIMARYSOURCECOUNTRY');
+      END IF;
+      vmeddrauser := esm_utl.f_get_meddrausername;
+      IF vmeddrauser IS NOT NULL
+      THEN
+         vmeddrauser := vmeddrauser || '.';
+      END IF;
+      esm_utl.get_meddra_info (vmeddrauser,
+                               v_xml,
+                               v_xml2,
+                               v_item_llt,
+                               v_item_llt_j,
+                               v_item_hlt,
+                               v_item_hlt_j,
+                               v_item_hlgt,
+                               v_item_hlgt_j,
+                               v_item_soc,
+                               v_item_soc_j,
+                               v_item_llt_code,
+                               v_item_hlt_code,
+                               v_item_hlgt_code,
+                               v_item_soc_code,
+                               v_pref_term,
+                               v_pref_term_j,
+                               v_pref_term_code,
+                               v_non_current_term,
+                               v_non_current_term_j,
+                               l_item_coded,
+                               l_item_coded_j,
+							   ln_rank
+                              );
+      l_return :=
+         esm_imp_utl.f_check_unit_value ('PATIENTDETERMINEAUTOPSY',
+                                         v_xml,
+                                         'PATIENTDETERMAUTOPSMEDDRAVER',
+                                         v_xml1,
+                                         :report_id
+                                        );
+      IF l_return = 1
+      THEN
+         esm_imp_utl.p_check_meddra (v_pref_term,
+                                     'PATIENTDETERMINEAUTOPSY',
+                                     v_xml,
+                                     :report_id,
+                                     vmeddrauser
+                                    );
+      END IF;
+      l_dict_id :=
+         esm_imp_utl.f_get_dict_id (:report_id,
+                                    :dtd_element,
+                                    'AUTOE_P_E_TERM_DIC'
+                                   );
+      IF l_item_coded = 0
+      THEN
+         v_cause_reptd := NVL (v_non_current_term, v_xml);
+      ELSE
+         v_cause_reptd := v_pref_term;
+      END IF;
+      IF l_item_coded_j = 0
+      THEN
+         v_cause_reptd_j := NVL (v_non_current_term_j, v_xml);
+      ELSE
+         v_cause_reptd_j := v_pref_term_j;
+      END IF;
+      l_return :=
+         esm_imp.f_write (:report_id,
+                          :parent_element,
+                          :dtd_element,
+                          :PROFILE,
+                          'CASE_DEATH_DETAILS',
+                          'CAUSE_REPTD',
+                          v_cause_reptd
+                         );
+      l_return :=
+         esm_imp.f_write (:report_id,
+                          :parent_element,
+                          :dtd_element,
+                          :PROFILE,
+                          'CASE_DEATH_DETAILS',
+                          'CAUSE_CODED',
+                          v_cause_reptd
+                         );
+      l_return :=
+         esm_imp.f_write (:report_id,
+                          :parent_element,
+                          :dtd_element,
+                          :PROFILE,
+                          'CASE_DEATH_DETAILS',
+                          'TERM_TYPE',
+                          2
+                         );
+      IF l_item_coded > 0
+      THEN
+         l_return :=
+            esm_imp.f_write (:report_id,
+                             :parent_element,
+                             :dtd_element,
+                             :PROFILE,
+                             'CASE_DEATH_DETAILS',
+                             'CAUSE',
+                             v_pref_term
+                            );
+         l_return :=
+            esm_imp.f_write (:report_id,
+                             :parent_element,
+                             :dtd_element,
+                             :PROFILE,
+                             'CASE_DEATH_DETAILS',
+                             'CAUSE_CODE',
+                             v_pref_term_code
+                            );
+         l_return :=
+            esm_imp.f_write (:report_id,
+                             :parent_element,
+                             :dtd_element,
+                             :PROFILE,
+                             'CASE_DEATH_DETAILS',
+                             'CAUSE_LLT_CODE',
+                             v_item_llt_code
+                            );
+         l_return :=
+            esm_imp.f_write (:report_id,
+                             :parent_element,
+                             :dtd_element,
+                             :PROFILE,
+                             'CASE_DEATH_DETAILS',
+                             'CAUSE_LLT',
+                             v_item_llt
+                            );
+         l_return :=
+            esm_imp.f_write (:report_id,
+                             :parent_element,
+                             :dtd_element,
+                             :PROFILE,
+                             'CASE_DEATH_DETAILS',
+                             'CAUSE_HLT_CODE',
+                             v_item_hlt_code
+                            );
+         l_return :=
+            esm_imp.f_write (:report_id,
+                             :parent_element,
+                             :dtd_element,
+                             :PROFILE,
+                             'CASE_DEATH_DETAILS',
+                             'CAUSE_HLT',
+                             v_item_hlt
+                            );
+         l_return :=
+            esm_imp.f_write (:report_id,
+                             :parent_element,
+                             :dtd_element,
+                             :PROFILE,
+                             'CASE_DEATH_DETAILS',
+                             'CAUSE_HLGT_CODE',
+                             v_item_hlgt_code
+                            );
+         l_return :=
+            esm_imp.f_write (:report_id,
+                             :parent_element,
+                             :dtd_element,
+                             :PROFILE,
+                             'CASE_DEATH_DETAILS',
+                             'CAUSE_HLGT',
+                             v_item_hlgt
+                            );
+         l_return :=
+            esm_imp.f_write (:report_id,
+                             :parent_element,
+                             :dtd_element,
+                             :PROFILE,
+                             'CASE_DEATH_DETAILS',
+                             'CAUSE_SOC_CODE',
+                             v_item_soc_code
+                            );
+         l_return :=
+            esm_imp.f_write (:report_id,
+                             :parent_element,
+                             :dtd_element,
+                             :PROFILE,
+                             'CASE_DEATH_DETAILS',
+                             'CAUSE_SOC',
+                             v_item_soc
+                            );
+         l_return :=
+            esm_imp.f_write (:report_id,
+                             :parent_element,
+                             :dtd_element,
+                             :PROFILE,
+                             'CASE_DEATH_DETAILS',
+                             'MULTI_EVENT_EXISTS',
+                             ln_rank
+                            );
+      END IF;
+      l_return :=
+         esm_imp.f_write (:report_id,
+                          :parent_element,
+                          :dtd_element,
+                          :PROFILE,
+                          'CASE_DEATH_DETAILS',
+                          'CAUSE_SYN_CODE',
+                          '-1'
+                         );
+      l_return :=
+         esm_imp.f_write (:report_id,
+                          :parent_element,
+                          :dtd_element,
+                          :PROFILE,
+                          'CASE_DEATH_DETAILS',
+                          'CAUSE_DICT',
+                          l_dict_id
+                         );
+      l_return :=
+         esm_imp.f_write (:report_id,
+                          :parent_element,
+                          :dtd_element,
+                          :PROFILE,
+                          'CASE_DEATH_DETAILS',
+                          'CAUSE_CODE_STATUS',
+                          l_item_coded
+                         );
+      IF :argus_j = 1 AND l_item_coded_j > 0
+      THEN
+         l_return :=
+            esm_imp.f_write (:report_id,
+                             :parent_element,
+                             :dtd_element,
+                             :PROFILE,
+                             'CASE_DEATH_DETAILS',
+                             'CAUSE_REPTD_J',
+                             v_cause_reptd_j
+                            );
+         l_return :=
+            esm_imp.f_write (:report_id,
+                             :parent_element,
+                             :dtd_element,
+                             :PROFILE,
+                             'CASE_DEATH_DETAILS',
+                             'CAUSE_CODED_J',
+                             v_cause_reptd_j
+                            );
+         l_return :=
+            esm_imp.f_write (:report_id,
+                             :parent_element,
+                             :dtd_element,
+                             :PROFILE,
+                             'CASE_DEATH_DETAILS',
+                             'CAUSE_J',
+                             v_pref_term_j
+                            );
+         l_return :=
+            esm_imp.f_write (:report_id,
+                             :parent_element,
+                             :dtd_element,
+                             :PROFILE,
+                             'CASE_DEATH_DETAILS',
+                             'CAUSE_LLT_CODE_J',
+                             v_item_llt_code
+                            );
+         l_return :=
+            esm_imp.f_write (:report_id,
+                             :parent_element,
+                             :dtd_element,
+                             :PROFILE,
+                             'CASE_DEATH_DETAILS',
+                             'CAUSE_LLT_J',
+                             v_item_llt_j
+                            );
+         l_return :=
+            esm_imp.f_write (:report_id,
+                             :parent_element,
+                             :dtd_element,
+                             :PROFILE,
+                             'CASE_DEATH_DETAILS',
+                             'CAUSE_HLT_J',
+                             v_item_hlt_j
+                            );
+         l_return :=
+            esm_imp.f_write (:report_id,
+                             :parent_element,
+                             :dtd_element,
+                             :PROFILE,
+                             'CASE_DEATH_DETAILS',
+                             'CAUSE_HLGT_J',
+                             v_item_hlgt_j
+                            );
+         l_return :=
+            esm_imp.f_write (:report_id,
+                             :parent_element,
+                             :dtd_element,
+                             :PROFILE,
+                             'CASE_DEATH_DETAILS',
+                             'CAUSE_SOC_J',
+                             v_item_soc_j
+                            );
+         l_return :=
+            esm_imp.f_write (:report_id,
+                             :parent_element,
+                             :dtd_element,
+                             :PROFILE,
+                             'CASE_DEATH_DETAILS',
+                             'CAUSE_SYN_CODE_J',
+                             '-1'
+                            );
+         l_return :=
+            esm_imp.f_write (:report_id,
+                             :parent_element,
+                             :dtd_element,
+                             :PROFILE,
+                             'CASE_DEATH_DETAILS',
+                             'CAUSE_CODE_STATUS_J',
+                             l_item_coded_j
+                            );
+      END IF;
+   END IF;
+END;

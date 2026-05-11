@@ -1,0 +1,25 @@
+DECLARE
+   v_xml    varchar2(32767);
+   v_xml1   varchar2(32767);
+   l_return number := 0;
+   l_date1  date;
+   l_vc1    varchar2(32767);
+   i        number;
+   l_res    number;
+   l_date1_vc varchar2(30);
+BEGIN
+   v_xml   := ESM_IMP.F_READ(:REPORT_ID,'TESTDATE');
+   v_xml1  := ESM_IMP.F_READ(:REPORT_ID,'TESTDATEFORMAT');
+   IF (v_xml IS NOT NULL AND v_xml1 IS NOT NULL) THEN
+     i := ESM_IMP_UTL.F_CHECK_UNIT_VALUE('TESTDATE',v_xml,'TESTDATEFORMAT',v_xml1, :report_id);
+     IF i = 0 THEN
+        l_date1  := to_date(ESM_AE.TRANSLATE_DATEFORMAT(v_xml,v_xml1,'N','TESTDATE','TESTDATEFORMAT',:report_id),'YYYYMMDDHH24MISS');
+        l_date1_vc := to_char(l_date1,'DD-MON-YYYY HH24:MI:SS');
+        l_vc1    := ESM_AE.TRANSLATE_DATEFORMAT(v_xml,v_xml1,'Y','TESTDATE','TESTDATEFORMAT',:report_id);
+        l_res := ESM_IMP_UTL.F_GET_DATE_RES(v_xml1);
+        l_return := ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_LAB_DATA','TEST_DATE',l_date1_vc);
+        l_return := ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_LAB_DATA','TEST_DATE_PARTIAL',l_vc1);
+        l_return := ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_LAB_DATA','TEST_DATE_RES',l_res);
+     END IF;   
+   END IF;
+END;

@@ -1,0 +1,21 @@
+DECLARE
+  v_xml				varchar2(32767);
+  l_return			number := 0;
+  l_value			number;
+  v_error_message	varchar2(4000);
+  v_stored_procedure varchar2(30) := 'CREATE_CASE_EVENT';
+BEGIN
+  v_xml    := trim(ESM_IMP.F_READ_EXTENSION(:REPORT_ID,:DTD_ELEMENT));
+ if v_xml ='1' then 
+  l_value:= 1;
+ elsif v_xml ='2' then 
+  l_value:= 0;
+ elsif v_xml ='3' then 
+  l_value:= 2;
+ else 
+  l_value:= -1;
+ end if; 
+    if l_value > -1 then 
+       l_return :=  ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_EVENT','TREATED',l_value);
+    end if;
+END;

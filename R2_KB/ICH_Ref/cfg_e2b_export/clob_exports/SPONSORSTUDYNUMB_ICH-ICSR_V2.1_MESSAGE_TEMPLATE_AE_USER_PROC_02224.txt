@@ -1,0 +1,147 @@
+DECLARE
+    v_xml                   varchar2(32767);
+    v_xml1                  varchar2(32767);
+    v_xml2                  varchar2(32767);
+    l_return                number := 0;
+    v_sponsorstudynumb      primarysource.sponsorstudynumb%type;
+    v_stored_procedure      varchar2(30) := 'CREATE_CASE_STUDY';
+    v_study_num             lm_studies.study_num%type;
+    v_study_num_j           lm_studies.study_num_j%type;
+    v_study_key             lm_studies.study_key%type;
+    l_cohort_id             lm_study_cohorts.cohort_id%type;
+    v_study_type_id         lm_study_cohorts.study_type_id%type;
+    v_protocol_num          lm_studies.protocol_num%type;
+    v_CLIN_COMP_NUM_J       lm_studies.CLIN_COMP_NUM_J%type; 
+    v_protocol_num_j        LM_PROTOCOLS.PROTOCOL_DESC_J%type;
+    v_other_num             lm_studies.other_num%type;
+    i_center_id             lm_study_centers.center_id%type;
+    v_center_name           lm_centers.center_name%type;
+    v_center_name_j         lm_centers.center_name_j%type;
+    i_protocol_id           lm_protocols.protocol_id%type;
+    i_classification_id     number;
+    vsponsorstudynumb       case_study.study_num%type;
+    v_error_message         varchar2(32767);
+    v_blind_name            lm_study_cohorts.blind_name%type;
+    v_blind_name_j          lm_study_cohorts.blind_name_j%type;
+    v_study_desc            case_study.study_desc%type;
+    v_study_desc_j          case_study.study_desc_j%type;
+    l_dev_phase_id          case_study.dev_phase_id%type;
+    l_code_broken           number;
+    l_count                 number;
+    l_match                 number := 0;
+    wdelim                  varchar2(3)      := esm_imp_utl.wdelim;
+BEGIN
+    v_xml  := ESM_IMP.F_READ(:REPORT_ID,'SPONSORSTUDYNUMB');
+    v_xml1 := ESM_IMP.F_READ(:REPORT_ID,'OBSERVESTUDYTYPE');
+    v_xml2 := ESM_IMP.F_READ(:REPORT_ID,'STUDYNAME');
+    
+    IF v_xml is not null OR v_xml2 is not null THEN
+        IF v_xml1 is not null THEN
+            l_return := ESM_IMP_UTL.F_CHECK_VALIDATION(:PROFILE, 'OBSERVESTUDYTYPE',v_xml1,:report_id);
+            if l_return = 0 THEN
+                if v_xml1 = '1' THEN
+                    BEGIN
+                        select classification_id into i_classification_id
+                        from lm_case_classification
+                        where upper(description) = upper('Clinical Trial') and rownum = 1;
+                    Exception when no_data_found THEN
+                        i_classification_id := null;
+                    end;
+                elsif v_xml1 = '2' THEN
+                    BEGIN
+                        select classification_id into i_classification_id
+                        from lm_case_classification
+                        where upper(description) = upper('Individual Patient Use') and rownum = 1;
+                    Exception when no_data_found THEN
+                        i_classification_id := null;
+                    end;
+                elsif v_xml1 = '3' THEN
+                    BEGIN
+                        select classification_id into i_classification_id
+                        from lm_case_classification
+                        where upper(description) = upper('Other Studies') and rownum = 1;
+                    Exception when no_data_found THEN
+                        i_classification_id := null;
+                    end;
+                end if;
+            end if;
+        END IF;
+        vsponsorstudynumb := Null;
+        IF v_xml IS NOT NULL THEN
+            IF length(v_xml) > 35 THEN
+                v_error_message := v_xml||wdelim||v_stored_procedure;
+                ESM_IMP_UTL.WRITE_ERROR_MSG('STDY_NUM_LONG','SPONSORSTUDYNUMB',v_xml,'',v_error_message,:report_id);
+                vsponsorstudynumb := substr(v_xml,1,35);
+            ELSE
+                vsponsorstudynumb := v_xml;
+            END IF;
+        ELSE
+            vsponsorstudynumb := Null;
+        END IF;
+        IF vsponsorstudynumb IS NOT NULL THEN
+            BEGIN
+                SELECT  lms.study_num, lms.study_num_j, lms.study_key, lsc.cohort_id, lsc.study_type_id, lms.other_num , 
+                        lms.protocol_num, lmp.PROTOCOL_DESC_J, lmc.center_name || '(' || lmc.CENTER_NO || ')' center_name, 
+                        lmc.center_name_j || '(' || lmc.CENTER_NO_J || ')' center_name_j, lmc.center_id, lmp.protocol_id, 
+                        lsc.blind_name, lsc.blind_name_j, lms.study_desc, lms.study_desc_j,
+                        decode(lsc.study_type_id,3,4,0), lms.dev_phase_id, lms.CLIN_COMP_NUM_J
+                into    v_study_num, v_study_num_j, v_study_key, l_cohort_id, v_study_type_id, v_other_num, 
+                        v_protocol_num, v_protocol_num_j, v_center_name, v_center_name_j, i_center_id, i_protocol_id, 
+                        v_blind_name, v_blind_name_j, v_study_desc, v_study_desc_j, 
+                        l_code_broken, l_dev_phase_id, v_CLIN_COMP_NUM_J
+                FROM    lm_studies lms, lm_study_cohorts lsc, lm_study_centers lmsc, lm_centers lmc, lm_protocols lmp
+                WHERE   lms.study_key = lmsc.study_key (+)
+                        AND   lms.study_key = lsc.study_key
+                        AND   lsc.primary = 1
+                        AND   lmsc.center_id = lmc.center_id (+)
+                        and   lms.protocol_num = lmp.PROTOCOL_DESC (+)
+                        and   upper(lms.study_num_j) = upper(v_xml)
+                        and   rownum = 1;
+                l_match := 1;
+            EXCEPTION WHEN NO_DATA_FOUND THEN                
+                NULL; -- l_match is initialized to 0 
+            END;            
+            if l_match = 1 then
+                l_return :=  ESM_IMP.F_WRITE(:REPORT_ID, :PARENT_ELEMENT, :DTD_ELEMENT,:PROFILE,'CASE_STUDY','STUDY_KEY',v_study_key);
+                l_return :=  ESM_IMP.F_WRITE(:REPORT_ID, :PARENT_ELEMENT, :DTD_ELEMENT,:PROFILE,'CASE_STUDY','COHORT_ID',l_cohort_id);
+                l_return :=  ESM_IMP.F_WRITE('CASE_STUDY','STUDY_NUM_J',vsponsorstudynumb);
+                l_return :=  ESM_IMP.F_WRITE('CASE_STUDY','STUDY_TYPE',v_study_type_id);
+                l_return :=  ESM_IMP.F_WRITE('CASE_STUDY','CENTER_ID',i_center_id);
+                l_return :=  ESM_IMP.F_WRITE('CASE_STUDY','CENTER_NAME',v_center_name);
+                l_return :=  ESM_IMP.F_WRITE('CASE_STUDY','CENTER_NAME_J',v_center_name_j);
+                l_return :=  ESM_IMP.F_WRITE('CASE_STUDY','PROTOCOL_ID',i_protocol_id);
+                l_return :=  ESM_IMP.F_WRITE('CASE_STUDY','PROTOCOL_NUM_J',v_protocol_num_j);
+                l_return :=  ESM_IMP.F_WRITE('CASE_STUDY','OTHER_ID',v_other_num);
+                l_return :=  ESM_IMP.F_WRITE('CASE_STUDY','CODE_BROKEN',l_code_broken);
+                l_return :=  ESM_IMP.F_WRITE('CASE_STUDY','PRODUCT_COUNT',1);
+                l_return :=  ESM_IMP.F_WRITE('CASE_STUDY','CLASSIFICATION_ID',i_classification_id);
+                l_return :=  ESM_IMP.F_WRITE('CASE_STUDY','BLIND_NAME_J',v_blind_name_j);
+                l_return :=  ESM_IMP.F_WRITE('CASE_STUDY','STUDY_DESC_J',v_study_desc_j);
+                l_return :=  ESM_IMP.F_WRITE('CASE_STUDY','DEV_PHASE_ID',l_dev_phase_id);
+                l_return :=  ESM_IMP.F_WRITE('CASE_STUDY','STUDY_NUM',v_study_num);
+                l_return :=  ESM_IMP.F_WRITE('CASE_STUDY','BLIND_NAME',v_blind_name);
+                l_return :=  ESM_IMP.F_WRITE('CASE_STUDY','STUDY_DESC',v_study_desc);
+                l_return :=  ESM_IMP.F_WRITE('CASE_STUDY','PROTOCOL_NUM',v_protocol_num);
+                l_return :=  ESM_IMP.F_WRITE('CASE_STUDY','CLIN_COMPOUND_NUM_J',v_CLIN_COMP_NUM_J);
+            end if;
+        END IF;
+        if l_match = 0 then
+            SELECT count(1) INTO l_count FROM drug WHERE report_id = :REPORT_ID AND upper(medicinalproduct) like 'B_%';
+            IF l_count > 0 THEN
+                l_code_broken := 0;
+                v_study_type_id := 1;
+            ELSE
+                l_code_broken := 4;
+                v_study_type_id := 3;
+            END IF;
+            v_blind_name_j := substr(v_xml2,1,70);
+            v_study_desc_j := v_xml2;
+            l_return :=  ESM_IMP.F_WRITE(:REPORT_ID, :PARENT_ELEMENT, :DTD_ELEMENT,:PROFILE,'CASE_STUDY','STUDY_NUM_J',vsponsorstudynumb);
+            l_return :=  ESM_IMP.F_WRITE('CASE_STUDY','CLASSIFICATION_ID',i_classification_id);
+            l_return :=  ESM_IMP.F_WRITE('CASE_STUDY','BLIND_NAME_J',v_blind_name_j);
+            l_return :=  ESM_IMP.F_WRITE('CASE_STUDY','STUDY_DESC_J',v_study_desc_j);
+            l_return :=  ESM_IMP.F_WRITE('CASE_STUDY','CODE_BROKEN',l_code_broken);
+            l_return :=  ESM_IMP.F_WRITE('CASE_STUDY','STUDY_TYPE',v_study_type_id);
+        end if;
+    END IF;
+END;

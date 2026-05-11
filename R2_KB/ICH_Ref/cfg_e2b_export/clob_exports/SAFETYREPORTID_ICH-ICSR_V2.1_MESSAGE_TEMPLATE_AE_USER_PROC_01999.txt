@@ -1,0 +1,22 @@
+DECLARE
+v_xml varchar2(32767);
+v_company varchar2(100);
+l_return number := 0;
+lb_return boolean;
+v_dtd_elements esm_imp.vtab;
+BEGIN
+v_xml := ESM_IMP.F_READ(:REPORT_ID,'SAFETYREPORTID');
+if v_xml is not null then
+   v_dtd_elements(1) := :DTD_ELEMENT;
+   lb_return := ESM_IMP.F_CHECK_AND_BUILD_KEY(:REPORT_ID,:PARENT_ELEMENT,v_dtd_elements);
+   if (lb_return) then
+      v_company := substr(SUBSTR(v_xml,4,(INSTR(v_xml,'-',1,2)-4)),1,50);
+      l_return := ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_REFERENCE','REF_NO',v_xml);
+      l_return := ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_REFERENCE','REF_TYPE_ID',12);
+      if l_return = 0 and v_company is not null then
+         l_return := ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_REFERENCE','NOTES',v_company);
+         l_return := ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_REFERENCE','NOTES_J',v_company);
+      end if;
+   end if;
+end if;
+END;

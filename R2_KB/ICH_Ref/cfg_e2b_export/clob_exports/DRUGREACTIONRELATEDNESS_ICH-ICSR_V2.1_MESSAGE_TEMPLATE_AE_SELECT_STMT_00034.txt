@@ -1,0 +1,91 @@
+SELECT
+    DECODE(ce.pref_term,NULL,NULL,esm_utl.get_meddra_version(ce.dict_id,3) ) drugreactionassesmeddraversion,
+    DECODE(esm_utl.get_meddra_version(ce.dict_id,3),NULL,NULL,substr(ce.pref_term,1,250) ) drugreactionasses,
+    substr(DECODE(rpt.causality,NULL,NULL,nvl(lcs.source,'PRIMARY SOURCE REPORTER') ),1,60) drugassessmentsource,
+    substr(DECODE(cmnf.hidden,1,cmp.value,lcm.method),1,35) drugassessmentmethod,
+    substr(DECODE(rpt.causality,NULL,NULL,rpt.causality),1,35) drugresult
+FROM
+    case_product cp,
+    case_event ce,
+    case_event_assess cea,
+    lm_causality rpt,
+    lm_causality_method lcm,
+    (
+        SELECT
+            nvl(hidden,0) hidden
+        FROM
+            cmn_fields
+        WHERE
+            field_id = 1210025
+    ) cmnf,
+    (
+        SELECT
+            value
+        FROM
+            cmn_profile
+        WHERE
+            upper(key) = 'DRUG_ASSESSMENT_METHOD'
+    ) cmp,
+    lm_causality_source lcs
+WHERE
+    cp.case_id =:case_id
+    AND   cp.views_available <> 2
+    AND   cp.seq_num =:dummy1
+    AND   cea.case_id =:case_id
+    AND   cp.seq_num = cea.prod_seq_num
+    AND   ce.case_id =:case_id
+    AND   cea.event_seq_num = ce.seq_num
+    AND   cea.rpt_causality_id = rpt.causality_id
+    AND   cea.rpt_source_id = lcs.source_id (+)
+    AND   cea.license_id = 0
+    AND   cea.datasheet_id = 0
+    AND   cea.rpt_method_id = lcm.method_id (+)
+    AND   ce.pref_term IS NOT NULL
+    AND   esm_utl.get_meddra_version(ce.dict_id,3) IS NOT NULL
+    AND ( TO_NUMBER(ESM_UTL.F_GET_SAFETY_CONTEXT('PI_TRANSMIT_CAUSALITY_STUDY')) = 1 or NVL(cp.product_id , cp.pat_exposure) > 0 or TO_NUMBER(ESM_UTL.F_GET_SAFETY_CONTEXT('PI_TRANSMIT_CAUSALITY_NONSTUDY')) = 1)
+UNION ALL
+SELECT
+    DECODE(ce.pref_term,NULL,NULL,esm_utl.get_meddra_version(ce.dict_id,3) ),
+    DECODE(esm_utl.get_meddra_version(ce.dict_id,3),NULL,NULL,substr(ce.pref_term,1,250) ) drugreactionasses,
+    substr(DECODE(det.causality,NULL,NULL,nvl(lcs.source,'PHARMACEUTICAL COMPANY') ),1,60) drugassessmentsource,
+    substr(DECODE(cmnf.hidden,1,cmp.value,lcm.method),1,35) drugassessmentmethod,
+    substr(DECODE(det.causality,NULL,NULL,det.causality),1,35) drugresult
+FROM
+    case_product cp,
+    case_event ce,
+    case_event_assess cea,
+    lm_causality det,
+    lm_causality_method lcm,
+    (
+        SELECT
+            nvl(hidden,0) hidden
+        FROM
+            cmn_fields
+        WHERE
+            field_id = 1210026
+    ) cmnf,
+    (
+        SELECT
+            value
+        FROM
+            cmn_profile
+        WHERE
+            upper(key) = 'DRUG_ASSESSMENT_METHOD'
+    ) cmp,
+    lm_causality_source lcs
+WHERE
+    cp.case_id =:case_id
+    AND   cp.views_available <> 2
+    AND   cp.seq_num =:dummy1
+    AND   cea.case_id =:case_id
+    AND   cp.seq_num = cea.prod_seq_num
+    AND   ce.case_id =:case_id
+    AND   cea.event_seq_num = ce.seq_num
+    AND   cea.det_causality_id = det.causality_id (+)
+    AND   cea.det_source_id = lcs.source_id (+)
+    AND   cea.license_id = 0
+    AND   cea.datasheet_id = 0
+    AND   cea.det_method_id = lcm.method_id (+)
+    AND   ce.pref_term IS NOT NULL
+    AND (TO_NUMBER(ESM_UTL.F_GET_SAFETY_CONTEXT('PI_TRANSMIT_CAUSALITY_STUDY')) = 1 or NVL(cp.product_id , cp.pat_exposure) > 0 or TO_NUMBER(ESM_UTL.F_GET_SAFETY_CONTEXT('PI_TRANSMIT_CAUSALITY_NONSTUDY')) = 1)
+    AND   esm_utl.get_meddra_version(ce.dict_id,3) IS NOT NULL

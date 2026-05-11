@@ -1,0 +1,62 @@
+DECLARE
+   v_xml0   varchar2(32767);
+   v_xml1   varchar2(32767);
+   v_xml2   varchar2(32767);
+   v_xml3   varchar2(32767);
+   v_xml4   varchar2(32767);
+   v_xml5   varchar2(32767);
+   v_xml6   varchar2(32767);
+   v_xml7   varchar2(32767);
+   v_xml8   varchar2(32767);
+   v_xml9   varchar2(32767);
+   v_xml10  varchar2(32767);
+   v_xml11  varchar2(32767);
+   l_return number := 0;
+   v_privacy	  varchar2(10) := 'PRIVACY';
+   l_reporter_type_id number;
+   v_hcp_flag   number;
+BEGIN        
+   v_xml0   := ESM_IMP.F_READ(:REPORT_ID,'REPORTERTITLE');
+   v_xml1   := ESM_IMP.F_READ(:REPORT_ID,'REPORTERGIVENAME');
+   v_xml2   := ESM_IMP.F_READ(:REPORT_ID,'REPORTERFAMILYNAME');
+   v_xml3   := ESM_IMP.F_READ(:REPORT_ID,'REPORTERORGANIZATION');
+   v_xml4   := ESM_IMP.F_READ(:REPORT_ID,'REPORTERSTREET');
+   v_xml5   := ESM_IMP.F_READ(:REPORT_ID,'REPORTERCITY');
+   v_xml6   := ESM_IMP.F_READ(:REPORT_ID,'REPORTERSTATE');
+   v_xml7   := ESM_IMP.F_READ(:REPORT_ID,'REPORTERPOSTCODE');
+   v_xml8   := ESM_IMP.F_READ(:REPORT_ID,'REPORTERCOUNTRY');
+   v_xml9   := ESM_IMP.F_READ(:REPORT_ID,'QUALIFICATION');
+   v_xml10  := ESM_IMP.F_READ(:REPORT_ID,'REPORTERMIDDLENAME');
+   v_xml11  := ESM_IMP.F_READ(:REPORT_ID,'REPORTERDEPARTMENT');
+   
+     if not (v_xml0  is null 
+         and v_xml1  is null 
+         and v_xml2  is null 
+         and v_xml3  is null       
+         and v_xml4  is null       
+         and v_xml5  is null 
+         and v_xml6  is null 
+         and v_xml7  is null 
+         and v_xml8  is null       
+         and v_xml9  is null 
+         and v_xml10 is null 
+         and v_xml11 is null) then 
+      l_reporter_type_id := NULL;
+      IF v_xml9 is not null THEN
+         l_return := ESM_IMP_UTL.F_CHECK_VALIDATION(:PROFILE,'QUALIFICATION',v_xml9,:report_id);
+       	 l_reporter_type_id := ESM_IMP_UTL.F_CHECK_SAME_E2B_CODE('QUALIFICATION',v_xml9,'LM_REPORTER_TYPE','RPTR_TYPE_ID','REPORTER_TYPE',:report_id);
+         IF l_reporter_type_id <= 0 THEN
+            l_reporter_type_id := ESM_IMP_UTL.F_GET_LM_ID_FROM_E2B_CODE (:REPORT_ID, 'QUALIFICATION','LM_REPORTER_TYPE', 'E2B_CODE', v_xml9, 'RPTR_TYPE_ID');
+         END IF;
+         IF v_xml9 in (1,2,3) THEN
+            v_hcp_flag := 1;
+         ELSE 
+            v_hcp_flag := 0;
+         END IF;
+      ELSE
+	      v_hcp_flag := 2;
+      END IF;
+      l_return :=  ESM_IMP.F_WRITE(:REPORT_ID, 'PRIMARYSOURCE', :DTD_ELEMENT,:PROFILE,'CASE_REPORTERS','REPORTER_TYPE',l_reporter_type_id);
+      l_return :=  ESM_IMP.F_WRITE(:REPORT_ID, 'PRIMARYSOURCE', :DTD_ELEMENT,:PROFILE,'CASE_REPORTERS','HCP_FLAG',v_hcp_flag);
+   END IF;
+END;

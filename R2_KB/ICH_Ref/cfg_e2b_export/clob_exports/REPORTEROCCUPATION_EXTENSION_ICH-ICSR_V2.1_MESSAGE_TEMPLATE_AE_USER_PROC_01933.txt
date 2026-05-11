@@ -1,0 +1,23 @@
+DECLARE
+  v_xml				varchar2(32767);
+  l_return			number := 0;
+  v_error_message	varchar2(4000);
+  v_stored_procedure varchar2(30) := 'CREATE_CASE_REPORTER';
+  l_occupation_id	lm_occupations.occupation_id%type;
+BEGIN
+  v_xml    := trim(ESM_IMP.F_READ_EXTENSION(:REPORT_ID,:DTD_ELEMENT));
+  if v_xml is not null then
+		BEGIN
+		  SELECT OCCUPATION_ID into l_occupation_id
+		  FROM LM_OCCUPATIONS WHERE (UPPER(OCCUPATION) = UPPER(v_xml) or UPPER(OCCUPATION_J) = UPPER(v_xml)) and DELETED IS NULL;
+		EXCEPTION when no_data_found then
+		  l_occupation_id := null;
+		END;
+		if l_occupation_id is null then
+			v_error_message := 'No matching data found in LM_OCCUPATIONS table for the dtd element REPORTEROCCUPATION_EXTENSION. Module : '||v_stored_procedure;
+			ESM_IMP_UTL.WRITE_ERROR_MSG('REPORTEROCCUPATION_EXTENSION','','',v_error_message,:REPORT_ID);
+		else
+			l_return :=  ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_REPORTERS','OCCUPATION_ID',l_occupation_id);
+		end if;
+  end if;
+END;

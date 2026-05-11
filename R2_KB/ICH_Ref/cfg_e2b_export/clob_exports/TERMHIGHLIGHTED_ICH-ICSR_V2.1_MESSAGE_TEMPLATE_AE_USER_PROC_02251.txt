@@ -1,0 +1,17 @@
+DECLARE
+  v_xml         varchar2(32767);
+  l_return      number := 0;
+  l_id          number;
+BEGIN
+  v_xml    := ESM_IMP.F_READ(:REPORT_ID,:DTD_ELEMENT);
+  if v_xml is not null then
+    if v_xml in ('1','3') then 
+       l_id := 1;
+    elsif v_xml in ('2','4') then 
+       l_id := 0;
+    else
+       l_id := NULL;
+    end if;
+     l_return :=  ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_EVENT','RPT_SERIOUS',l_id);     
+  end if;
+END;

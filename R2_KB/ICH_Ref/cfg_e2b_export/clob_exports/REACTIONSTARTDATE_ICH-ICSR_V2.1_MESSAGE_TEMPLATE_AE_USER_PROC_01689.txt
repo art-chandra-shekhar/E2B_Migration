@@ -1,0 +1,37 @@
+DECLARE
+   v_xml1 varchar2(32767);
+   v_xml2 varchar2(32767);
+   v_xml3 varchar2(32767);
+   v_xml4 varchar2(32767);
+   l_return varchar2(4000) := null;
+   l_return_code number := null;
+   l_append NUMBER := 0;
+BEGIN
+   v_xml1 := ESM_IMP.F_READ(:REPORT_ID,:DTD_ELEMENT);
+   v_xml2 := ESM_IMP.F_READ(:REPORT_ID,'REACTIONSTARTDATEFORMAT');
+   l_return_code := ESM_IMP_UTL.F_CHECK_UNIT_VALUE(:DTD_ELEMENT,v_xml1,'REACTIONSTARTDATEFORMAT',v_xml2, :REPORT_ID);
+   if v_xml1 is not null and v_xml2 is not null then  
+      v_xml4 := ESM_AE.translate_dateformat(v_xml1,v_xml2,'N',:DTD_ELEMENT,'REACTIONSTARTDATEFORMAT',:REPORT_ID);
+      v_xml3 := ESM_AE.translate_dateformat(v_xml1,v_xml2,'Y',:DTD_ELEMENT,'REACTIONSTARTDATEFORMAT',:REPORT_ID);
+         if v_xml4 is not null then
+            v_xml4 := to_char(to_date(v_xml4,'YYYYMMDDHH24MISS'),'DD-MON-YYYY HH24:MI:SS');
+            l_return :=  ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_EVENT','ONSET',v_xml4);
+            l_return :=  ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_EVENT','ONSET_DATE_PARTIAL',v_xml3);
+         end if;
+   end if;
+   if v_xml2 is not null then
+      l_return_code := ESM_IMP_UTL.F_CHECK_VALIDATION(:PROFILE,'REACTIONSTARTDATEFORMAT',v_xml2,:REPORT_ID);
+      if v_xml2 in ('102','203','204') then 
+         v_xml2 := '8';
+      elsif v_xml2 = 610 then 
+         v_xml2 := '7';
+      elsif v_xml2 = 602 then 
+         v_xml2 := '5';
+      else
+         v_xml2 := NULL;
+      end if;
+      if v_xml2 is not NULL then
+         l_return :=  ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_EVENT','ONSET_RES',v_xml2);
+      end if;
+   end if;
+END;

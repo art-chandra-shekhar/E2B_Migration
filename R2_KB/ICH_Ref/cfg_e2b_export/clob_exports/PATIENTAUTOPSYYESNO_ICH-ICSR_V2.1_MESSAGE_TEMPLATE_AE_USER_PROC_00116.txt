@@ -1,0 +1,29 @@
+DECLARE
+   v_xml     varchar2(32767);
+   lb_result boolean := FALSE;
+   l_return  number := 0;
+   l_append  number := 0;
+   l_autopsy number;
+   l_patientdetermineautopsy varchar2(1) := NULL;
+BEGIN
+      v_xml := ESM_IMP.F_READ(:REPORT_ID,:DTD_ELEMENT);
+      lb_result := ESM_IMP.F_RECORD_EXISTS(:REPORT_ID,'PATIENTDETERMINEAUTOPSY','PATIENTAUTOPSY');
+      if lb_result then
+         l_patientdetermineautopsy := '1';
+      end if;
+      if v_xml is not null then
+         l_return := ESM_IMP_UTL.F_CHECK_VALIDATION(:PROFILE, 'PATIENTAUTOPSYYESNO',v_xml,:REPORT_ID);
+         if l_return = 0 then
+            IF v_xml = 1 AND l_patientdetermineautopsy IS NULL THEN
+                 l_autopsy := 9;
+            ELSIF v_xml = 1 AND l_patientdetermineautopsy IS NOT NULL THEN
+              l_autopsy := 10;
+            ELSIF v_xml = 2 THEN
+              l_autopsy := 4;
+            ELSIF v_xml = 3 THEN
+              l_autopsy := 12;
+            END IF;
+            l_return :=  ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_DEATH','AUTOPSY',l_autopsy);
+         end if;
+      end if;
+END;

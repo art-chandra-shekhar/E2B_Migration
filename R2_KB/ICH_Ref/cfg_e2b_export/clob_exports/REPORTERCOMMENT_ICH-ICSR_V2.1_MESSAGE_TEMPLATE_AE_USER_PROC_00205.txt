@@ -1,0 +1,9 @@
+DECLARE
+   v_xml varchar2(32767);
+   l_return number := 0;
+BEGIN
+   v_xml  := ESM_IMP.F_READ(:REPORT_ID,:DTD_ELEMENT);
+   IF v_xml is not null then
+      l_return :=  ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_COMMENTS','COMMENT_TXT',v_xml);   
+   END IF;
+END;

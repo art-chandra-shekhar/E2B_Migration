@@ -1,0 +1,16 @@
+DECLARE
+   v_xml varchar2(32767);
+   l_return number := 0;
+   l_append      number := 0;
+   l_AGE_GROUP_ID number;
+BEGIN
+   v_xml  := ESM_IMP.F_READ(:REPORT_ID,'PATIENTAGEGROUP');
+
+   if v_xml is not null then
+      l_AGE_GROUP_ID := ESM_IMP_UTL.F_CHECK_SAME_E2B_CODE('PATIENTAGEGROUP',v_xml,'LM_AGE_GROUPS','AGE_GROUP_ID','GROUP_NAME',:report_id);
+      if l_AGE_GROUP_ID <= 0 then
+         l_AGE_GROUP_ID := ESM_IMP_UTL.F_GET_LM_ID_FROM_E2B_CODE (:report_id, 'PATIENTAGEGROUP','LM_AGE_GROUPS', 'E2B_CODE', v_xml, 'AGE_GROUP_ID');
+       end if;
+   end if;
+   l_return :=  ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_PAT_INFO','AGE_GROUP_ID',l_AGE_GROUP_ID);
+END;

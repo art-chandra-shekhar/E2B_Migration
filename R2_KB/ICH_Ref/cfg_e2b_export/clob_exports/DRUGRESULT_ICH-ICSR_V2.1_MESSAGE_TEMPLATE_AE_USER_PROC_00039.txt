@@ -1,0 +1,91 @@
+DECLARE
+     v_xml             VARCHAR2 (32767);
+     v_xml1            VARCHAR2 (32767);
+     v_xml2            VARCHAR2 (32767);
+     v_xml3            VARCHAR2 (4000);
+     l_method_id       lm_causality_method.method_id%TYPE;
+     l_source_id       lm_causality_source.source_id%TYPE;
+     l_return          NUMBER := 0;
+     lb_return         BOOLEAN := FALSE;
+     l_causality_id    NUMBER := 0;
+     l_field_id        NUMBER := 0;
+     v_error_message   VARCHAR2 (4000);
+     wdelim            VARCHAR2 (3) := esm_imp_utl.wdelim;
+     s_Source_Type     VARCHAR2 (1000);
+  BEGIN
+     v_xml := ESM_IMP.F_READ (:REPORT_ID, 'DRUGRESULT');
+     v_xml1 := ESM_IMP.F_READ (:REPORT_ID, 'DRUGREACTIONASSES');
+     v_xml2 := ESM_IMP.F_READ (:REPORT_ID, 'DRUGASSESSMENTSOURCE');
+     v_xml3 := ESM_IMP.F_READ (:REPORT_ID, 'DRUGASSESSMENTMETHOD');
+
+     s_Source_Type := 'R';
+     l_source_id := -1;
+     IF v_xml2 IS NOT NULL THEN
+         BEGIN
+             SELECT /*+ RESULT_CACHE */ UPPER (Source_Type), source_id
+               INTO s_Source_Type, l_source_id
+               FROM LM_CAUSALITY_SOURCE
+              WHERE UPPER (SOURCE) = UPPER (v_xml2);
+         EXCEPTION
+              WHEN NO_DATA_FOUND THEN  
+                  s_Source_Type := 'R';
+                  l_source_id := -1;
+                   v_error_message := SUBSTR (SQLERRM, 1, 500);
+                    v_error_message := v_error_message || wdelim || v_xml2;
+                    ESM_IMP_UTL.WRITE_ERROR_MSG ('BAD_CAUS_SOURCE', 'DRUGASSESSMENTSOURCE', v_xml2, '', v_xml2, :REPORT_ID);
+         END;
+
+      END IF;
+     IF s_Source_Type = 'D'
+     THEN
+        l_field_id := esm_imp_utl.f_get_cmn_field_id (:REPORT_ID, 'CASE_EVENT_ASSESS', 'DET_CAUSALITY_ID');
+     ELSE
+        l_field_id := esm_imp_utl.f_get_cmn_field_id (:REPORT_ID, 'CASE_EVENT_ASSESS', 'RPT_CAUSALITY_ID');
+     END IF;
+     IF v_xml IS NOT NULL AND l_field_id IS NOT NULL
+     THEN
+        lb_return := ESM_IMP.F_BUILD_KEY_RELATEDNESS (:REPORT_ID, v_xml1, l_field_id);
+        IF (lb_return)
+        THEN
+           l_causality_id := ESM_IMP_UTL.F_CHECK_SAME_E2B_CODE (:DTD_ELEMENT, v_xml, 'LM_CAUSALITY', 'CAUSALITY_ID', 'CAUSALITY', :REPORT_ID);
+           IF l_causality_id <= 0
+           THEN
+              l_causality_id := ESM_IMP_UTL.F_GET_LM_ID_FROM_E2B_CODE (:REPORT_ID, :DTD_ELEMENT, 'LM_CAUSALITY', 'CAUSALITY', v_xml, 'CAUSALITY_ID');
+           END IF;
+           IF s_Source_Type = 'D'
+           THEN
+              l_return := ESM_IMP.F_WRITE (:REPORT_ID, :PARENT_ELEMENT, :DTD_ELEMENT, :PROFILE, 'CASE_EVENT_ASSESS', 'DET_CAUSALITY_ID', l_causality_id);
+           ELSE
+              l_return := ESM_IMP.F_WRITE (:REPORT_ID, :PARENT_ELEMENT, :DTD_ELEMENT, :PROFILE, 'CASE_EVENT_ASSESS', 'RPT_CAUSALITY_ID', l_causality_id);
+           END IF;
+         IF l_source_id > 0 THEN
+               IF s_Source_Type = 'D' THEN
+                  l_return := ESM_IMP.F_WRITE (:REPORT_ID, :PARENT_ELEMENT, :DTD_ELEMENT, :PROFILE, 'CASE_EVENT_ASSESS', 'DET_SOURCE_ID', l_source_id);
+               ELSE
+                  l_return := ESM_IMP.F_WRITE (:REPORT_ID, :PARENT_ELEMENT, :DTD_ELEMENT, :PROFILE, 'CASE_EVENT_ASSESS', 'RPT_SOURCE_ID', l_source_id);
+               END IF;
+         END IF;
+           IF v_xml3 IS NOT NULL
+           THEN
+              BEGIN
+                 SELECT /*+ RESULT_CACHE */ method_id 
+                   INTO l_method_id
+                   FROM lm_causality_method
+                  WHERE UPPER (method) = UPPER (v_xml3);
+                 IF s_Source_Type = 'D'
+                 THEN
+                    l_return := ESM_IMP.F_WRITE (:REPORT_ID, :PARENT_ELEMENT, :DTD_ELEMENT, :PROFILE, 'CASE_EVENT_ASSESS', 'DET_METHOD_ID', l_method_id);
+                 ELSE
+                    l_return := ESM_IMP.F_WRITE (:REPORT_ID, :PARENT_ELEMENT, :DTD_ELEMENT, :PROFILE, 'CASE_EVENT_ASSESS', 'RPT_METHOD_ID', l_method_id);
+                 END IF;
+              EXCEPTION
+                 WHEN OTHERS
+                 THEN
+                    v_error_message := SUBSTR (SQLERRM, 1, 500);
+                    v_error_message := v_error_message || wdelim || v_xml3;
+                    ESM_IMP_UTL.WRITE_ERROR_MSG ('BAD_ASS_METHOD', 'DRUGASSESSMENTMETHOD', v_xml3, '', v_error_message, :REPORT_ID);
+              END;
+           END IF;
+        END IF;
+     END IF;
+  END;

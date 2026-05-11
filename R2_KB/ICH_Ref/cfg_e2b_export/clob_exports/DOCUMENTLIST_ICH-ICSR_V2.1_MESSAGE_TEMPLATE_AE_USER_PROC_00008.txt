@@ -1,0 +1,22 @@
+DECLARE
+   v_xml1 varchar2(32767);
+   v_xml2 varchar2(32767);
+   l_return       number := 0;
+   i_classification_id  number;
+BEGIN
+		 v_xml1  := ESM_IMP.F_READ(:REPORT_ID,:DTD_ELEMENT);
+		 v_xml2  := ESM_IMP.F_READ(:REPORT_ID,'ADDITIONALDOCUMENT');
+     l_return := ESM_IMP_UTL.F_CHECK_VALIDATION(:PROFILE,'ADDITIONALDOCUMENT',v_xml2,:REPORT_ID);
+		 BEGIN
+           SELECT classification_id INTO i_classification_id
+           FROM lm_classification
+           WHERE UPPER(CLASSIFICATION) = 'E2B ADDITIONAL DOC'
+             AND ROWNUM = 1 order by classification_id;
+           EXCEPTION WHEN no_data_found THEN
+              i_classification_id := Null;
+     END;
+		 if l_return = 0 and v_xml1 is not null then
+		    l_return :=  ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_NOTES_ATTACH','CLASSIFICATION',i_classification_id);
+		    l_return :=  ESM_IMP.F_WRITE(:REPORT_ID,:PARENT_ELEMENT,:DTD_ELEMENT,:PROFILE,'CASE_NOTES_ATTACH','NOTES',v_xml1);
+     end if;
+END;
