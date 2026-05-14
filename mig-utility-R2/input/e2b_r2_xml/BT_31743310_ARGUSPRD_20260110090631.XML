@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ichicsr SYSTEM "https://www.accessdata.fda.gov/xml/icsr-xml-v2.1.dtd">
+<ichicsr lang="en">
+	<ichicsrmessageheader>
+		<messagetype>ichicsr</messagetype>
+		<messageformatversion>2.1</messageformatversion>
+		<messageformatrelease>2.0</messageformatrelease>
+		<messagenumb>31743310_ARG</messagenumb>
+		<messagesenderidentifier>BRAINTREE</messagesenderidentifier>
+		<messagereceiveridentifier>ZZFDA</messagereceiveridentifier>
+		<messagedateformat>204</messagedateformat>
+		<messagedate>20260110090631</messagedate>
+	</ichicsrmessageheader>
+	<safetyreport>
+		<safetyreportversion>1</safetyreportversion>
+		<safetyreportid>US-BRAINTREE-2020BTE03539</safetyreportid>
+		<primarysourcecountry>US</primarysourcecountry>
+		<occurcountry>US</occurcountry>
+		<transmissiondateformat>102</transmissiondateformat>
+		<transmissiondate>20260110</transmissiondate>
+		<reporttype>1</reporttype>
+		<serious>2</serious>
+		<seriousnessdeath>2</seriousnessdeath>
+		<seriousnesslifethreatening>2</seriousnesslifethreatening>
+		<seriousnesshospitalization>2</seriousnesshospitalization>
+		<seriousnessdisabling>2</seriousnessdisabling>
+		<seriousnesscongenitalanomali>2</seriousnesscongenitalanomali>
+		<seriousnessother>2</seriousnessother>
+		<receivedateformat>102</receivedateformat>
+		<receivedate>20140722</receivedate>
+		<receiptdateformat>102</receiptdateformat>
+		<receiptdate>20140722</receiptdate>
+		<additionaldocument>2</additionaldocument>
+		<fulfillexpeditecriteria>1</fulfillexpeditecriteria>
+		<companynumb>Braintree Laboratories 140272</companynumb>
+		<duplicate>1</duplicate>
+		<medicallyconfirm>2</medicallyconfirm>
+		<reportduplicate>
+			<duplicatesource>Braintree Laboratories</duplicatesource>
+			<duplicatenumb>US-Braintree Laboratories-140272</duplicatenumb>
+		</reportduplicate>
+		<linkedreport>
+			<linkreportnumb>029114</linkreportnumb>
+		</linkedreport>
+		<primarysource>
+			<reportertitle>Ms.</reportertitle>
+			<reportergivename>Connie</reportergivename>
+			<reporterfamilyname>Henry</reporterfamilyname>
+			<reportercity>Twain Harte</reportercity>
+			<reporterstate>CA</reporterstate>
+			<reporterpostcode>95383</reporterpostcode>
+			<reportercountry>US</reportercountry>
+			<qualification>5</qualification>
+		</primarysource>
+		<sender>
+			<sendertype>1</sendertype>
+			<senderorganization>BRAINTREE</senderorganization>
+			<senderdepartment>Regulatory Affairs</senderdepartment>
+			<senderstreetaddress>8 Cabot Road, Suite 2000</senderstreetaddress>
+			<sendercity>Woburn</sendercity>
+			<senderstate>MA</senderstate>
+			<senderpostcode>01801</senderpostcode>
+			<sendercountrycode>US</sendercountrycode>
+			<sendertel>1800461</sendertel>
+			<sendertelextension>7449</sendertelextension>
+			<sendertelcountrycode>1</sendertelcountrycode>
+			<senderemailaddress>aereports@azurity.com</senderemailaddress>
+		</sender>
+		<receiver>
+			<receivertype>2</receivertype>
+			<receiverorganization>ZZFDA</receiverorganization>
+			<receiverdepartment>Office of Surveillance and Epidemiology</receiverdepartment>
+			<receivergivename>FAERS</receivergivename>
+			<receiverstreetaddress>10903 New Hampshire Avenue</receiverstreetaddress>
+			<receivercity>Silver Spring</receivercity>
+			<receiverstate>MD</receiverstate>
+			<receiverpostcode>20993</receiverpostcode>
+			<receivercountrycode>US</receivercountrycode>
+			<receiveremailaddress>faersesub@fda.hhs.gov</receiveremailaddress>
+		</receiver>
+		<patient>
+			<patientinitial>CH</patientinitial>
+			<patientonsetage>63</patientonsetage>
+			<patientonsetageunit>801</patientonsetageunit>
+			<patientsex>2</patientsex>
+			<patientmedicalhistorytext>Migraines; Myalgia</patientmedicalhistorytext>
+			<reaction>
+				<primarysourcereaction>nauseated</primarysourcereaction>
+				<reactionmeddraversionllt>28.1</reactionmeddraversionllt>
+				<reactionmeddrallt>Nauseated</reactionmeddrallt>
+				<reactionmeddraversionpt>28.1</reactionmeddraversionpt>
+				<reactionmeddrapt>Nausea</reactionmeddrapt>
+			</reaction>
+			<reaction>
+				<primarysourcereaction>burping</primarysourcereaction>
+				<reactionmeddraversionllt>28.1</reactionmeddraversionllt>
+				<reactionmeddrallt>Burping</reactionmeddrallt>
+				<reactionmeddraversionpt>28.1</reactionmeddraversionpt>
+				<reactionmeddrapt>Eructation</reactionmeddrapt>
+			</reaction>
+			<reaction>
+				<primarysourcereaction>vomited</primarysourcereaction>
+				<reactionmeddraversionllt>28.1</reactionmeddraversionllt>
+				<reactionmeddrallt>Vomited</reactionmeddrallt>
+				<reactionmeddraversionpt>28.1</reactionmeddraversionpt>
+				<reactionmeddrapt>Vomiting</reactionmeddrapt>
+				<reactionstartdateformat>102</reactionstartdateformat>
+				<reactionstartdate>20140721</reactionstartdate>
+			</reaction>
+			<drug>
+				<drugcharacterization>1</drugcharacterization>
+				<medicinalproduct>SUPREP BOWEL PREP KIT</medicinalproduct>
+				<obtaindrugcountry>US</obtaindrugcountry>
+				<drugbatchnumb>2814030 05/2016</drugbatchnumb>
+				<drugauthorizationnumb>NDA 022372</drugauthorizationnumb>
+				<drugauthorizationcountry>US</drugauthorizationcountry>
+				<drugauthorizationholder>AZURITY</drugauthorizationholder>
+				<drugstructuredosagenumb>1</drugstructuredosagenumb>
+				<drugstructuredosageunit>032</drugstructuredosageunit>
+				<drugdosagetext>1 x 6oz bottle</drugdosagetext>
+				<drugdosageform>Powder, for solution</drugdosageform>
+				<drugadministrationroute>048</drugadministrationroute>
+				<drugindicationmeddraversion>28.1</drugindicationmeddraversion>
+				<drugindication>Colonoscopy</drugindication>
+				<drugstartdateformat>102</drugstartdateformat>
+				<drugstartdate>20140721</drugstartdate>
+				<drugenddateformat>102</drugenddateformat>
+				<drugenddate>20140721</drugenddate>
+				<drugrecurreadministration>3</drugrecurreadministration>
+				<activesubstance>
+					<activesubstancename>MAGNESIUM SULFATE</activesubstancename>
+				</activesubstance>
+				<activesubstance>
+					<activesubstancename>POTASSIUM SULFATE</activesubstancename>
+				</activesubstance>
+				<activesubstance>
+					<activesubstancename>SODIUM SULFATE</activesubstancename>
+				</activesubstance>
+				<drugreactionrelatedness>
+					<drugreactionassesmeddraversion>28.1</drugreactionassesmeddraversion>
+					<drugreactionasses>Eructation</drugreactionasses>
+					<drugassessmentsource>PHARMACEUTICAL COMPANY</drugassessmentsource>
+					<drugresult>Probable</drugresult>
+				</drugreactionrelatedness>
+				<drugreactionrelatedness>
+					<drugreactionassesmeddraversion>28.1</drugreactionassesmeddraversion>
+					<drugreactionasses>Eructation</drugreactionasses>
+				</drugreactionrelatedness>
+				<drugreactionrelatedness>
+					<drugreactionassesmeddraversion>28.1</drugreactionassesmeddraversion>
+					<drugreactionasses>Nausea</drugreactionasses>
+					<drugassessmentsource>PHARMACEUTICAL COMPANY</drugassessmentsource>
+					<drugresult>Probable</drugresult>
+				</drugreactionrelatedness>
+				<drugreactionrelatedness>
+					<drugreactionassesmeddraversion>28.1</drugreactionassesmeddraversion>
+					<drugreactionasses>Nausea</drugreactionasses>
+				</drugreactionrelatedness>
+				<drugreactionrelatedness>
+					<drugreactionassesmeddraversion>28.1</drugreactionassesmeddraversion>
+					<drugreactionasses>Vomiting</drugreactionasses>
+					<drugassessmentsource>PHARMACEUTICAL COMPANY</drugassessmentsource>
+					<drugresult>Probable</drugresult>
+				</drugreactionrelatedness>
+				<drugreactionrelatedness>
+					<drugreactionassesmeddraversion>28.1</drugreactionassesmeddraversion>
+					<drugreactionasses>Vomiting</drugreactionasses>
+				</drugreactionrelatedness>
+			</drug>
+			<summary>
+				<narrativeincludeclinical>The patient took the first dose at 4PM yesterday (07/21/14) and completed dose, and began to drink water. The patient completed the first 16oz of water, and began the  second glass. About 4:45PM she began burping and was nauseated. She then vomited it all back up. She called her MD and was told to stop use of product and cancelled procedure. Her MD told her he had never had a patient with the difficulties that she had with product use.
+
+CONCOMITANT PRODUCTS AND THERAPY DATES
+
+Celexa; Tramadol; Flexeril; Temazepam; Imitrex</narrativeincludeclinical>
+			</summary>
+		</patient>
+	</safetyreport>
+</ichicsr>

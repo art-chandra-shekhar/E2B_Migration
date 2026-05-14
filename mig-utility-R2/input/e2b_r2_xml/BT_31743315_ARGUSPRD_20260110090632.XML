@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ichicsr SYSTEM "https://www.accessdata.fda.gov/xml/icsr-xml-v2.1.dtd">
+<ichicsr lang="en">
+	<ichicsrmessageheader>
+		<messagetype>ichicsr</messagetype>
+		<messageformatversion>2.1</messageformatversion>
+		<messageformatrelease>2.0</messageformatrelease>
+		<messagenumb>31743315_ARG</messagenumb>
+		<messagesenderidentifier>BRAINTREE</messagesenderidentifier>
+		<messagereceiveridentifier>ZZFDA</messagereceiveridentifier>
+		<messagedateformat>204</messagedateformat>
+		<messagedate>20260110090632</messagedate>
+	</ichicsrmessageheader>
+	<safetyreport>
+		<safetyreportversion>2</safetyreportversion>
+		<safetyreportid>US-BRAINTREE LABORATORIES, INC.-2020BTE03834</safetyreportid>
+		<primarysourcecountry>US</primarysourcecountry>
+		<occurcountry>US</occurcountry>
+		<transmissiondateformat>102</transmissiondateformat>
+		<transmissiondate>20260110</transmissiondate>
+		<reporttype>1</reporttype>
+		<serious>1</serious>
+		<seriousnessdeath>2</seriousnessdeath>
+		<seriousnesslifethreatening>2</seriousnesslifethreatening>
+		<seriousnesshospitalization>2</seriousnesshospitalization>
+		<seriousnessdisabling>2</seriousnessdisabling>
+		<seriousnesscongenitalanomali>2</seriousnesscongenitalanomali>
+		<seriousnessother>1</seriousnessother>
+		<receivedateformat>102</receivedateformat>
+		<receivedate>20140723</receivedate>
+		<receiptdateformat>102</receiptdateformat>
+		<receiptdate>20140723</receiptdate>
+		<additionaldocument>2</additionaldocument>
+		<fulfillexpeditecriteria>1</fulfillexpeditecriteria>
+		<companynumb>Braintree Laboratories 140286</companynumb>
+		<duplicate>1</duplicate>
+		<medicallyconfirm>2</medicallyconfirm>
+		<reportduplicate>
+			<duplicatesource>Braintree Laboratories</duplicatesource>
+			<duplicatenumb>US-Braintree Laboratories-140286</duplicatenumb>
+		</reportduplicate>
+		<linkedreport>
+			<linkreportnumb>030614</linkreportnumb>
+		</linkedreport>
+		<primarysource>
+			<reportertitle>Mr.</reportertitle>
+			<reportergivename>Anthony</reportergivename>
+			<reporterfamilyname>Nichols</reporterfamilyname>
+			<reportercountry>US</reportercountry>
+			<qualification>5</qualification>
+		</primarysource>
+		<sender>
+			<sendertype>1</sendertype>
+			<senderorganization>BRAINTREE</senderorganization>
+			<senderdepartment>Regulatory Affairs</senderdepartment>
+			<senderstreetaddress>8 Cabot Road, Suite 2000</senderstreetaddress>
+			<sendercity>Woburn</sendercity>
+			<senderstate>MA</senderstate>
+			<senderpostcode>01801</senderpostcode>
+			<sendercountrycode>US</sendercountrycode>
+			<sendertel>1800461</sendertel>
+			<sendertelextension>7449</sendertelextension>
+			<sendertelcountrycode>1</sendertelcountrycode>
+			<senderemailaddress>aereports@azurity.com</senderemailaddress>
+		</sender>
+		<receiver>
+			<receivertype>2</receivertype>
+			<receiverorganization>ZZFDA</receiverorganization>
+			<receiverdepartment>Office of Surveillance and Epidemiology</receiverdepartment>
+			<receivergivename>FAERS</receivergivename>
+			<receiverstreetaddress>10903 New Hampshire Avenue</receiverstreetaddress>
+			<receivercity>Silver Spring</receivercity>
+			<receiverstate>MD</receiverstate>
+			<receiverpostcode>20993</receiverpostcode>
+			<receivercountrycode>US</receivercountrycode>
+			<receiveremailaddress>faersesub@fda.hhs.gov</receiveremailaddress>
+		</receiver>
+		<patient>
+			<patientinitial>UNK</patientinitial>
+			<patientmedicalhistorytext>toxic colitis, additional unknown</patientmedicalhistorytext>
+			<reaction>
+				<primarysourcereaction>severe diarrhea</primarysourcereaction>
+				<reactionmeddraversionllt>28.1</reactionmeddraversionllt>
+				<reactionmeddrallt>Diarrhea</reactionmeddrallt>
+				<reactionmeddraversionpt>28.1</reactionmeddraversionpt>
+				<reactionmeddrapt>Diarrhoea</reactionmeddrapt>
+			</reaction>
+			<drug>
+				<drugcharacterization>1</drugcharacterization>
+				<medicinalproduct>SUPREP BOWEL PREP KIT</medicinalproduct>
+				<obtaindrugcountry>US</obtaindrugcountry>
+				<drugauthorizationnumb>NDA 022372</drugauthorizationnumb>
+				<drugauthorizationcountry>US</drugauthorizationcountry>
+				<drugauthorizationholder>AZURITY</drugauthorizationholder>
+				<drugstructuredosagenumb>1</drugstructuredosagenumb>
+				<drugstructuredosageunit>032</drugstructuredosageunit>
+				<drugdosageform>Powder, for solution</drugdosageform>
+				<drugadministrationroute>065</drugadministrationroute>
+				<drugrecurreadministration>3</drugrecurreadministration>
+				<activesubstance>
+					<activesubstancename>MAGNESIUM SULFATE</activesubstancename>
+				</activesubstance>
+				<activesubstance>
+					<activesubstancename>POTASSIUM SULFATE</activesubstancename>
+				</activesubstance>
+				<activesubstance>
+					<activesubstancename>SODIUM SULFATE</activesubstancename>
+				</activesubstance>
+				<drugreactionrelatedness>
+					<drugreactionassesmeddraversion>28.1</drugreactionassesmeddraversion>
+					<drugreactionasses>Diarrhoea</drugreactionasses>
+					<drugassessmentsource>PHARMACEUTICAL COMPANY</drugassessmentsource>
+					<drugresult>Possible</drugresult>
+				</drugreactionrelatedness>
+				<drugreactionrelatedness>
+					<drugreactionassesmeddraversion>28.1</drugreactionassesmeddraversion>
+					<drugreactionasses>Diarrhoea</drugreactionasses>
+				</drugreactionrelatedness>
+			</drug>
+			<summary>
+				<narrativeincludeclinical>One patient who had a history of toxic colitis was sent to the ER. The patient had severe diarrhea and had to be rushed to the hospital.</narrativeincludeclinical>
+			</summary>
+		</patient>
+	</safetyreport>
+</ichicsr>

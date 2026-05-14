@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ichicsr SYSTEM "https://www.accessdata.fda.gov/xml/icsr-xml-v2.1.dtd">
+<ichicsr lang="en">
+	<ichicsrmessageheader>
+		<messagetype>ichicsr</messagetype>
+		<messageformatversion>2.1</messageformatversion>
+		<messageformatrelease>2.0</messageformatrelease>
+		<messagenumb>31743309_ARG</messagenumb>
+		<messagesenderidentifier>BRAINTREE</messagesenderidentifier>
+		<messagereceiveridentifier>ZZFDA</messagereceiveridentifier>
+		<messagedateformat>204</messagedateformat>
+		<messagedate>20260110090631</messagedate>
+	</ichicsrmessageheader>
+	<safetyreport>
+		<safetyreportversion>1</safetyreportversion>
+		<safetyreportid>US-BRAINTREE-2020BTE03554</safetyreportid>
+		<primarysourcecountry>US</primarysourcecountry>
+		<occurcountry>US</occurcountry>
+		<transmissiondateformat>102</transmissiondateformat>
+		<transmissiondate>20260110</transmissiondate>
+		<reporttype>1</reporttype>
+		<serious>2</serious>
+		<seriousnessdeath>2</seriousnessdeath>
+		<seriousnesslifethreatening>2</seriousnesslifethreatening>
+		<seriousnesshospitalization>2</seriousnesshospitalization>
+		<seriousnessdisabling>2</seriousnessdisabling>
+		<seriousnesscongenitalanomali>2</seriousnesscongenitalanomali>
+		<seriousnessother>2</seriousnessother>
+		<receivedateformat>102</receivedateformat>
+		<receivedate>20140722</receivedate>
+		<receiptdateformat>102</receiptdateformat>
+		<receiptdate>20140722</receiptdate>
+		<additionaldocument>2</additionaldocument>
+		<fulfillexpeditecriteria>1</fulfillexpeditecriteria>
+		<companynumb>Braintree Laboratories 140276</companynumb>
+		<duplicate>1</duplicate>
+		<medicallyconfirm>2</medicallyconfirm>
+		<reportduplicate>
+			<duplicatesource>Braintree Laboratories</duplicatesource>
+			<duplicatenumb>US-Braintree Laboratories-140276</duplicatenumb>
+		</reportduplicate>
+		<linkedreport>
+			<linkreportnumb>029514</linkreportnumb>
+		</linkedreport>
+		<primarysource>
+			<reportertitle>Mr.</reportertitle>
+			<reportergivename>Robert</reportergivename>
+			<reporterfamilyname>Boggs</reporterfamilyname>
+			<reportercity>Cincinnati</reportercity>
+			<reporterstate>OH</reporterstate>
+			<reporterpostcode>45211</reporterpostcode>
+			<reportercountry>US</reportercountry>
+			<qualification>5</qualification>
+		</primarysource>
+		<sender>
+			<sendertype>1</sendertype>
+			<senderorganization>BRAINTREE</senderorganization>
+			<senderdepartment>Regulatory Affairs</senderdepartment>
+			<senderstreetaddress>8 Cabot Road, Suite 2000</senderstreetaddress>
+			<sendercity>Woburn</sendercity>
+			<senderstate>MA</senderstate>
+			<senderpostcode>01801</senderpostcode>
+			<sendercountrycode>US</sendercountrycode>
+			<sendertel>1800461</sendertel>
+			<sendertelextension>7449</sendertelextension>
+			<sendertelcountrycode>1</sendertelcountrycode>
+			<senderemailaddress>aereports@azurity.com</senderemailaddress>
+		</sender>
+		<receiver>
+			<receivertype>2</receivertype>
+			<receiverorganization>ZZFDA</receiverorganization>
+			<receiverdepartment>Office of Surveillance and Epidemiology</receiverdepartment>
+			<receivergivename>FAERS</receivergivename>
+			<receiverstreetaddress>10903 New Hampshire Avenue</receiverstreetaddress>
+			<receivercity>Silver Spring</receivercity>
+			<receiverstate>MD</receiverstate>
+			<receiverpostcode>20993</receiverpostcode>
+			<receivercountrycode>US</receivercountrycode>
+			<receiveremailaddress>faersesub@fda.hhs.gov</receiveremailaddress>
+		</receiver>
+		<patient>
+			<patientinitial>RB</patientinitial>
+			<patientonsetage>66</patientonsetage>
+			<patientonsetageunit>801</patientonsetageunit>
+			<patientsex>1</patientsex>
+			<patientmedicalhistorytext>overweight, Hypercholesterolemia, Bipolar manic depression</patientmedicalhistorytext>
+			<reaction>
+				<primarysourcereaction>not totally cleaned out</primarysourcereaction>
+				<reactionmeddraversionllt>28.1</reactionmeddraversionllt>
+				<reactionmeddrallt>Drug ineffective</reactionmeddrallt>
+				<reactionmeddraversionpt>28.1</reactionmeddraversionpt>
+				<reactionmeddrapt>Drug ineffective</reactionmeddrapt>
+				<reactionstartdateformat>102</reactionstartdateformat>
+				<reactionstartdate>20140502</reactionstartdate>
+			</reaction>
+			<drug>
+				<drugcharacterization>1</drugcharacterization>
+				<medicinalproduct>SUPREP BOWEL PREP KIT</medicinalproduct>
+				<obtaindrugcountry>US</obtaindrugcountry>
+				<drugauthorizationnumb>NDA 022372</drugauthorizationnumb>
+				<drugauthorizationcountry>US</drugauthorizationcountry>
+				<drugauthorizationholder>AZURITY</drugauthorizationholder>
+				<drugstructuredosagenumb>1</drugstructuredosagenumb>
+				<drugstructuredosageunit>032</drugstructuredosageunit>
+				<drugdosagetext>2 x 6 oz. bottle</drugdosagetext>
+				<drugdosageform>Powder, for solution</drugdosageform>
+				<drugadministrationroute>048</drugadministrationroute>
+				<drugindicationmeddraversion>28.1</drugindicationmeddraversion>
+				<drugindication>Colonoscopy</drugindication>
+				<drugstartdateformat>102</drugstartdateformat>
+				<drugstartdate>20140501</drugstartdate>
+				<drugenddateformat>102</drugenddateformat>
+				<drugenddate>20140502</drugenddate>
+				<drugrecurreadministration>3</drugrecurreadministration>
+				<activesubstance>
+					<activesubstancename>MAGNESIUM SULFATE</activesubstancename>
+				</activesubstance>
+				<activesubstance>
+					<activesubstancename>POTASSIUM SULFATE</activesubstancename>
+				</activesubstance>
+				<activesubstance>
+					<activesubstancename>SODIUM SULFATE</activesubstancename>
+				</activesubstance>
+				<drugreactionrelatedness>
+					<drugreactionassesmeddraversion>28.1</drugreactionassesmeddraversion>
+					<drugreactionasses>Drug ineffective</drugreactionasses>
+					<drugassessmentsource>PHARMACEUTICAL COMPANY</drugassessmentsource>
+					<drugresult>Probable</drugresult>
+				</drugreactionrelatedness>
+				<drugreactionrelatedness>
+					<drugreactionassesmeddraversion>28.1</drugreactionassesmeddraversion>
+					<drugreactionasses>Drug ineffective</drugreactionasses>
+				</drugreactionrelatedness>
+			</drug>
+			<summary>
+				<narrativeincludeclinical>The patient was scheduled for a procedure once before (05/14) and was taking this product and woke up 6 hours before his procedure and took the second dose but they told him that he was not totally cleaned out and had to reschedule.  He took the product at 6pm then again at 2am in the morning. The second dose didn't start working for the patient until 10 am, after they had already determined he wasn't cleaned out enough for the procedure. 
+MD did suggest that they use the same product again but with different timing.  He is now scheduled for a colonoscopy at ~7:30am 07/24/14.The patient has had nothing to eat today. The patient is concerned he will not be cleaned out enough again. The patient took the first dose at ~10am. The patient is starting to feel the urge to start to go now.  
+
+CONCOMITANT PRODUCTS AND THERAPY DATES
+
+Baby Aspirin; heart pill (name unknown); supposed to take Simvastatin and Seroquel but hasn't taken for 30 days by choice</narrativeincludeclinical>
+			</summary>
+		</patient>
+	</safetyreport>
+</ichicsr>

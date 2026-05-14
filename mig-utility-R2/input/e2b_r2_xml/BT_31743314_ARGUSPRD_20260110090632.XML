@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ichicsr SYSTEM "https://www.accessdata.fda.gov/xml/icsr-xml-v2.1.dtd">
+<ichicsr lang="en">
+	<ichicsrmessageheader>
+		<messagetype>ichicsr</messagetype>
+		<messageformatversion>2.1</messageformatversion>
+		<messageformatrelease>2.0</messageformatrelease>
+		<messagenumb>31743314_ARG</messagenumb>
+		<messagesenderidentifier>BRAINTREE</messagesenderidentifier>
+		<messagereceiveridentifier>ZZFDA</messagereceiveridentifier>
+		<messagedateformat>204</messagedateformat>
+		<messagedate>20260110090632</messagedate>
+	</ichicsrmessageheader>
+	<safetyreport>
+		<safetyreportversion>1</safetyreportversion>
+		<safetyreportid>US-BRAINTREE-2020BTE04247</safetyreportid>
+		<primarysourcecountry>US</primarysourcecountry>
+		<occurcountry>US</occurcountry>
+		<transmissiondateformat>102</transmissiondateformat>
+		<transmissiondate>20260110</transmissiondate>
+		<reporttype>1</reporttype>
+		<serious>2</serious>
+		<seriousnessdeath>2</seriousnessdeath>
+		<seriousnesslifethreatening>2</seriousnesslifethreatening>
+		<seriousnesshospitalization>2</seriousnesshospitalization>
+		<seriousnessdisabling>2</seriousnessdisabling>
+		<seriousnesscongenitalanomali>2</seriousnesscongenitalanomali>
+		<seriousnessother>2</seriousnessother>
+		<receivedateformat>102</receivedateformat>
+		<receivedate>20140801</receivedate>
+		<receiptdateformat>102</receiptdateformat>
+		<receiptdate>20140801</receiptdate>
+		<additionaldocument>2</additionaldocument>
+		<fulfillexpeditecriteria>1</fulfillexpeditecriteria>
+		<companynumb>Braintree Laboratories 140302</companynumb>
+		<duplicate>1</duplicate>
+		<medicallyconfirm>2</medicallyconfirm>
+		<reportduplicate>
+			<duplicatesource>Braintree Laboratories</duplicatesource>
+			<duplicatenumb>US-Braintree Laboratories-140302</duplicatenumb>
+		</reportduplicate>
+		<linkedreport>
+			<linkreportnumb>032314</linkreportnumb>
+		</linkedreport>
+		<primarysource>
+			<reportertitle>Mr.</reportertitle>
+			<reportergivename>Joseph</reportergivename>
+			<reporterfamilyname>Kosarki</reporterfamilyname>
+			<reporterstreet>750 SE Cary Parkway, Apt 411</reporterstreet>
+			<reportercity>Cary</reportercity>
+			<reporterstate>NC</reporterstate>
+			<reporterpostcode>27511</reporterpostcode>
+			<reportercountry>US</reportercountry>
+			<qualification>5</qualification>
+		</primarysource>
+		<sender>
+			<sendertype>1</sendertype>
+			<senderorganization>BRAINTREE</senderorganization>
+			<senderdepartment>Regulatory Affairs</senderdepartment>
+			<senderstreetaddress>8 Cabot Road, Suite 2000</senderstreetaddress>
+			<sendercity>Woburn</sendercity>
+			<senderstate>MA</senderstate>
+			<senderpostcode>01801</senderpostcode>
+			<sendercountrycode>US</sendercountrycode>
+			<sendertel>1800461</sendertel>
+			<sendertelextension>7449</sendertelextension>
+			<sendertelcountrycode>1</sendertelcountrycode>
+			<senderemailaddress>aereports@azurity.com</senderemailaddress>
+		</sender>
+		<receiver>
+			<receivertype>2</receivertype>
+			<receiverorganization>ZZFDA</receiverorganization>
+			<receiverdepartment>Office of Surveillance and Epidemiology</receiverdepartment>
+			<receivergivename>FAERS</receivergivename>
+			<receiverstreetaddress>10903 New Hampshire Avenue</receiverstreetaddress>
+			<receivercity>Silver Spring</receivercity>
+			<receiverstate>MD</receiverstate>
+			<receiverpostcode>20993</receiverpostcode>
+			<receivercountrycode>US</receivercountrycode>
+			<receiveremailaddress>faersesub@fda.hhs.gov</receiveremailaddress>
+		</receiver>
+		<patient>
+			<patientinitial>FK</patientinitial>
+			<patientonsetage>76</patientonsetage>
+			<patientonsetageunit>801</patientonsetageunit>
+			<patientweight>52.616</patientweight>
+			<patientsex>2</patientsex>
+			<patientmedicalhistorytext>Arthritis; Degenerative Disc Disease; Chronic Fatigue Disorder; Barrett's Esophagus; Diverticulosis; history of Ulcers; Lactose Intolerant; GERD; Anxiety; Depression; history of Muscle Spasms; Fibromyalgia; Chronic Pain; Sensitive to Abilify; Flagyl; and Bactrim DS/Septra DS; NSAIDs; Allergic to penicillin</patientmedicalhistorytext>
+			<reaction>
+				<primarysourcereaction>explosive diarrhea in her bed while she was taking a nap</primarysourcereaction>
+				<reactionmeddraversionllt>28.1</reactionmeddraversionllt>
+				<reactionmeddrallt>Involuntary bowel movement</reactionmeddrallt>
+				<reactionmeddraversionpt>28.1</reactionmeddraversionpt>
+				<reactionmeddrapt>Anal incontinence</reactionmeddrapt>
+				<reactionstartdateformat>102</reactionstartdateformat>
+				<reactionstartdate>20140731</reactionstartdate>
+			</reaction>
+			<reaction>
+				<primarysourcereaction>bottom raw</primarysourcereaction>
+				<reactionmeddraversionllt>28.1</reactionmeddraversionllt>
+				<reactionmeddrallt>Anal irritation</reactionmeddrallt>
+				<reactionmeddraversionpt>28.1</reactionmeddraversionpt>
+				<reactionmeddrapt>Anorectal discomfort</reactionmeddrapt>
+			</reaction>
+			<reaction>
+				<primarysourcereaction>dulcolax use</primarysourcereaction>
+				<reactionmeddraversionllt>28.1</reactionmeddraversionllt>
+				<reactionmeddrallt>Drug maladministration</reactionmeddrallt>
+				<reactionmeddraversionpt>28.1</reactionmeddraversionpt>
+				<reactionmeddrapt>Product administration error</reactionmeddrapt>
+			</reaction>
+			<drug>
+				<drugcharacterization>1</drugcharacterization>
+				<medicinalproduct>SUPREP BOWEL PREP KIT</medicinalproduct>
+				<obtaindrugcountry>US</obtaindrugcountry>
+				<drugbatchnumb>2814032 05/2016</drugbatchnumb>
+				<drugauthorizationnumb>NDA 022372</drugauthorizationnumb>
+				<drugauthorizationcountry>US</drugauthorizationcountry>
+				<drugauthorizationholder>AZURITY</drugauthorizationholder>
+				<drugstructuredosagenumb>1</drugstructuredosagenumb>
+				<drugstructuredosageunit>032</drugstructuredosageunit>
+				<drugdosagetext>2 x 6oz bottle</drugdosagetext>
+				<drugdosageform>Powder, for solution</drugdosageform>
+				<drugadministrationroute>048</drugadministrationroute>
+				<drugindicationmeddraversion>28.1</drugindicationmeddraversion>
+				<drugindication>Colonoscopy</drugindication>
+				<drugstartdateformat>102</drugstartdateformat>
+				<drugstartdate>20140730</drugstartdate>
+				<drugenddateformat>102</drugenddateformat>
+				<drugenddate>20140731</drugenddate>
+				<drugrecurreadministration>3</drugrecurreadministration>
+				<activesubstance>
+					<activesubstancename>MAGNESIUM SULFATE</activesubstancename>
+				</activesubstance>
+				<activesubstance>
+					<activesubstancename>POTASSIUM SULFATE</activesubstancename>
+				</activesubstance>
+				<activesubstance>
+					<activesubstancename>SODIUM SULFATE</activesubstancename>
+				</activesubstance>
+				<drugreactionrelatedness>
+					<drugreactionassesmeddraversion>28.1</drugreactionassesmeddraversion>
+					<drugreactionasses>Anal incontinence</drugreactionasses>
+					<drugassessmentsource>PHARMACEUTICAL COMPANY</drugassessmentsource>
+					<drugresult>Probable</drugresult>
+				</drugreactionrelatedness>
+				<drugreactionrelatedness>
+					<drugreactionassesmeddraversion>28.1</drugreactionassesmeddraversion>
+					<drugreactionasses>Anal incontinence</drugreactionasses>
+				</drugreactionrelatedness>
+				<drugreactionrelatedness>
+					<drugreactionassesmeddraversion>28.1</drugreactionassesmeddraversion>
+					<drugreactionasses>Anorectal discomfort</drugreactionasses>
+					<drugassessmentsource>PHARMACEUTICAL COMPANY</drugassessmentsource>
+					<drugresult>Probable</drugresult>
+				</drugreactionrelatedness>
+				<drugreactionrelatedness>
+					<drugreactionassesmeddraversion>28.1</drugreactionassesmeddraversion>
+					<drugreactionasses>Anorectal discomfort</drugreactionasses>
+				</drugreactionrelatedness>
+				<drugreactionrelatedness>
+					<drugreactionassesmeddraversion>28.1</drugreactionassesmeddraversion>
+					<drugreactionasses>Product administration error</drugreactionasses>
+					<drugassessmentsource>PHARMACEUTICAL COMPANY</drugassessmentsource>
+					<drugresult>Probable</drugresult>
+				</drugreactionrelatedness>
+				<drugreactionrelatedness>
+					<drugreactionassesmeddraversion>28.1</drugreactionassesmeddraversion>
+					<drugreactionasses>Product administration error</drugreactionasses>
+				</drugreactionrelatedness>
+			</drug>
+			<summary>
+				<narrativeincludeclinical>The patient took the product on Wednesday, 07/30/14. Her doctor instructed her to take 2 dulcolax tablets at 4pm. She then took her first dose at 6pm with the required water. At 10:45 she got concerned that she was not having a bowel movement so she (on her own-not doctor's instructed) took two more dulcolax tablets. At 11:30 pm she did start having multiple small bowel movements. The patient describes them to be the consistency and color of honey. At 8am the next morning (07/31/14) she took the second dose. She then laid down in bed to rest before she had to go in for her colonoscopy. She had explosive diarrhea in her bed while she was taking a nap. She did make it to her colonoscopy and was properly cleaned out. 
+
+08/04/14: The patient was able to have her colonoscopy, but that the physician had to suction a lot of liquid stool from her rectum so they could perform the procedure. They have not yet gotten all of the results of the procedure from their physician, but that the patient did have two polyps removed.  After having all of the explosive diarrhea and loose stools, the patient's bottom is raw. They have been using a desitin product that was recommended by their doctor, and that she is feeling much better.
+
+CONCOMITANT PRODUCTS AND THERAPY DATES
+
+Omeprazole; Valium; Amitriptyline; Acetaminophen; Biotin; Vitamin B12 Energy Sublingual; Vitamin D3; L-Lysine; Omega XL for inflamation</narrativeincludeclinical>
+			</summary>
+		</patient>
+	</safetyreport>
+</ichicsr>

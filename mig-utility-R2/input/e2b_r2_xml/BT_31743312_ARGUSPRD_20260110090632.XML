@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ichicsr SYSTEM "https://www.accessdata.fda.gov/xml/icsr-xml-v2.1.dtd">
+<ichicsr lang="en">
+	<ichicsrmessageheader>
+		<messagetype>ichicsr</messagetype>
+		<messageformatversion>2.1</messageformatversion>
+		<messageformatrelease>2.0</messageformatrelease>
+		<messagenumb>31743312_ARG</messagenumb>
+		<messagesenderidentifier>BRAINTREE</messagesenderidentifier>
+		<messagereceiveridentifier>ZZFDA</messagereceiveridentifier>
+		<messagedateformat>204</messagedateformat>
+		<messagedate>20260110090632</messagedate>
+	</ichicsrmessageheader>
+	<safetyreport>
+		<safetyreportversion>2</safetyreportversion>
+		<safetyreportid>US-BRAINTREE LABORATORIES, INC.-2020BTE01777</safetyreportid>
+		<primarysourcecountry>US</primarysourcecountry>
+		<occurcountry>US</occurcountry>
+		<transmissiondateformat>102</transmissiondateformat>
+		<transmissiondate>20260110</transmissiondate>
+		<reporttype>1</reporttype>
+		<serious>1</serious>
+		<seriousnessdeath>2</seriousnessdeath>
+		<seriousnesslifethreatening>1</seriousnesslifethreatening>
+		<seriousnesshospitalization>1</seriousnesshospitalization>
+		<seriousnessdisabling>2</seriousnessdisabling>
+		<seriousnesscongenitalanomali>2</seriousnesscongenitalanomali>
+		<seriousnessother>2</seriousnessother>
+		<receivedateformat>102</receivedateformat>
+		<receivedate>20140714</receivedate>
+		<receiptdateformat>102</receiptdateformat>
+		<receiptdate>20140714</receiptdate>
+		<additionaldocument>2</additionaldocument>
+		<fulfillexpeditecriteria>1</fulfillexpeditecriteria>
+		<companynumb>Braintree Laboratories 140257</companynumb>
+		<duplicate>1</duplicate>
+		<reportduplicate>
+			<duplicatesource>Braintree Laboratories</duplicatesource>
+			<duplicatenumb>US-Braintree Laboratories-140257</duplicatenumb>
+		</reportduplicate>
+		<linkedreport>
+			<linkreportnumb>027514</linkreportnumb>
+		</linkedreport>
+		<primarysource>
+			<reportercountry>US</reportercountry>
+			<qualification>3</qualification>
+			<literaturereference>Mosquera et al. "Case Report Aspiration Pneumonitis Caused by Polyethylene Glycol-Electrolyte Solution Treated with Conservative Management"; Case Reports in Pediatrics. Volume 2014. ID 872634, 3 pages, May 2014.University of Texas Health Science of HoustonHouston, TX 77030, USA</literaturereference>
+		</primarysource>
+		<sender>
+			<sendertype>1</sendertype>
+			<senderorganization>BRAINTREE</senderorganization>
+			<senderdepartment>Regulatory Affairs</senderdepartment>
+			<senderstreetaddress>8 Cabot Road, Suite 2000</senderstreetaddress>
+			<sendercity>Woburn</sendercity>
+			<senderstate>MA</senderstate>
+			<senderpostcode>01801</senderpostcode>
+			<sendercountrycode>US</sendercountrycode>
+			<sendertel>1800461</sendertel>
+			<sendertelextension>7449</sendertelextension>
+			<sendertelcountrycode>1</sendertelcountrycode>
+			<senderemailaddress>aereports@azurity.com</senderemailaddress>
+		</sender>
+		<receiver>
+			<receivertype>2</receivertype>
+			<receiverorganization>ZZFDA</receiverorganization>
+			<receiverdepartment>Office of Surveillance and Epidemiology</receiverdepartment>
+			<receivergivename>FAERS</receivergivename>
+			<receiverstreetaddress>10903 New Hampshire Avenue</receiverstreetaddress>
+			<receivercity>Silver Spring</receivercity>
+			<receiverstate>MD</receiverstate>
+			<receiverpostcode>20993</receiverpostcode>
+			<receivercountrycode>US</receivercountrycode>
+			<receiveremailaddress>faersesub@fda.hhs.gov</receiveremailaddress>
+		</receiver>
+		<patient>
+			<patientinitial>UNK</patientinitial>
+			<patientonsetage>9</patientonsetage>
+			<patientonsetageunit>801</patientonsetageunit>
+			<patientsex>1</patientsex>
+			<patientmedicalhistorytext>Spina bifida, hydrocephalus status post-VP shunt with normal neurological cognitive function, and neurogenic bladder with ileovesicostomy</patientmedicalhistorytext>
+			<resultstestsprocedures>Chest X-ray showed a right lower lobe aspiration pneumonitis; subsequent X-ray showed worsening of pneumonitis, PCO2 and pH remained within normal limits; (+7 days) chest X-ray obtained demonstrated complete resolution of pneumonitis.</resultstestsprocedures>
+			<reaction>
+				<primarysourcereaction>wrong route of administration</primarysourcereaction>
+				<reactionmeddraversionllt>28.1</reactionmeddraversionllt>
+				<reactionmeddrallt>Wrong route of administration</reactionmeddrallt>
+				<reactionmeddraversionpt>28.1</reactionmeddraversionpt>
+				<reactionmeddrapt>Incorrect route of product administration</reactionmeddrapt>
+			</reaction>
+			<reaction>
+				<primarysourcereaction>Aspiration pneumonitis</primarysourcereaction>
+				<reactionmeddraversionllt>28.1</reactionmeddraversionllt>
+				<reactionmeddrallt>Aspiration pneumonitis</reactionmeddrallt>
+				<reactionmeddraversionpt>28.1</reactionmeddraversionpt>
+				<reactionmeddrapt>Pneumonitis aspiration</reactionmeddrapt>
+			</reaction>
+			<drug>
+				<drugcharacterization>1</drugcharacterization>
+				<medicinalproduct>GOLYTELY</medicinalproduct>
+				<obtaindrugcountry>US</obtaindrugcountry>
+				<drugauthorizationnumb>NDA 019011</drugauthorizationnumb>
+				<drugauthorizationcountry>US</drugauthorizationcountry>
+				<drugauthorizationholder>AZURITY</drugauthorizationholder>
+				<drugstructuredosagenumb>1</drugstructuredosagenumb>
+				<drugstructuredosageunit>032</drugstructuredosageunit>
+				<drugdosagetext>283 mL</drugdosagetext>
+				<drugdosageform>Powder, for solution</drugdosageform>
+				<drugadministrationroute>050</drugadministrationroute>
+				<drugrecurreadministration>3</drugrecurreadministration>
+				<activesubstance>
+					<activesubstancename>POLYETHYLENE GLYCOL</activesubstancename>
+				</activesubstance>
+				<activesubstance>
+					<activesubstancename>POTASSIUM CHLORIDE</activesubstancename>
+				</activesubstance>
+				<activesubstance>
+					<activesubstancename>SODIUM BICARBONATE</activesubstancename>
+				</activesubstance>
+				<activesubstance>
+					<activesubstancename>SODIUM CHLORIDE</activesubstancename>
+				</activesubstance>
+				<activesubstance>
+					<activesubstancename>SODIUM SULFATE</activesubstancename>
+				</activesubstance>
+				<drugreactionrelatedness>
+					<drugreactionassesmeddraversion>28.1</drugreactionassesmeddraversion>
+					<drugreactionasses>Incorrect route of product administration</drugreactionasses>
+					<drugassessmentsource>PHARMACEUTICAL COMPANY</drugassessmentsource>
+					<drugresult>Probable</drugresult>
+				</drugreactionrelatedness>
+				<drugreactionrelatedness>
+					<drugreactionassesmeddraversion>28.1</drugreactionassesmeddraversion>
+					<drugreactionasses>Incorrect route of product administration</drugreactionasses>
+				</drugreactionrelatedness>
+				<drugreactionrelatedness>
+					<drugreactionassesmeddraversion>28.1</drugreactionassesmeddraversion>
+					<drugreactionasses>Pneumonitis aspiration</drugreactionasses>
+					<drugassessmentsource>PHARMACEUTICAL COMPANY</drugassessmentsource>
+					<drugresult>Probable</drugresult>
+				</drugreactionrelatedness>
+				<drugreactionrelatedness>
+					<drugreactionassesmeddraversion>28.1</drugreactionassesmeddraversion>
+					<drugreactionasses>Pneumonitis aspiration</drugreactionasses>
+				</drugreactionrelatedness>
+			</drug>
+			<summary>
+				<narrativeincludeclinical>A 9-year-old Hispanic boy with spina bifida, hydrocephalus status post-VP shunt with normal neurological cognitive function, and neurogenic bladder with ileovesicostomy was scheduled for bladder augmentation and revision of his urinary diversion. He was admitted to the hospital for preoperative bowel preparation consisting of polyethylene lavage (1400cc over 4 hours) via nasogastric feeding tube (NGT) with a kangaroo feeding pump. The NGT placement was confirmed with auscultation. Shortly after the infusion was begun, the patient developed significant coughing and gagging with small amount of emesis of clear fluid. The infusion was immediately stopped and a radiograph showed placement of the NG tube in the right lung. A review of the feeding pump revealed the patient had received a total of 283mL of solution. The primary care provider and the pediatric and pulmonary services were notified and consulted. Prior to the incident the patient.s vitals were stable with a heart rate of 80 beats/minute, blood pressure 90/64mm Hg, respiratory rate 18 breaths/minute, and oxygen saturation 100% in room air. When the infusion was stopped, the patient.s vitals were mildly elevated with a heart rate of 126 beats/min, blood pressure 111/55mm Hg, a respiratory rate 28 breaths/min, and oxygen saturation 93% in room air. On exam the patient had decreased breath sounds over the right lung field with no crackles or wheezing and did not appear to be in significant distress. A chest X-ray showed a right lower lobe aspiration pneumonitis. IV clindamycin was begun and the patient was transferred to the Pediatric IMU (intermediate medical unit) for continuous cardiopulmonary monitoring with recommendations to start supplemental oxygen and intravenous steroids if his condition deteriorated. Overnight, the patient had an increase in tachypnea and his oxygen desaturated to 87-89% on room air. He subsequently received 2 liters of oxygen via nasal cannula to maintain oxygen saturations above 92% and IV Solu-Medrolwas begun at a dose of 2mg/kg/day. A subsequent X-ray was performed the following day that showed worsening of his pneumonitis though his PCO2 and pH remained within normal limits and he appeared clinically stable. Two days after the ingestion, the patient was transitioned to room air and his condition began to steadily improve. The patient's symptoms disappeared after four days. The patient was discharged 4 days after the infusion and a final chest X-ray obtained demonstrated complete resolution of pneumonitis (7 days after infusion).</narrativeincludeclinical>
+			</summary>
+		</patient>
+	</safetyreport>
+</ichicsr>

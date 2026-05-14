@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ichicsr SYSTEM "https://www.accessdata.fda.gov/xml/icsr-xml-v2.1.dtd">
+<ichicsr lang="en">
+	<ichicsrmessageheader>
+		<messagetype>ichicsr</messagetype>
+		<messageformatversion>2.1</messageformatversion>
+		<messageformatrelease>2.0</messageformatrelease>
+		<messagenumb>31743307_ARG</messagenumb>
+		<messagesenderidentifier>BRAINTREE</messagesenderidentifier>
+		<messagereceiveridentifier>ZZFDA</messagereceiveridentifier>
+		<messagedateformat>204</messagedateformat>
+		<messagedate>20260110090630</messagedate>
+	</ichicsrmessageheader>
+	<safetyreport>
+		<safetyreportversion>2</safetyreportversion>
+		<safetyreportid>US-BRAINTREE LABORATORIES, INC.-2020BTE03869</safetyreportid>
+		<primarysourcecountry>US</primarysourcecountry>
+		<occurcountry>US</occurcountry>
+		<transmissiondateformat>102</transmissiondateformat>
+		<transmissiondate>20260110</transmissiondate>
+		<reporttype>1</reporttype>
+		<serious>1</serious>
+		<seriousnessdeath>2</seriousnessdeath>
+		<seriousnesslifethreatening>2</seriousnesslifethreatening>
+		<seriousnesshospitalization>2</seriousnesshospitalization>
+		<seriousnessdisabling>2</seriousnessdisabling>
+		<seriousnesscongenitalanomali>2</seriousnesscongenitalanomali>
+		<seriousnessother>1</seriousnessother>
+		<receivedateformat>102</receivedateformat>
+		<receivedate>20131009</receivedate>
+		<receiptdateformat>102</receiptdateformat>
+		<receiptdate>20131009</receiptdate>
+		<additionaldocument>2</additionaldocument>
+		<fulfillexpeditecriteria>1</fulfillexpeditecriteria>
+		<companynumb>Braintree Laboratories 130344-2</companynumb>
+		<duplicate>1</duplicate>
+		<medicallyconfirm>2</medicallyconfirm>
+		<reportduplicate>
+			<duplicatesource>Braintree Laboratories</duplicatesource>
+			<duplicatenumb>US-Braintree Laboratories-130344-2</duplicatenumb>
+		</reportduplicate>
+		<linkedreport>
+			<linkreportnumb>042113</linkreportnumb>
+		</linkedreport>
+		<primarysource>
+			<reportercountry>US</reportercountry>
+			<qualification>5</qualification>
+		</primarysource>
+		<sender>
+			<sendertype>1</sendertype>
+			<senderorganization>BRAINTREE</senderorganization>
+			<senderdepartment>Regulatory Affairs</senderdepartment>
+			<senderstreetaddress>8 Cabot Road, Suite 2000</senderstreetaddress>
+			<sendercity>Woburn</sendercity>
+			<senderstate>MA</senderstate>
+			<senderpostcode>01801</senderpostcode>
+			<sendercountrycode>US</sendercountrycode>
+			<sendertel>1800461</sendertel>
+			<sendertelextension>7449</sendertelextension>
+			<sendertelcountrycode>1</sendertelcountrycode>
+			<senderemailaddress>aereports@azurity.com</senderemailaddress>
+		</sender>
+		<receiver>
+			<receivertype>2</receivertype>
+			<receiverorganization>ZZFDA</receiverorganization>
+			<receiverdepartment>Office of Surveillance and Epidemiology</receiverdepartment>
+			<receivergivename>FAERS</receivergivename>
+			<receiverstreetaddress>10903 New Hampshire Avenue</receiverstreetaddress>
+			<receivercity>Silver Spring</receivercity>
+			<receiverstate>MD</receiverstate>
+			<receiverpostcode>20993</receiverpostcode>
+			<receivercountrycode>US</receivercountrycode>
+			<receiveremailaddress>faersesub@fda.hhs.gov</receiveremailaddress>
+		</receiver>
+		<patient>
+			<patientinitial>JE</patientinitial>
+			<patientonsetage>66</patientonsetage>
+			<patientonsetageunit>801</patientonsetageunit>
+			<patientweight>77.11</patientweight>
+			<patientsex>2</patientsex>
+			<patientmedicalhistorytext>Allergic to Shellfish; band-aid adhesive allergies; 2008 breast cancer (now in remission); high cholesterol; diabetic; *colonoscopy- couple of polyps</patientmedicalhistorytext>
+			<resultstestsprocedures>n/a</resultstestsprocedures>
+			<reaction>
+				<primarysourcereaction>bloating</primarysourcereaction>
+				<reactionmeddraversionllt>28.1</reactionmeddraversionllt>
+				<reactionmeddrallt>Bloating</reactionmeddrallt>
+				<reactionmeddraversionpt>28.1</reactionmeddraversionpt>
+				<reactionmeddrapt>Abdominal distension</reactionmeddrapt>
+			</reaction>
+			<reaction>
+				<primarysourcereaction>vomitus bloody</primarysourcereaction>
+				<reactionmeddraversionllt>28.1</reactionmeddraversionllt>
+				<reactionmeddrallt>Emesis bloody</reactionmeddrallt>
+				<reactionmeddraversionpt>28.1</reactionmeddraversionpt>
+				<reactionmeddrapt>Haematemesis</reactionmeddrapt>
+				<reactionstartdateformat>102</reactionstartdateformat>
+				<reactionstartdate>20131008</reactionstartdate>
+			</reaction>
+			<reaction>
+				<primarysourcereaction>pain when cough</primarysourcereaction>
+				<reactionmeddraversionllt>28.1</reactionmeddraversionllt>
+				<reactionmeddrallt>Painful cough</reactionmeddrallt>
+				<reactionmeddraversionpt>28.1</reactionmeddraversionpt>
+				<reactionmeddrapt>Cough</reactionmeddrapt>
+			</reaction>
+			<reaction>
+				<primarysourcereaction>gas</primarysourcereaction>
+				<reactionmeddraversionllt>28.1</reactionmeddraversionllt>
+				<reactionmeddrallt>Gas</reactionmeddrallt>
+				<reactionmeddraversionpt>28.1</reactionmeddraversionpt>
+				<reactionmeddrapt>Flatulence</reactionmeddrapt>
+			</reaction>
+			<reaction>
+				<primarysourcereaction>emesis</primarysourcereaction>
+				<reactionmeddraversionllt>28.1</reactionmeddraversionllt>
+				<reactionmeddrallt>Emesis</reactionmeddrallt>
+				<reactionmeddraversionpt>28.1</reactionmeddraversionpt>
+				<reactionmeddrapt>Vomiting</reactionmeddrapt>
+			</reaction>
+			<reaction>
+				<primarysourcereaction>abdominal pain</primarysourcereaction>
+				<reactionmeddraversionllt>28.1</reactionmeddraversionllt>
+				<reactionmeddrallt>Abdominal pain</reactionmeddrallt>
+				<reactionmeddraversionpt>28.1</reactionmeddraversionpt>
+				<reactionmeddrapt>Abdominal pain</reactionmeddrapt>
+			</reaction>
+			<reaction>
+				<primarysourcereaction>sore throat</primarysourcereaction>
+				<reactionmeddraversionllt>28.1</reactionmeddraversionllt>
+				<reactionmeddrallt>Sore throat</reactionmeddrallt>
+				<reactionmeddraversionpt>28.1</reactionmeddraversionpt>
+				<reactionmeddrapt>Oropharyngeal pain</reactionmeddrapt>
+			</reaction>
+			<reaction>
+				<primarysourcereaction>nausea</primarysourcereaction>
+				<reactionmeddraversionllt>28.1</reactionmeddraversionllt>
+				<reactionmeddrallt>Nausea</reactionmeddrallt>
+				<reactionmeddraversionpt>28.1</reactionmeddraversionpt>
+				<reactionmeddrapt>Nausea</reactionmeddrapt>
+			</reaction>
+			<drug>
+				<drugcharacterization>1</drugcharacterization>
+				<medicinalproduct>SUPREP BOWEL PREP KIT</medicinalproduct>
+				<obtaindrugcountry>US</obtaindrugcountry>
+				<drugbatchnumb>2813036 07/2015</drugbatchnumb>
+				<drugauthorizationnumb>NDA 022372</drugauthorizationnumb>
+				<drugauthorizationcountry>US</drugauthorizationcountry>
+				<drugauthorizationholder>AZURITY</drugauthorizationholder>
+				<drugstructuredosagenumb>1</drugstructuredosagenumb>
+				<drugstructuredosageunit>032</drugstructuredosageunit>
+				<drugdosagetext>1.5 x 6oz bottle</drugdosagetext>
+				<drugdosageform>Powder, for solution</drugdosageform>
+				<drugadministrationroute>048</drugadministrationroute>
+				<drugindicationmeddraversion>28.1</drugindicationmeddraversion>
+				<drugindication>Colonoscopy</drugindication>
+				<drugstartdateformat>102</drugstartdateformat>
+				<drugstartdate>20131008</drugstartdate>
+				<drugenddateformat>102</drugenddateformat>
+				<drugenddate>20131009</drugenddate>
+				<drugrecurreadministration>3</drugrecurreadministration>
+				<activesubstance>
+					<activesubstancename>MAGNESIUM SULFATE</activesubstancename>
+				</activesubstance>
+				<activesubstance>
+					<activesubstancename>POTASSIUM SULFATE</activesubstancename>
+				</activesubstance>
+				<activesubstance>
+					<activesubstancename>SODIUM SULFATE</activesubstancename>
+				</activesubstance>
+				<drugreactionrelatedness>
+					<drugreactionassesmeddraversion>28.1</drugreactionassesmeddraversion>
+					<drugreactionasses>Abdominal distension</drugreactionasses>
+					<drugassessmentsource>PHARMACEUTICAL COMPANY</drugassessmentsource>
+					<drugresult>Probable</drugresult>
+				</drugreactionrelatedness>
+				<drugreactionrelatedness>
+					<drugreactionassesmeddraversion>28.1</drugreactionassesmeddraversion>
+					<drugreactionasses>Abdominal distension</drugreactionasses>
+				</drugreactionrelatedness>
+				<drugreactionrelatedness>
+					<drugreactionassesmeddraversion>28.1</drugreactionassesmeddraversion>
+					<drugreactionasses>Abdominal pain</drugreactionasses>
+					<drugassessmentsource>PHARMACEUTICAL COMPANY</drugassessmentsource>
+					<drugresult>Probable</drugresult>
+				</drugreactionrelatedness>
+				<drugreactionrelatedness>
+					<drugreactionassesmeddraversion>28.1</drugreactionassesmeddraversion>
+					<drugreactionasses>Abdominal pain</drugreactionasses>
+				</drugreactionrelatedness>
+				<drugreactionrelatedness>
+					<drugreactionassesmeddraversion>28.1</drugreactionassesmeddraversion>
+					<drugreactionasses>Cough</drugreactionasses>
+					<drugassessmentsource>PHARMACEUTICAL COMPANY</drugassessmentsource>
+					<drugresult>Probable</drugresult>
+				</drugreactionrelatedness>
+				<drugreactionrelatedness>
+					<drugreactionassesmeddraversion>28.1</drugreactionassesmeddraversion>
+					<drugreactionasses>Cough</drugreactionasses>
+				</drugreactionrelatedness>
+				<drugreactionrelatedness>
+					<drugreactionassesmeddraversion>28.1</drugreactionassesmeddraversion>
+					<drugreactionasses>Flatulence</drugreactionasses>
+					<drugassessmentsource>PHARMACEUTICAL COMPANY</drugassessmentsource>
+					<drugresult>Probable</drugresult>
+				</drugreactionrelatedness>
+				<drugreactionrelatedness>
+					<drugreactionassesmeddraversion>28.1</drugreactionassesmeddraversion>
+					<drugreactionasses>Flatulence</drugreactionasses>
+				</drugreactionrelatedness>
+				<drugreactionrelatedness>
+					<drugreactionassesmeddraversion>28.1</drugreactionassesmeddraversion>
+					<drugreactionasses>Haematemesis</drugreactionasses>
+					<drugassessmentsource>PHARMACEUTICAL COMPANY</drugassessmentsource>
+					<drugresult>Probable</drugresult>
+				</drugreactionrelatedness>
+				<drugreactionrelatedness>
+					<drugreactionassesmeddraversion>28.1</drugreactionassesmeddraversion>
+					<drugreactionasses>Haematemesis</drugreactionasses>
+				</drugreactionrelatedness>
+				<drugreactionrelatedness>
+					<drugreactionassesmeddraversion>28.1</drugreactionassesmeddraversion>
+					<drugreactionasses>Nausea</drugreactionasses>
+					<drugassessmentsource>PHARMACEUTICAL COMPANY</drugassessmentsource>
+					<drugresult>Probable</drugresult>
+				</drugreactionrelatedness>
+				<drugreactionrelatedness>
+					<drugreactionassesmeddraversion>28.1</drugreactionassesmeddraversion>
+					<drugreactionasses>Nausea</drugreactionasses>
+				</drugreactionrelatedness>
+				<drugreactionrelatedness>
+					<drugreactionassesmeddraversion>28.1</drugreactionassesmeddraversion>
+					<drugreactionasses>Oropharyngeal pain</drugreactionasses>
+					<drugassessmentsource>PHARMACEUTICAL COMPANY</drugassessmentsource>
+					<drugresult>Probable</drugresult>
+				</drugreactionrelatedness>
+				<drugreactionrelatedness>
+					<drugreactionassesmeddraversion>28.1</drugreactionassesmeddraversion>
+					<drugreactionasses>Oropharyngeal pain</drugreactionasses>
+				</drugreactionrelatedness>
+				<drugreactionrelatedness>
+					<drugreactionassesmeddraversion>28.1</drugreactionassesmeddraversion>
+					<drugreactionasses>Vomiting</drugreactionasses>
+					<drugassessmentsource>PHARMACEUTICAL COMPANY</drugassessmentsource>
+					<drugresult>Probable</drugresult>
+				</drugreactionrelatedness>
+				<drugreactionrelatedness>
+					<drugreactionassesmeddraversion>28.1</drugreactionassesmeddraversion>
+					<drugreactionasses>Vomiting</drugreactionasses>
+				</drugreactionrelatedness>
+			</drug>
+			<summary>
+				<narrativeincludeclinical>The patient is taking Suprep kit; has a colonoscopy scheduled later this morning. She took the first dose with accompanying water as directed, approximately 10 hrs ago (1 x 6 oz. bottle/1X/PO). Almost immediately after finishing the first dose, symptoms began: abdominal pain, gas/bloating, severe nausea, emesis. Over the course of the night she has vomited approximately 10 times total. She did start the second dose just recently, as scheduled, but her symptoms worsened almost immediately. She vomited again and during this most recent episode, her vomitus was bloody. She attempted to contact her physician's office and inform them of her symptoms, but has not yet heard back from the on-call MD.
+
+10/11/13: The patient has pain when she coughs. She was unable to have the colonoscopy done because she could not take the remainder of the dose. The patient did not go to the ER. She still has a sore throat but no other symptoms.
+
+*01/20/14: The patient's pain resolved on its own. The patient does not remember when for sure but estimates it to be about 1-2 weeks after. The patient did get another colonoscopy prep and was able to complete a colonoscopy. The patient did have a couple of polyps but it went well. The patient did not receive any medical care for the pain in her throat or cough.
+
+CONCOMITANT PRODUCTS AND THERAPY DATES
+
+cholesterol medications, aspirin</narrativeincludeclinical>
+			</summary>
+		</patient>
+	</safetyreport>
+</ichicsr>
