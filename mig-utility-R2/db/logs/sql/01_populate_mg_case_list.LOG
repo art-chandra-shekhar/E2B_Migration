@@ -4,9 +4,9 @@ SQL> SELECT TO_CHAR( SYSDATE, 'DD-MON-YYYY HH24:MI:SS' ) START_TIME FROM DUAL;
 
 START_TIME          
 --------------------
-21-MAY-2026 05:26:05
+21-MAY-2026 06:11:48
 
-Elapsed: 00:00:00.317
+Elapsed: 00:00:00.316
 SQL> 
 SQL> 
 SQL> -- Table Population Logic Starts Here
@@ -14,14 +14,14 @@ SQL> TRUNCATE TABLE MG_CASE_LIST;
 
 Table MG_CASE_LIST truncated.
 
-Elapsed: 00:00:00.311
+Elapsed: 00:00:00.362
 SQL> 
 SQL> INSERT INTO MG_CASE_LIST (SCASENUM)
   2  SELECT SAFETYREPORTID FROM S_SAFETYREPORT;
 
 9 rows inserted.
 
-Elapsed: 00:00:00.323
+Elapsed: 00:00:00.316
 SQL> 
 SQL> 
 SQL> -- Add TCASENUM, TCASEID, STATUS, ERRORS, WARNINGS, EXEC_THREAD_ID
@@ -60,13 +60,13 @@ SQL> DECLARE
 
 PL/SQL procedure successfully completed.
 
-Elapsed: 00:00:00.325
+Elapsed: 00:00:00.319
 SQL> 
 SQL> COMMIT;
 
 Commit complete.
 
-Elapsed: 00:00:00.308
+Elapsed: 00:00:00.307
 SQL> -- Table Population Logic Ends Here
 SQL> 
 SQL> -- Log End Time
@@ -74,9 +74,9 @@ SQL> SELECT TO_CHAR( SYSDATE, 'DD-MON-YYYY HH24:MI:SS' ) END_TIME FROM DUAL;
 
 END_TIME            
 --------------------
-21-MAY-2026 05:26:08
+21-MAY-2026 06:11:50
 
-Elapsed: 00:00:00.306
+Elapsed: 00:00:00.305
 SQL> 
 SQL> -- Echo Off
 SQL> SET ECHO OFF;

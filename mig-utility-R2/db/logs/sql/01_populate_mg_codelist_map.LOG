@@ -1,0 +1,236 @@
+SQL> 
+SQL> -- Log Start Time
+SQL> SELECT TO_CHAR( SYSDATE, 'DD-MON-YYYY HH24:MI:SS' ) START_TIME FROM DUAL;
+
+START_TIME          
+--------------------
+21-MAY-2026 12:41:36
+
+Elapsed: 00:00:00.337
+SQL> 
+SQL> 
+SQL> -- Table Population Logic Starts Here
+SQL> 
+SQL> /*TRANSFER SCRIPT FROM MG_CL_MASTER TO S_MG_CL_INFO AND T_MG_CL_INFO*/
+SQL> SET SERVEROUTPUT ON;
+SQL> DECLARE
+  2      CURSOR cur IS
+  3          SELECT
+  4          CL_NAME,
+  5          S_CL_TABLE,
+  6          S_CL_CODE_COL,
+  7          S_CL_DECODE_COL,
+  8          S_WHERE_COND,
+  9          T_CL_TABLE,
+ 10          T_CL_CODE_COL,
+ 11          T_CL_DECODE_COL,
+ 12          T_WHERE_COND,
+ 13          ACTIVE,
+ 14          STATUS,
+ 15          S_CL_DISPLAY_COL,
+ 16          T_CL_DISPLAY_COL,
+ 17          T_CL_E2B_CODE_COL
+ 18      FROM
+ 19          mg_cl_master
+ 20      WHERE S_CL_CODE_COL IS NOT NULL
+ 21        AND T_CL_CODE_COL IS NOT NULL;
+ 22  
+ 23      v_sql    VARCHAR2(4000);
+ 24      v_code   VARCHAR2(4000);
+ 25      v_decode VARCHAR2(4000);
+ 26      r2       SYS_REFCURSOR;
+ 27      v_disp_s VARCHAR2(100) := NULL;
+ 28      v_disp_t VARCHAR2(100) := NULL;
+ 29      vdisp    NUMBER := NULL;
+ 30      V_E2B_CODE  NUMBER;
+ 31      V_A2_CODE   VARCHAR2(2000);
+ 32  BEGIN
+ 33      DELETE FROM MG_S_CL_INFO;
+ 34      DELETE FROM MG_T_CL_INFO;
+ 35  
+ 36      FOR r1 IN cur LOOP
+ 37          if r1.T_CL_DISPLAY_COL is null THEN 
+ 38              V_DISP_t:= '1 display'; 
+ 39          ELSE 
+ 40              V_DISP_T:='DISPLAY'; 
+ 41          END IF;
+ 42  
+ 43          /*source_table*/
+ 44          v_sql := 'SELECT DISTINCT ' || r1.S_CL_CODE_COL || --','||v_disp_s||
+ 45                   ' FROM ' || r1.S_CL_TABLE || 
+ 46                   ' WHERE ' || r1.S_CL_DECODE_COL || ' IS NOT NULL';
+ 47  
+ 48  
+ 49          -- Append S_WHERE_COND if present
+ 50          IF r1.S_WHERE_COND IS NOT NULL THEN
+ 51              v_sql := v_sql || ' AND ' || r1.S_WHERE_COND;
+ 52          END IF;
+ 53  
+ 54          --dbms_output.put_line('Source SQL');
+ 55          --dbms_output.put_line(v_sql);
+ 56  
+ 57          OPEN r2 FOR v_sql;
+ 58          LOOP
+ 59              FETCH r2 INTO v_code; --, vdisp;
+ 60              EXIT WHEN r2%NOTFOUND;
+ 61  
+ 62              --  If Source Code contains Non-Numeric, load in S_CL_DECODE column
+ 63              IF REGEXP_LIKE(v_code, '[[:alpha:]]') THEN
+ 64                  INSERT INTO MG_S_CL_INFO(CL_NAME, S_CL_DECODE, S_CL_DISPLAY, CODELIST_TYPE)
+ 65                  VALUES (r1.CL_NAME, v_code, vdisp, 'E2B');
+ 66              ELSE
+ 67              --  If Source Code contains Numbers, load in S_CL_CODE column
+ 68                  INSERT INTO MG_S_CL_INFO(CL_NAME, S_CL_CODE, S_CL_DISPLAY, CODELIST_TYPE)
+ 69                  VALUES (r1.CL_NAME, v_code, vdisp, 'E2B');
+ 70              END IF;
+ 71  
+ 72          END LOOP;
+ 73          CLOSE r2;
+ 74  
+ 75          /*target_table*/
+ 76          v_sql := 'SELECT DISTINCT ' || r1.T_CL_CODE_COL || ', ' || r1.T_CL_DECODE_COL || ',' || v_disp_t ||
+ 77                   CASE WHEN R1.T_CL_E2B_CODE_COL IS NOT NULL THEN ','|| R1.T_CL_E2B_CODE_COL ELSE ', NULL E2B_CODE' END ||
+ 78                   CASE WHEN r1.T_CL_TABLE = 'LM_COUNTRIES' THEN ', A2' ELSE ', NULL A2' END ||
+ 79                   ' FROM ARGUS_APP.' || r1.T_CL_TABLE || 
+ 80                   ' WHERE ' || r1.T_CL_DECODE_COL || ' IS NOT NULL';
+ 81  
+ 82          -- Append T_WHERE_COND if present
+ 83          IF r1.t_where_cond IS NOT NULL THEN
+ 84              v_sql := v_sql
+ 85                       || ' AND '
+ 86                       || REPLACE(UPPER(r1.t_where_cond),'WHERE');
+ 87          END IF;
+ 88  
+ 89          --dbms_output.put_line('Target SQL');
+ 90          --dbms_output.put_line(v_sql);
+ 91  
+ 92          OPEN r2 FOR v_sql;
+ 93  
+ 94          LOOP
+ 95              FETCH r2 INTO
+ 96                  v_decode,
+ 97                  v_code,
+ 98                  vdisp, 
+ 99                  V_E2B_CODE,
+100                  V_A2_CODE;
+101  
+102              EXIT WHEN r2%notfound;
+103  
+104              INSERT INTO mg_t_cl_info (
+105                  cl_name,
+106                  t_cl_code,
+107                  t_cl_decode,
+108                  t_cl_display,
+109                  t_cl_e2b_code,
+110                  t_a2_decode
+111              ) VALUES ( r1.cl_name,
+112                         v_code,
+113                         v_decode,
+114                         vdisp, 
+115                         V_E2B_CODE,
+116                         V_A2_CODE);
+117  
+118          END LOOP;
+119  
+120          CLOSE r2;
+121  
+122          /*updating active and status*/
+123          UPDATE mg_cl_master
+124          SET
+125              active = 1,
+126              status = 1
+127          WHERE
+128              cl_name = r1.cl_name;
+129  
+130      END LOOP;
+131  END;
+132  /
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.358
+SQL> 
+SQL> 
+SQL> TRUNCATE TABLE MG_CODELIST_MAP;
+
+Table MG_CODELIST_MAP truncated.
+
+Elapsed: 00:00:00.334
+SQL> INSERT INTO MG_CODELIST_MAP (CODELIST_TYPE, CL_NAME, S_CL_E2B_CODE,S_CL_E2B_DECODE, S_CL_CODE,S_CL_DECODE, MAPPING_TYPE, T_CL_CODE, T_CL_DECODE, T_CL_E2B_CODE, T_A2_DECODE, COMMENTS) 
+  2  WITH SRC1 AS (
+  3      SELECT distinct CODELIST_TYPE, CL_NAME, S_CL_CODE, S_CL_DECODE FROM MG_S_CL_INFO  WHERE CODELIST_TYPE = 'E2B' AND CL_NAME<>'Formulation' and cl_name <> 'Dose Units'
+  4  ),
+  5  SRC2 AS (
+  6      SELECT distinct CODELIST_TYPE, CL_NAME, S_CL_CODE, S_CL_DECODE FROM MG_S_CL_INFO  WHERE CODELIST_TYPE = 'Non_E2B' and cl_name <> 'Dose Units'
+  7      UNION
+  8      SELECT distinct CODELIST_TYPE, CL_NAME, S_CL_CODE, S_CL_DECODE FROM MG_S_CL_INFO WHERE CODELIST_TYPE = 'E2B' AND CL_NAME='Formulation' and cl_name <> 'Dose Units')
+  9  SELECT 'E2B',NVL(SRC.CL_NAME,TGT.CL_NAME),SRC.S_CL_CODE,SRC.S_CL_DECODE,NULL,NULL,
+ 10      CASE 
+ 11          WHEN SRC.CL_NAME IS NOT NULL AND TGT.CL_NAME IS NOT NULL THEN 'Exact Match'
+ 12          WHEN SRC.CL_NAME IS NOT NULL THEN 'Only in Source'
+ 13          ELSE 'Only in Target'
+ 14      END AS MAPPING_TYPE,TGT.T_CL_CODE,TGT.T_CL_DECODE,TGT.T_CL_E2B_CODE,TGT.T_A2_DECODE,
+ 15      CASE 
+ 16          WHEN SRC.S_CL_CODE IS NOT NULL THEN 'E2B Codelist Mapping using Tgt E2B Code'
+ 17         ELSE  'E2B Codelist Mapping using Tgt E2B decode' END
+ 18  FROM SRC1 SRC
+ 19  FULL OUTER JOIN (select * from MG_T_CL_INFO where cl_name <> 'Dose Units' ) TGT
+ 20  ON (
+ 21      UPPER(TRIM(SRC.CL_NAME)) = UPPER(TRIM(TGT.CL_NAME))
+ 22      AND (
+ 23          (SRC.S_CL_CODE IS NOT NULL 
+ 24              AND UPPER(LTRIM(TRIM(SRC.S_CL_CODE),'0')) = UPPER(LTRIM(TRIM(TGT.T_CL_E2B_CODE),'0')))
+ 25          OR
+ 26          (SRC.S_CL_CODE IS NULL 
+ 27              AND UPPER(TRIM(SRC.S_CL_DECODE)) = UPPER(TRIM(TGT.T_A2_DECODE)))
+ 28      )
+ 29  )
+ 30  /*
+ 31  UNION
+ 32  SELECT
+ 33  Case when nvl(src.cl_name,tgt.cl_name) = 'Formulation' then  'E2B' else 'Non_E2B'  end,
+ 34  NVL(SRC.CL_NAME,TGT.CL_NAME),NULL,NULL,SRC.S_CL_CODE,SRC.S_CL_DECODE,
+ 35      CASE 
+ 36          WHEN SRC.CL_NAME IS NOT NULL AND TGT.CL_NAME IS NOT NULL THEN 'Exact Match'
+ 37          WHEN SRC.CL_NAME IS NOT NULL THEN 'Only in Source'
+ 38          ELSE 'Only in Target'
+ 39      END AS MAPPING_TYPE,TGT.T_CL_CODE,TGT.T_CL_DECODE,TGT.T_CL_E2B_CODE,TGT.T_A2_DECODE,
+ 40      CASE 
+ 41          WHEN SRC.S_CL_CODE IS NOT NULL THEN 'Non_E2B Codelist Mapping using Tgt Code'
+ 42          when NVL(SRC.CL_NAME,TGT.CL_NAME )='Formulation' THEN 'E2B Mapping of formulation using only s_cl_decode and Tgt Decode'
+ 43         ELSE  'Non_E2B Codelist Mapping using Tgt decode' END
+ 44  FROM SRC2 SRC
+ 45  FULL OUTER JOIN  (select * from MG_T_CL_INFO where cl_name <> 'Dose Units' )  TGT
+ 46  ON (
+ 47      UPPER(TRIM(SRC.CL_NAME)) = UPPER(TRIM(TGT.CL_NAME))
+ 48      AND (
+ 49          (SRC.S_CL_CODE IS NOT NULL 
+ 50              AND UPPER(LTRIM(TRIM(SRC.S_CL_CODE),'0')) = UPPER(LTRIM(TRIM(TGT.T_CL_E2B_CODE),'0')))
+ 51          OR
+ 52          (SRC.S_CL_CODE IS NULL 
+ 53              AND UPPER(TRIM(SRC.S_CL_DECODE)) = UPPER(TRIM(TGT.T_CL_DECODE)))
+ 54      ))*/
+ 55  ;
+
+666 rows inserted.
+
+Elapsed: 00:00:00.323
+SQL> 
+SQL> COMMIT;
+
+Commit complete.
+
+Elapsed: 00:00:00.307
+SQL> -- Table Population Logic Ends Here
+SQL> 
+SQL> -- Log End Time
+SQL> SELECT TO_CHAR( SYSDATE, 'DD-MON-YYYY HH24:MI:SS' ) END_TIME FROM DUAL;
+
+END_TIME            
+--------------------
+21-MAY-2026 12:41:38
+
+Elapsed: 00:00:00.311
+SQL> 
+SQL> -- Echo Off
+SQL> SET ECHO OFF;
