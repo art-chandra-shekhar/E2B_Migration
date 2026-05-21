@@ -1,0 +1,142 @@
+SQL> 
+SQL> -- Log Start Time
+SQL> SELECT TO_CHAR( SYSDATE, 'DD-MON-YYYY HH24:MI:SS' ) START_TIME FROM DUAL;
+
+START_TIME          
+--------------------
+21-MAY-2026 05:25:12
+
+Elapsed: 00:00:00.317
+SQL> 
+SQL> 
+SQL> -- Table Population Logic Starts Here
+SQL> -- Source: f_mg_key_val unique pi_key values (PKG_MG_MIGRATION, PKG_MG_BUSS_RULES)
+SQL> 
+SQL> INSERT INTO MG_CASE_CONST_VAL(KEY,VALUE,SQL_QUERY)
+  2  VALUES (
+  3      'Migration Date',
+  4      '',
+  5      'SELECT TO_CHAR( SYSDATE, ''DD-MON-YYYY HH24:MI:SS'' ) FROM DUAL'
+  6  );
+
+1 row inserted.
+
+Elapsed: 00:00:00.333
+SQL> 
+SQL> INSERT INTO MG_CASE_CONST_VAL(KEY,VALUE,SQL_QUERY)
+  2  VALUES (
+  3      'Migration User Id',
+  4      '',
+  5      'SELECT USER_ID FROM ARGUS_APP.CFG_USERS WHERE USER_NAME = ''MIGRATION'' AND DELETED IS NULL'
+  6  );
+
+1 row inserted.
+
+Elapsed: 00:00:00.308
+SQL> 
+SQL> INSERT INTO MG_CASE_CONST_VAL(KEY,VALUE,SQL_QUERY)
+  2  VALUES (
+  3      'Site Id',
+  4      '',
+  5      'SELECT SITE_ID FROM ARGUS_APP.LM_SITES WHERE SITE_ABRV = ''IND'' AND DELETED IS NULL'
+  6  );
+
+1 row inserted.
+
+Elapsed: 00:00:00.305
+SQL> 
+SQL> INSERT INTO MG_CASE_CONST_VAL(KEY,VALUE,SQL_QUERY)
+  2  VALUES (
+  3      'Enterprise Id',
+  4      '',
+  5      'SELECT ENTERPRISE_ID FROM ARGUS_APP.CFG_ENTERPRISE WHERE ACTIVE = 1 AND DELETED IS NULL AND ROWNUM = 1'
+  6  );
+
+1 row inserted.
+
+Elapsed: 00:00:00.308
+SQL> 
+SQL> INSERT INTO MG_CASE_CONST_VAL(KEY,VALUE,SQL_QUERY)
+  2  VALUES (
+  3      'Database SID',
+  4      '',
+  5      'SELECT SYS_CONTEXT(''USERENV'', ''DB_NAME'') FROM DUAL'
+  6  );
+
+1 row inserted.
+
+Elapsed: 00:00:00.306
+SQL> 
+SQL> INSERT INTO MG_CASE_CONST_VAL(KEY,VALUE,SQL_QUERY)
+  2  VALUES (
+  3      'MedDRA Dict Id',
+  4      '',
+  5      'SELECT VALUE FROM ARGUS_APP.CMN_PROFILE WHERE KEY = ''AUTOE_P_E_TERM_DIC'''
+  6  );
+
+1 row inserted.
+
+Elapsed: 00:00:00.306
+SQL> 
+SQL> INSERT INTO MG_CASE_CONST_VAL(KEY,VALUE,SQL_QUERY)
+  2  VALUES (
+  3      'Causality Method',
+  4      '',
+  5      'SELECT METHOD_ID FROM ARGUS_APP.LM_CAUSALITY_METHOD WHERE DELETED IS NULL AND LOWER(METHOD) = ''global introspection'''
+  6  );
+
+1 row inserted.
+
+Elapsed: 00:00:00.304
+SQL> 
+SQL> INSERT INTO MG_CASE_CONST_VAL(KEY,VALUE,SQL_QUERY)
+  2  VALUES (
+  3      'Reported Source Causality',
+  4      '',
+  5      'SELECT SOURCE_ID FROM ARGUS_APP.LM_CAUSALITY_SOURCE WHERE SOURCE_TYPE = ''R'' AND UPPER(SOURCE) LIKE ''%REPORT%'' AND DELETED IS NULL AND ROWNUM = 1'
+  6  );
+
+1 row inserted.
+
+Elapsed: 00:00:00.306
+SQL> 
+SQL> INSERT INTO MG_CASE_CONST_VAL(KEY,VALUE,SQL_QUERY)
+  2  VALUES (
+  3      'Determined Source Causality',
+  4      '',
+  5      'SELECT SOURCE_ID FROM ARGUS_APP.LM_CAUSALITY_SOURCE WHERE SOURCE_TYPE = ''D'' AND UPPER(SOURCE) LIKE ''%COMP%'' AND DELETED IS NULL AND ROWNUM = 1'
+  6  );
+
+1 row inserted.
+
+Elapsed: 00:00:00.305
+SQL> 
+SQL> INSERT INTO MG_CASE_CONST_VAL(KEY,VALUE,SQL_QUERY)
+  2  VALUES (
+  3      'MKT_AUTH_HOLDER',
+  4      '',
+  5      'SELECT ''NOT SPECIFIED'' FROM DUAL'
+  6  );
+
+1 row inserted.
+
+Elapsed: 00:00:00.306
+SQL> 
+SQL> COMMIT;
+
+Commit complete.
+
+Elapsed: 00:00:00.311
+SQL> -- Table Population Logic Ends Here
+SQL> 
+SQL> -- Log End Time
+SQL> SELECT TO_CHAR( SYSDATE, 'DD-MON-YYYY HH24:MI:SS' ) END_TIME FROM DUAL;
+
+END_TIME            
+--------------------
+21-MAY-2026 05:25:17
+
+Elapsed: 00:00:00.305
+SQL> 
+SQL> -- Echo Off
+SQL> SET ECHO OFF;

@@ -11,6 +11,7 @@ It is intended as a practical reference so developers do not need to re-parse th
 ## Reference Inputs
 - DTD schema: `ich-icsr-v2_1.dtd`
 - Sample instance: `testdata/ich-icsr-v2-1-testdata.sgm`
+- DTD → ESM / `S_*` table mapping: `E2B_R2_DTD_ESM_Table_Mapping.md`
 
 ## Core Hierarchy (DTD-Driven)
 

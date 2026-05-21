@@ -3,9 +3,9 @@ SQL> SELECT TO_CHAR( SYSDATE, 'DD-MON-YYYY HH24:MI:SS' ) START_TIME FROM DUAL;
 
 START_TIME          
 --------------------
-14-MAY-2026 18:18:59
+21-MAY-2026 05:20:36
 
-Elapsed: 00:00:00.343
+Elapsed: 00:00:00.315
 SQL> 
 SQL> 
 SQL> CREATE USER &&STG_USER IDENTIFIED BY &&STG_PASS
@@ -23,7 +23,7 @@ new:CREATE USER MG_STG_TST IDENTIFIED BY MG_STG_TST
 
 User MG_STG_TST created.
 
-Elapsed: 00:00:00.403
+Elapsed: 00:00:00.371
 SQL> 
 SQL> -- CONNECT includes CREATE SESSION; RESOURCE is legacy (includes some object privs).
 SQL> GRANT CONNECT TO &&STG_USER;
@@ -32,14 +32,14 @@ new:GRANT CONNECT TO MG_STG_TST
 
 Grant succeeded.
 
-Elapsed: 00:00:00.361
+Elapsed: 00:00:00.347
 SQL> GRANT RESOURCE TO &&STG_USER;
 old:GRANT RESOURCE TO &&STG_USER
 new:GRANT RESOURCE TO MG_STG_TST
 
 Grant succeeded.
 
-Elapsed: 00:00:00.337
+Elapsed: 00:00:00.308
 SQL> 
 SQL> -- Object privileges in own schema.
 SQL> GRANT CREATE TABLE TO &&STG_USER;
@@ -48,7 +48,7 @@ new:GRANT CREATE TABLE TO MG_STG_TST
 
 Grant succeeded.
 
-Elapsed: 00:00:00.341
+Elapsed: 00:00:00.307
 SQL> -- In Oracle, CREATE PROCEDURE covers procedures, functions, and packages in your schema.
 SQL> GRANT CREATE PROCEDURE TO &&STG_USER;
 old:GRANT CREATE PROCEDURE TO &&STG_USER
@@ -56,7 +56,7 @@ new:GRANT CREATE PROCEDURE TO MG_STG_TST
 
 Grant succeeded.
 
-Elapsed: 00:00:00.338
+Elapsed: 00:00:00.305
 SQL> 
 SQL> -- =============================================================================
 SQL> -- Read-only: SELECT on tables, views, and materialized views in ARGUS_APP and
@@ -138,7 +138,7 @@ Skip/fail: ARGUS_APP.JOBS_ON_SERVER_VU - ORA-01720: grant option does not exist 
 
 PL/SQL procedure successfully completed.
 
-Elapsed: 00:00:09.985
+Elapsed: 00:00:09.044
 SQL> 
 SQL> -- Sequences: SELECT allows CURRVAL/NEXTVAL for read-oriented jobs.
 SQL> DECLARE
@@ -200,7 +200,7 @@ END;
 
 PL/SQL procedure successfully completed.
 
-Elapsed: 00:00:01.633
+Elapsed: 00:00:01.583
 SQL> 
 SQL> -- =============================================================================
 SQL> -- EXECUTE on common SYS-owned DBMS_* packages (extend as needed).
@@ -212,7 +212,7 @@ new:GRANT EXECUTE ON SYS.DBMS_RANDOM             TO MG_STG_TST
 
 Grant succeeded.
 
-Elapsed: 00:00:00.344
+Elapsed: 00:00:00.312
 SQL> 
 SQL> -- =============================================================================
 SQL> -- Notes
@@ -237,35 +237,35 @@ new:GRANT DELETE, INSERT, SELECT, UPDATE ON ARGUS_APP.CASE_E2BATTACHMENT_STATUS 
 
 Grant succeeded.
 
-Elapsed: 00:00:00.340
+Elapsed: 00:00:00.317
 SQL> GRANT DELETE, INSERT, SELECT, UPDATE ON ARGUS_APP.USER_CASE_ASSIGNMENT TO &&STG_USER;
 old:GRANT DELETE, INSERT, SELECT, UPDATE ON ARGUS_APP.USER_CASE_ASSIGNMENT TO &&STG_USER
 new:GRANT DELETE, INSERT, SELECT, UPDATE ON ARGUS_APP.USER_CASE_ASSIGNMENT TO MG_STG_TST
 
 Grant succeeded.
 
-Elapsed: 00:00:00.337
+Elapsed: 00:00:00.309
 SQL> GRANT DELETE, INSERT, SELECT, UPDATE ON ARGUS_APP.CMN_AUDIT_LOG TO &&STG_USER;
 old:GRANT DELETE, INSERT, SELECT, UPDATE ON ARGUS_APP.CMN_AUDIT_LOG TO &&STG_USER
 new:GRANT DELETE, INSERT, SELECT, UPDATE ON ARGUS_APP.CMN_AUDIT_LOG TO MG_STG_TST
 
 Grant succeeded.
 
-Elapsed: 00:00:00.344
+Elapsed: 00:00:00.308
 SQL> GRANT DELETE, INSERT, SELECT, UPDATE ON ARGUS_APP.CASE_NULL_FLAVOR TO &&STG_USER;
 old:GRANT DELETE, INSERT, SELECT, UPDATE ON ARGUS_APP.CASE_NULL_FLAVOR TO &&STG_USER
 new:GRANT DELETE, INSERT, SELECT, UPDATE ON ARGUS_APP.CASE_NULL_FLAVOR TO MG_STG_TST
 
 Grant succeeded.
 
-Elapsed: 00:00:00.340
+Elapsed: 00:00:00.312
 SQL> GRANT DELETE, INSERT, SELECT, UPDATE ON ARGUS_APP.USER_CASE_PROCESSING_TIME TO &&STG_USER;
 old:GRANT DELETE, INSERT, SELECT, UPDATE ON ARGUS_APP.USER_CASE_PROCESSING_TIME TO &&STG_USER
 new:GRANT DELETE, INSERT, SELECT, UPDATE ON ARGUS_APP.USER_CASE_PROCESSING_TIME TO MG_STG_TST
 
 Grant succeeded.
 
-Elapsed: 00:00:00.338
+Elapsed: 00:00:00.312
 SQL> 
 SQL> -- =============================================================================
 SQL> -- EXECUTE on ARGUS packages (extend as needed).
@@ -276,15 +276,15 @@ new:GRANT EXECUTE ON VPD_ADMIN.PKG_RLS TO MG_STG_TST
 
 Grant succeeded.
 
-Elapsed: 00:00:00.341
+Elapsed: 00:00:00.308
 SQL> 
 SQL> 
 SQL> SELECT TO_CHAR( SYSDATE, 'DD-MON-YYYY HH24:MI:SS' ) END_TIME FROM DUAL;
 
 END_TIME            
 --------------------
-14-MAY-2026 18:19:21
+21-MAY-2026 05:20:56
 
-Elapsed: 00:00:00.337
+Elapsed: 00:00:00.304
 SQL> 
 SQL> SET ECHO OFF;

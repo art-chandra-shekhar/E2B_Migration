@@ -1,0 +1,82 @@
+SQL> 
+SQL> -- Log Start Time
+SQL> SELECT TO_CHAR( SYSDATE, 'DD-MON-YYYY HH24:MI:SS' ) START_TIME FROM DUAL;
+
+START_TIME          
+--------------------
+21-MAY-2026 05:26:05
+
+Elapsed: 00:00:00.317
+SQL> 
+SQL> 
+SQL> -- Table Population Logic Starts Here
+SQL> TRUNCATE TABLE MG_CASE_LIST;
+
+Table MG_CASE_LIST truncated.
+
+Elapsed: 00:00:00.311
+SQL> 
+SQL> INSERT INTO MG_CASE_LIST (SCASENUM)
+  2  SELECT SAFETYREPORTID FROM S_SAFETYREPORT;
+
+9 rows inserted.
+
+Elapsed: 00:00:00.323
+SQL> 
+SQL> 
+SQL> -- Add TCASENUM, TCASEID, STATUS, ERRORS, WARNINGS, EXEC_THREAD_ID
+SQL> DECLARE
+  2      v_tcaseid NUMBER;
+  3      v_tcasenum VARCHAR2(2000);
+  4  
+  5      /* Update below values as per Project Requirements */
+  6      v_status NUMBER := 0;
+  7      v_errors NUMBER := 0;
+  8      v_warnings NUMBER := 0;
+  9      v_exec_thread_id NUMBER := 1;
+ 10      /* End of Project Requirements */
+ 11  
+ 12      CURSOR c_case_master IS
+ 13          SELECT SAFETYREPORTID FROM S_SAFETYREPORT;
+ 14  BEGIN
+ 15      FOR rec IN c_case_master LOOP
+ 16          -- Get next case id
+ 17          --SELECT ARGUS_APP.S_CASE_MASTE_CASE_ID.NEXTVAL INTO v_tcaseid FROM DUAL;
+ 18  
+ 19          -- Get next case number
+ 20          --SELECT ARGUS_APP.S_CASE_MASTE_CASE_NUM.NEXTVAL INTO v_tcasenum FROM DUAL;
+ 21  
+ 22          UPDATE MG_CASE_LIST
+ 23             SET TCASENUM = v_tcasenum,
+ 24                 TCASEID = v_tcaseid, 
+ 25                 STATUS = v_status, 
+ 26                 ERRORS = v_errors, 
+ 27                 WARNINGS = v_warnings, 
+ 28                 EXEC_THREAD_ID = v_exec_thread_id 
+ 29           WHERE SCASENUM = rec.SAFETYREPORTID;
+ 30      END LOOP;
+ 31  END;
+ 32  /
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.325
+SQL> 
+SQL> COMMIT;
+
+Commit complete.
+
+Elapsed: 00:00:00.308
+SQL> -- Table Population Logic Ends Here
+SQL> 
+SQL> -- Log End Time
+SQL> SELECT TO_CHAR( SYSDATE, 'DD-MON-YYYY HH24:MI:SS' ) END_TIME FROM DUAL;
+
+END_TIME            
+--------------------
+21-MAY-2026 05:26:08
+
+Elapsed: 00:00:00.306
+SQL> 
+SQL> -- Echo Off
+SQL> SET ECHO OFF;
