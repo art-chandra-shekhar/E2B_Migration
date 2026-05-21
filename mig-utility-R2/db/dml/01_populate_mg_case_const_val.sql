@@ -1,0 +1,107 @@
+-- Populate MG_CASE_CONST_VAL from source.
+-- Spool: db/logs/sql/01_populate_mg_case_const_val.LOG (path is relative to SQL*Plus cwd;
+--         run from db/dml or db/run, or override: DEFINE spool_log_dir = '/your/path' before @)
+
+SET ECHO ON;
+SET TIMING ON;
+SET TIME ON;
+
+col START_TIME HEADING "START_TIME"
+col START_TIME format A20
+col END_TIME HEADING "END_TIME"
+col END_TIME format A20
+
+-- Define Spool Log Directory
+DEFINE spool_log_dir = '../logs/sql'
+
+-- Spool Log File
+SPOOL &spool_log_dir./01_populate_mg_case_const_val.LOG
+
+-- Log Start Time
+SELECT TO_CHAR( SYSDATE, 'DD-MON-YYYY HH24:MI:SS' ) START_TIME FROM DUAL;
+
+
+-- Table Population Logic Starts Here
+-- Source: f_mg_key_val unique pi_key values (PKG_MG_MIGRATION, PKG_MG_BUSS_RULES)
+
+INSERT INTO MG_CASE_CONST_VAL(KEY,VALUE,SQL_QUERY)
+VALUES (
+    'Migration Date',
+    '',
+    'SELECT TO_CHAR( SYSDATE, ''DD-MON-YYYY HH24:MI:SS'' ) FROM DUAL'
+);
+
+INSERT INTO MG_CASE_CONST_VAL(KEY,VALUE,SQL_QUERY)
+VALUES (
+    'Migration User Id',
+    '',
+    'SELECT USER_ID FROM ARGUS_APP.CFG_USERS WHERE USER_NAME = ''MIGRATION'' AND DELETED IS NULL'
+);
+
+INSERT INTO MG_CASE_CONST_VAL(KEY,VALUE,SQL_QUERY)
+VALUES (
+    'Site Id',
+    '',
+    'SELECT SITE_ID FROM ARGUS_APP.LM_SITES WHERE SITE_ABRV = ''IND'' AND DELETED IS NULL'
+);
+
+INSERT INTO MG_CASE_CONST_VAL(KEY,VALUE,SQL_QUERY)
+VALUES (
+    'Enterprise Id',
+    '',
+    'SELECT ENTERPRISE_ID FROM ARGUS_APP.CFG_ENTERPRISE WHERE ACTIVE = 1 AND DELETED IS NULL AND ROWNUM = 1'
+);
+
+INSERT INTO MG_CASE_CONST_VAL(KEY,VALUE,SQL_QUERY)
+VALUES (
+    'Database SID',
+    '',
+    'SELECT SYS_CONTEXT(''USERENV'', ''DB_NAME'') FROM DUAL'
+);
+
+INSERT INTO MG_CASE_CONST_VAL(KEY,VALUE,SQL_QUERY)
+VALUES (
+    'MedDRA Dict Id',
+    '',
+    'SELECT VALUE FROM ARGUS_APP.CMN_PROFILE WHERE KEY = ''AUTOE_P_E_TERM_DIC'''
+);
+
+INSERT INTO MG_CASE_CONST_VAL(KEY,VALUE,SQL_QUERY)
+VALUES (
+    'Causality Method',
+    '',
+    'SELECT METHOD_ID FROM ARGUS_APP.LM_CAUSALITY_METHOD WHERE DELETED IS NULL AND LOWER(METHOD) = ''global introspection'''
+);
+
+INSERT INTO MG_CASE_CONST_VAL(KEY,VALUE,SQL_QUERY)
+VALUES (
+    'Reported Source Causality',
+    '',
+    'SELECT SOURCE_ID FROM ARGUS_APP.LM_CAUSALITY_SOURCE WHERE SOURCE_TYPE = ''R'' AND UPPER(SOURCE) LIKE ''%REPORT%'' AND DELETED IS NULL AND ROWNUM = 1'
+);
+
+INSERT INTO MG_CASE_CONST_VAL(KEY,VALUE,SQL_QUERY)
+VALUES (
+    'Determined Source Causality',
+    '',
+    'SELECT SOURCE_ID FROM ARGUS_APP.LM_CAUSALITY_SOURCE WHERE SOURCE_TYPE = ''D'' AND UPPER(SOURCE) LIKE ''%COMP%'' AND DELETED IS NULL AND ROWNUM = 1'
+);
+
+INSERT INTO MG_CASE_CONST_VAL(KEY,VALUE,SQL_QUERY)
+VALUES (
+    'MKT_AUTH_HOLDER',
+    '',
+    'SELECT ''NOT SPECIFIED'' FROM DUAL'
+);
+
+COMMIT;
+-- Table Population Logic Ends Here
+
+-- Log End Time
+SELECT TO_CHAR( SYSDATE, 'DD-MON-YYYY HH24:MI:SS' ) END_TIME FROM DUAL;
+
+-- Echo Off
+SET ECHO OFF;
+
+-- Spool Off    
+SPOOL OFF;
