@@ -1,5 +1,225 @@
 create or replace PACKAGE BODY pkg_mg_buss_rules IS
 
+    PROCEDURE p_meddra_map_code (
+        pi_source        IN VARCHAR2,
+        pi_llt_code      IN NUMBER,
+        pi_pt_code       IN NUMBER,
+        pi_llt_name      IN VARCHAR2,
+        pi_pref_term     IN VARCHAR2,
+        pi_reported_term IN VARCHAR2,
+        po_llt_code      OUT NUMBER,
+        po_llt_name      OUT VARCHAR2,
+        po_pt_code       OUT NUMBER,
+        po_pt_name       OUT VARCHAR2,
+        po_hlt_code      OUT NUMBER,
+        po_hlt_name      OUT VARCHAR2,
+        po_hlgt_code     OUT NUMBER,
+        po_hlgt_name     OUT VARCHAR2,
+        po_soc_code      OUT NUMBER,
+        po_soc_name      OUT VARCHAR2,
+        po_code_status   OUT NUMBER,
+        po_dict_id       OUT NUMBER
+    ) AS
+    BEGIN
+        BEGIN
+            SELECT
+                mmh.soc_code,
+                mmh.soc_name,
+                mmh.hlgt_code,
+                mmh.hlgt_name,
+                mmh.hlt_code,
+                mmh.hlt_name,
+                mmh.pt_code,
+                mmh.pt_name,
+                mptl.llt_code,
+                mptl.llt_name_english
+            INTO
+                po_soc_code,
+                po_soc_name,
+                po_hlgt_code,
+                po_hlgt_name,
+                po_hlt_code,
+                po_hlt_name,
+                po_pt_code,
+                po_pt_name,
+                po_llt_code,
+                po_llt_name
+            FROM
+                tmeddra_md_hierarchy  mmh,
+                tmeddra_pref_term_llt mptl
+            WHERE
+                    mmh.pt_code = mptl.pt_code
+                AND mptl.llt_code = pi_llt_code
+                AND mmh.pt_code = pi_pt_code
+                AND mmh.primary_soc_fg = 'Y'
+                AND mptl.llt_currency = 'Y';
+ 
+            po_dict_id := pkg_mg_util.f_mg_key_val('MedDRA Dict Id');
+            po_code_status := 1;
+        EXCEPTION
+            WHEN no_data_found OR too_many_rows THEN
+                po_code_status := 0;
+                po_dict_id := NULL;
+        END;
+ 
+        IF po_code_status = 0 THEN
+            BEGIN
+                SELECT
+                    mmh.soc_code,
+                    mmh.soc_name,
+                    mmh.hlgt_code,
+                    mmh.hlgt_name,
+                    mmh.hlt_code,
+                    mmh.hlt_name,
+                    mmh.pt_code,
+                    mmh.pt_name,
+                    mptl.llt_code,
+                    mptl.llt_name_english
+                INTO
+                    po_soc_code,
+                    po_soc_name,
+                    po_hlgt_code,
+                    po_hlgt_name,
+                    po_hlt_code,
+                    po_hlt_name,
+                    po_pt_code,
+                    po_pt_name,
+                    po_llt_code,
+                    po_llt_name
+                FROM
+                    tmeddra_md_hierarchy  mmh,
+                    tmeddra_pref_term_llt mptl
+                WHERE
+                        mmh.pt_code = mptl.pt_code
+                    AND mptl.llt_code = pi_llt_code
+                  --AND mmh.pt_code  = pi_pt_code
+                    AND mmh.primary_soc_fg = 'Y'
+                    AND mptl.llt_currency = 'Y';
+ 
+                po_dict_id := pkg_mg_util.f_mg_key_val('MedDRA Dict Id');
+                po_code_status := 1;
+            EXCEPTION
+                WHEN no_data_found OR too_many_rows THEN
+                    po_code_status := 0;
+                    po_dict_id := NULL;
+            END;
+ 
+        END IF;
+ 
+        IF
+            po_code_status = 0
+            AND pi_llt_name IS NOT NULL
+        THEN
+            BEGIN
+                SELECT
+                    mmh.soc_code,
+                    mmh.soc_name,
+                    mmh.hlgt_code,
+                    mmh.hlgt_name,
+                    mmh.hlt_code,
+                    mmh.hlt_name,
+                    mmh.pt_code,
+                    mmh.pt_name,
+                    mptl.llt_code,
+                    mptl.llt_name_english
+                INTO
+                    po_soc_code,
+                    po_soc_name,
+                    po_hlgt_code,
+                    po_hlgt_name,
+                    po_hlt_code,
+                    po_hlt_name,
+                    po_pt_code,
+                    po_pt_name,
+                    po_llt_code,
+                    po_llt_name
+                FROM
+                    tmeddra_md_hierarchy  mmh,
+                    tmeddra_pref_term_llt mptl
+                WHERE
+                        mmh.pt_code = mptl.pt_code
+                    AND upper(trim(mptl.llt_name_english)) = upper(trim(pi_llt_name))
+--                  AND mmh.pt_code  = pi_pt_code
+                    AND mmh.primary_soc_fg = 'Y'
+                    AND mptl.llt_currency = 'Y';
+ 
+                po_dict_id := pkg_mg_util.f_mg_key_val('MedDRA Dict Id');
+                po_code_status := 1;
+            EXCEPTION
+                WHEN no_data_found OR too_many_rows THEN
+                    po_code_status := 0;
+                    po_dict_id := NULL;
+            END;
+        END IF;
+ 
+        IF
+            po_code_status = 0
+            AND pi_pref_term IS NOT NULL
+        THEN
+            BEGIN
+                SELECT
+                    mmh.soc_code,
+                    mmh.soc_name,
+                    mmh.hlgt_code,
+                    mmh.hlgt_name,
+                    mmh.hlt_code,
+                    mmh.hlt_name,
+                    mmh.pt_code,
+                    mmh.pt_name,
+                    mptl.llt_code,
+                    mptl.llt_name_english
+                INTO
+                    po_soc_code,
+                    po_soc_name,
+                    po_hlgt_code,
+                    po_hlgt_name,
+                    po_hlt_code,
+                    po_hlt_name,
+                    po_pt_code,
+                    po_pt_name,
+                    po_llt_code,
+                    po_llt_name
+                FROM
+                    tmeddra_md_hierarchy  mmh,
+                    tmeddra_pref_term_llt mptl
+                WHERE
+                        mmh.pt_code = mptl.pt_code
+                    AND upper(trim(mmh.pt_name)) = upper(trim(pi_pref_term))
+--                  AND mmh.pt_code  = pi_pt_code
+                    AND mmh.primary_soc_fg = 'Y'
+                    AND mptl.llt_currency = 'Y';
+ 
+                po_dict_id := pkg_mg_util.f_mg_key_val('MedDRA Dict Id');
+                po_code_status := 1;
+            EXCEPTION
+                WHEN no_data_found OR too_many_rows THEN
+                    po_code_status := 0;
+                    po_dict_id := NULL;
+            END;
+        END IF;
+ 
+    EXCEPTION
+        WHEN no_data_found THEN
+            po_code_status := 0;
+            pkg_mg_util.p_mg_log_message(
+                pi_scase_num    => pkg_mg_util.g_scase_num,
+                pi_tcase_id     => pkg_mg_util.g_tcase_id,
+                pi_message_type => 'WARNING',
+                pi_message      => 'MedDRA Mapping Not Found - LLT Code For Source->'
+                              || pi_source
+                              || ' in'
+                              || pi_llt_name
+                              || ', PT Code'
+                              || pi_pref_term,
+                pi_thread_id    => NULL,
+                pi_date_time    => systimestamp
+            );
+ 
+ 
+        WHEN OTHERS THEN
+            raise_application_error(-20003, NULL);
+    END p_meddra_map_code;
+    
     PROCEDURE p_meddra_map_br001 (
         pi_source        IN VARCHAR2,
         pi_llt_name      IN VARCHAR2,

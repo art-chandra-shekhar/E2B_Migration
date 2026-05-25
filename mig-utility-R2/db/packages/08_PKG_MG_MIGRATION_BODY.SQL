@@ -557,42 +557,54 @@ AND CASE_NUMber=SRC_CASE_NUM;
             v_case_pat_hist(v_index).case_id := pi_tcase_id;
             v_case_pat_hist(v_index).seq_num := pkg_mg_util.f_mg_seq_num('CASE_PAT_HIST', 'SEQ_NUM');
             v_case_pat_hist(v_index).enterprise_id := pkg_mg_util.f_mg_key_val('Enterprise Id');
+
             v_case_pat_hist(v_index).indication := v_row.patientdrugindication;
+            
+            pkg_mg_buss_rules.p_meddra_map_code (
+                pi_source        => 'INDICATION',
+                pi_llt_code      => v_row.patientdrugindication,
+                pi_pt_code       => v_row.patientdrugindication,
+                pi_llt_name      => v_row.patientdrugindication,
+                pi_pref_term     => v_row.patientdrugindication,
+                pi_reported_term => v_row.patientdrugindication,
+                po_llt_code      => v_case_pat_hist(v_index).ind_llt_code,
+                po_llt_name      => v_case_pat_hist(v_index).ind_llt,
+                po_pt_code       => v_case_pat_hist(v_index).ind_pt_code, 
+                po_pt_name       => v_case_pat_hist(v_index).ind_coded,
+                po_hlt_code      => v_case_pat_hist(v_index).ind_hlt_code,
+                po_hlt_name      => v_case_pat_hist(v_index).ind_hlt,
+                po_hlgt_code     => v_case_pat_hist(v_index).ind_hlgt_code,
+                po_hlgt_name     => v_case_pat_hist(v_index).ind_hlgt,
+                po_soc_code      => v_case_pat_hist(v_index).ind_soc_code,
+                po_soc_name      => v_case_pat_hist(v_index).ind_soc,
+                po_code_status   => v_case_pat_hist(v_index).ind_code_status,
+                po_dict_id       => v_case_pat_hist(v_index).ind_dict_id
+            );
+               
+
             v_case_pat_hist(v_index).reaction := v_row.patientdrugreaction;
-            pkg_mg_buss_rules.p_meddra_map_br001('INDICATION',
-                                                 v_row.patientdrugindication,
-                                                 v_row.patientdrugindication,
-                                                 v_row.patientdrugindication,
-                                                 v_case_pat_hist(v_index).ind_llt_code,
-                                                 v_case_pat_hist(v_index).ind_llt,
-                                                 v_case_pat_hist(v_index).ind_pt_code,
-                                                 v_case_pat_hist(v_index).ind_coded,
-                                                 v_case_pat_hist(v_index).ind_hlt_code,
-                                                 v_case_pat_hist(v_index).ind_hlt,
-                                                 v_case_pat_hist(v_index).ind_hlgt_code,
-                                                 v_case_pat_hist(v_index).ind_hlgt,
-                                                 v_case_pat_hist(v_index).ind_soc_code,
-                                                 v_case_pat_hist(v_index).ind_soc,
-                                                 v_case_pat_hist(v_index).ind_code_status,
-                                                 v_case_pat_hist(v_index).ind_dict_id);
 
-            pkg_mg_buss_rules.p_meddra_map_br001('REACTION',
-                                                 v_row.patientdrugreaction,
-                                                 v_row.patientdrugreaction,
-                                                 v_row.patientdrugreaction,
-                                                 v_case_pat_hist(v_index).ind_llt_code,
-                                                 v_case_pat_hist(v_index).ind_llt,
-                                                 v_case_pat_hist(v_index).ind_pt_code,
-                                                 v_case_pat_hist(v_index).ind_coded,
-                                                 v_case_pat_hist(v_index).ind_hlt_code,
-                                                 v_case_pat_hist(v_index).ind_hlt,
-                                                 v_case_pat_hist(v_index).ind_hlgt_code,
-                                                 v_case_pat_hist(v_index).ind_hlgt,
-                                                 v_case_pat_hist(v_index).ind_soc_code,
-                                                 v_case_pat_hist(v_index).ind_soc,
-                                                 v_case_pat_hist(v_index).ind_code_status,
-                                                 v_case_pat_hist(v_index).ind_dict_id);
-
+            pkg_mg_buss_rules.p_meddra_map_code (
+                pi_source        => 'REACTION',
+                pi_llt_code      => v_row.patientdrugreaction,
+                pi_pt_code       => v_row.patientdrugreaction,
+                pi_llt_name      => v_row.patientdrugreaction,
+                pi_pref_term     => v_row.patientdrugreaction,
+                pi_reported_term => v_row.patientdrugreaction,
+                po_llt_code      => v_case_pat_hist(v_index).react_llt_code,
+                po_llt_name      => v_case_pat_hist(v_index).react_llt,
+                po_pt_code       => v_case_pat_hist(v_index).react_pt_code, 
+                po_pt_name       => v_case_pat_hist(v_index).react_coded,
+                po_hlt_code      => v_case_pat_hist(v_index).react_hlt_code,
+                po_hlt_name      => v_case_pat_hist(v_index).react_hlt,
+                po_hlgt_code     => v_case_pat_hist(v_index).react_hlgt_code,
+                po_hlgt_name     => v_case_pat_hist(v_index).react_hlgt,
+                po_soc_code      => v_case_pat_hist(v_index).react_soc_code,
+                po_soc_name      => v_case_pat_hist(v_index).react_soc,
+                po_code_status   => v_case_pat_hist(v_index).react_code_status,
+                po_dict_id       => v_case_pat_hist(v_index).react_dict_id
+            );
+               
             pkg_mg_buss_rules.p_get_partial_date('PATIENTPASTDRUGTHERAPY',
                                                  v_row.patientdrugstartdateformat,
                                                  v_row.patientdrugstartdate,
@@ -634,28 +646,32 @@ AND CASE_NUMber=SRC_CASE_NUM;
             v_case_pat_hist(v_index).condition := v_row.patientepisodename;
             v_case_pat_hist(v_index).note := v_row.patientmedicalcomment;
             v_case_pat_hist(v_index).continue :=
-                CASE
-                    WHEN v_row.patientmedicalcontinue = 1 THEN
-                        1
-                    ELSE 0
-                END;
+            CASE
+                WHEN v_row.patientmedicalcontinue = 1 THEN
+                    1
+                ELSE 0
+            END;
 
-            pkg_mg_buss_rules.p_meddra_map_br001('Medical History Item',
-                                                 v_row.patientepisodename,
-                                                 v_row.patientepisodename,
-                                                 v_row.patientepisodename,
-                                                 v_case_pat_hist(v_index).item_llt_code,
-                                                 v_case_pat_hist(v_index).item_llt,
-                                                 v_case_pat_hist(v_index).item_code,
-                                                 v_case_pat_hist(v_index).item_coded,
-                                                 v_case_pat_hist(v_index).item_hlt_code,
-                                                 v_case_pat_hist(v_index).item_hlt,
-                                                 v_case_pat_hist(v_index).item_hlgt_code,
-                                                 v_case_pat_hist(v_index).item_hlgt,
-                                                 v_case_pat_hist(v_index).item_soc_code,
-                                                 v_case_pat_hist(v_index).item_soc,
-                                                 v_case_pat_hist(v_index).item_code_status,
-                                                 v_case_pat_hist(v_index).item_dict);
+            pkg_mg_buss_rules.p_meddra_map_code (
+                pi_source        => 'Medical History Item',
+                pi_llt_code      => v_row.patientepisodename,
+                pi_pt_code       => v_row.patientepisodename,
+                pi_llt_name      => v_row.patientepisodename,
+                pi_pref_term     => v_row.patientepisodename,
+                pi_reported_term => v_row.patientepisodename,
+                po_llt_code      => v_case_pat_hist(v_index).item_llt_code,
+                po_llt_name      => v_case_pat_hist(v_index).item_llt,
+                po_pt_code       => v_case_pat_hist(v_index).item_code, 
+                po_pt_name       => v_case_pat_hist(v_index).item_coded,
+                po_hlt_code      => v_case_pat_hist(v_index).item_hlt_code,
+                po_hlt_name      => v_case_pat_hist(v_index).item_hlt,
+                po_hlgt_code     => v_case_pat_hist(v_index).item_hlgt_code,
+                po_hlgt_name     => v_case_pat_hist(v_index).item_hlgt,
+                po_soc_code      => v_case_pat_hist(v_index).item_soc_code,
+                po_soc_name      => v_case_pat_hist(v_index).item_soc,
+                po_code_status   => v_case_pat_hist(v_index).item_code_status,
+                po_dict_id       => v_case_pat_hist(v_index).item_dict
+            );
 
             pkg_mg_buss_rules.p_get_partial_date('MEDICALHISTORYEPISODE-Start_Date',
                                                  v_row.patientmedicalstartdateformat,
@@ -761,22 +777,27 @@ AND CASE_NUMber=SRC_CASE_NUM;
             v_case_lab_data(v_index).info_available := v_row.moreinformation;
             v_case_lab_data(v_index).enterprise_id := pkg_mg_util.f_mg_key_val('Enterprise Id');
             v_case_lab_data(v_index).multi_event_exists := NULL;
-            pkg_mg_buss_rules.p_meddra_map_br001('Lab Data',
-                                                 NULL,
-                                                 v_row.testname,
-                                                 NULL,
-                                                 v_case_lab_data(v_index).llt_code,
-                                                 v_case_lab_data(v_index).llt,
-                                                 v_case_lab_data(v_index).pt_code,
-                                                 v_case_lab_data(v_index).lab_test_name,
-                                                 v_case_lab_data(v_index).hlt_code,
-                                                 v_case_lab_data(v_index).hlt,
-                                                 v_case_lab_data(v_index).hlgt_code,
-                                                 v_case_lab_data(v_index).hlgt,
-                                                 v_case_lab_data(v_index).soc_code,
-                                                 v_case_lab_data(v_index).soc,
-                                                 v_case_lab_data(v_index).code_status,
-                                                 v_case_lab_data(v_index).dict_id);
+
+            pkg_mg_buss_rules.p_meddra_map_code (
+                pi_source        => 'Lab Data',
+                pi_llt_code      => v_row.testname,
+                pi_pt_code       => v_row.testname,
+                pi_llt_name      => v_row.testname,
+                pi_pref_term     => v_row.testname,
+                pi_reported_term => v_row.testname,
+                po_llt_code      => v_case_lab_data(v_index).llt_code,
+                po_llt_name      => v_case_lab_data(v_index).llt,
+                po_pt_code       => v_case_lab_data(v_index).pt_code, 
+                po_pt_name       => v_case_lab_data(v_index).lab_test_name,
+                po_hlt_code      => v_case_lab_data(v_index).hlt_code,
+                po_hlt_name      => v_case_lab_data(v_index).hlt,
+                po_hlgt_code     => v_case_lab_data(v_index).hlgt_code,
+                po_hlgt_name     => v_case_lab_data(v_index).hlgt,
+                po_soc_code      => v_case_lab_data(v_index).soc_code,
+                po_soc_name      => v_case_lab_data(v_index).soc,
+                po_code_status   => v_case_lab_data(v_index).code_status,
+                po_dict_id       => v_case_lab_data(v_index).dict_id
+            );
 
             pkg_mg_buss_rules.p_get_partial_date('Lab Data',             --changed sn
                                                  v_row.testdateformat,
@@ -1157,22 +1178,27 @@ AND CASE_NUMber=SRC_CASE_NUM;
                 END;
 
             v_case_event(v_index).enterprise_id := pkg_mg_util.f_mg_key_val('Enterprise Id');
-            pkg_mg_buss_rules.p_meddra_map_br001('Event',
-                                                 v_row.reactionmeddrallt,
-                                                 v_row.preferred_term,
-                                                 v_row.reported_term,
-                                                 v_case_event(v_index).inc_code,
-                                                 v_case_event(v_index).inc_term,
-                                                 v_case_event(v_index).art_code,
-                                                 v_case_event(v_index).pref_term,
-                                                 v_case_event(v_index).hlt_code,
-                                                 v_case_event(v_index).hlt,
-                                                 v_case_event(v_index).hlgt_code,
-                                                 v_case_event(v_index).hlgt,
-                                                 v_case_event(v_index).soc_code,
-                                                 v_case_event(v_index).body_sys,
-                                                 v_case_event(v_index).code_status,
-                                                 v_case_event(v_index).dict_id);
+
+            pkg_mg_buss_rules.p_meddra_map_code (
+                pi_source        => 'Event',
+                pi_llt_code      => v_row.reactionmeddrallt,
+                pi_pt_code       => v_row.preferred_term,
+                pi_llt_name      => v_row.reactionmeddrallt,
+                pi_pref_term     => v_row.preferred_term,
+                pi_reported_term => v_row.reported_term,
+                po_llt_code      => v_case_event(v_index).inc_code,
+                po_llt_name      => v_case_event(v_index).inc_term,
+                po_pt_code       => v_case_event(v_index).art_code, 
+                po_pt_name       => v_case_event(v_index).pref_term,
+                po_hlt_code      => v_case_event(v_index).hlt_code,
+                po_hlt_name      => v_case_event(v_index).hlt,
+                po_hlgt_code     => v_case_event(v_index).hlgt_code,
+                po_hlgt_name     => v_case_event(v_index).hlgt,
+                po_soc_code      => v_case_event(v_index).soc_code,
+                po_soc_name      => v_case_event(v_index).body_sys,
+                po_code_status   => v_case_event(v_index).code_status,
+                po_dict_id       => v_case_event(v_index).dict_id
+            );
 
             pkg_mg_buss_rules.p_get_partial_date('CASE_EVENT',
                                                  v_row.reactionstartdateformat,
@@ -1956,24 +1982,27 @@ END IF;
             v_case_prod_indications(v_index).enterprise_id :=  pkg_mg_util.f_mg_key_val('Enterprise Id');
             v_case_prod_indications(v_index).multi_event_exists := NULL;
 
-              pkg_mg_buss_rules.p_meddra_map_br001('Product Indication',
+            pkg_mg_buss_rules.p_meddra_map_code (
+                pi_source        => 'Product Indication',
+                pi_llt_code      => v_row.DRUGINDICATION,
+                pi_pt_code       => v_row.DRUGINDICATION,
+                pi_llt_name      => v_row.DRUGINDICATION,
+                pi_pref_term     => v_row.DRUGINDICATION,
+                pi_reported_term => v_row.DRUGINDICATION,
+                po_llt_code      => v_case_prod_indications(v_index).ind_llt_code,
+                po_llt_name      => v_case_prod_indications(v_index).ind_llt,
+                po_pt_code       => v_case_prod_indications(v_index).ind_code, 
+                po_pt_name       => v_case_prod_indications(v_index).ind_pref_term,
+                po_hlt_code      => v_case_prod_indications(v_index).ind_hlt_code,
+                po_hlt_name      => v_case_prod_indications(v_index).ind_hlt,
+                po_hlgt_code     => v_case_prod_indications(v_index).ind_hlgt_code,
+                po_hlgt_name     => v_case_prod_indications(v_index).ind_hlgt,
+                po_soc_code      => v_case_prod_indications(v_index).ind_soc_code,
+                po_soc_name      => v_case_prod_indications(v_index).ind_soc,
+                po_code_status   => v_case_prod_indications(v_index).ind_code_status,
+                po_dict_id       => v_case_prod_indications(v_index).ind_code_dict
+            );
 
-                                                 v_row.DRUGINDICATION,
-
-                                                 v_row.DRUGINDICATION,
-                                                v_row.DRUGINDICATION,
-                                                 v_case_prod_indications(v_index).ind_llt_code,
-                                                 v_case_prod_indications(v_index).ind_llt,
-                                                 v_case_prod_indications(v_index).ind_code,
-                                                 v_case_prod_indications(v_index).ind_pref_term,
-                                                 v_case_prod_indications(v_index).ind_hlt_code,
-                                                 v_case_prod_indications(v_index).ind_hlt,
-                                                 v_case_prod_indications(v_index).ind_hlgt_code,
-                                                 v_case_prod_indications(v_index).ind_hlgt,
-                                                 v_case_prod_indications(v_index).ind_soc_code,
-                                                 v_case_prod_indications(v_index).ind_soc,
-                                                 v_case_prod_indications(v_index).ind_code_status,
-                                                 v_case_prod_indications(v_index).ind_code_dict);
         END LOOP;
 
         FOR i IN 1..v_index LOOP
@@ -2867,6 +2896,67 @@ v_case_company_cmts(v_index).enterprise_id := pkg_mg_util.f_mg_key_val('Enterpri
         v_case_assess(v_index).case_id := pi_tcase_id;
         v_case_assess(v_index).updated := pkg_mg_util.f_mg_key_val('Migration Date');
         v_case_assess(v_index).enterprise_id := pkg_mg_util.f_mg_key_val('Enterprise Id');
+
+    /* Case Level Causality */
+    DECLARE
+        L_CASE_ID           NUMBER := pi_tcase_id;
+        L_CAUSALITY         NUMBER := NULL;
+        L_CAUSALITY_NOTES   VARCHAR2(2000) := NULL;
+        L_CAUSALITY_NOTES_J VARCHAR2(2000) := NULL;
+        V_RETURN            NUMBER;
+    BEGIN
+        V_RETURN := ARGUS_APP.SF_CASE_CAUSALITY(    PI_CASE_ID              => L_CASE_ID,
+                                                    PO_CAUSALITY            => L_CAUSALITY,
+                                                    PO_CAUSALITY_NOTES      => L_CAUSALITY_NOTES,
+                                                    PO_CAUSALITY_NOTES_J    => L_CAUSALITY_NOTES_J
+                                                );
+        
+        --  Reassign above out parameters to local variables
+        v_case_assess(v_index).agent_suspect    := L_CAUSALITY;
+        v_case_assess(v_index).agent_notes      := L_CAUSALITY_NOTES;
+        v_case_assess(v_index).agent_notes_j    := L_CAUSALITY_NOTES_J;
+    END;
+
+    /* Case Level Listedness */
+    DECLARE
+        L_CASE_ID               NUMBER := pi_tcase_id;
+        L_LISTEDNESS            NUMBER := NULL;
+        L_LISTEDNESS_NOTES      VARCHAR2(2000) := NULL;
+        L_LISTEDNESS_NOTES_J    VARCHAR2(2000) := NULL;
+        V_RETURN                NUMBER;
+    BEGIN
+        V_RETURN := ARGUS_APP.SF_CASE_LISTEDNESS(   PI_CASE_ID             => L_CASE_ID,
+                                                    PO_LISTEDNESS          => L_LISTEDNESS,
+                                                    PO_LISTEDNESS_NOTES    => L_LISTEDNESS_NOTES,
+                                                    PO_LISTEDNESS_NOTES_J  => L_LISTEDNESS_NOTES_J
+                                                );
+        
+        --  Reassign above out parameters to local variables
+        v_case_assess(v_index).listedness           := L_LISTEDNESS;
+        v_case_assess(v_index).listedness_notes     := L_LISTEDNESS_NOTES;
+        v_case_assess(v_index).listedness_notes_j   := L_LISTEDNESS_NOTES_J;
+    END;
+
+    /* Case Level Seriousness */
+    DECLARE
+        L_CASE_ID           NUMBER := pi_tcase_id;
+        L_SERIOUSNESS       NUMBER := NULL;
+        L_SERIOUS_NOTES     VARCHAR2(2000) := NULL;
+        L_SERIOUS_NOTES_J   VARCHAR2(2000) := NULL;
+        V_RETURN            NUMBER;
+    BEGIN
+        V_RETURN := ARGUS_APP.SF_CASE_SERIOUSNESS(  PI_CASE_ID          => L_CASE_ID,
+                                                    PO_SERIOUSNESS      => L_SERIOUSNESS,
+                                                    PO_SERIOUS_NOTES    => L_SERIOUS_NOTES,
+                                                    PO_SERIOUS_NOTES_J  => L_SERIOUS_NOTES_J
+                                                );
+        
+        --  Reassign above out parameters to local variables
+        v_case_assess(v_index).seriousness      := L_SERIOUSNESS;
+        v_case_assess(v_index).serious_notes    := L_SERIOUS_NOTES;
+        v_case_assess(v_index).serious_notes_j  := L_SERIOUS_NOTES_J;                                     
+    END;
+
         FOR i IN 1..v_index LOOP
             INSERT INTO tcase_assess VALUES v_case_assess ( i );
 
